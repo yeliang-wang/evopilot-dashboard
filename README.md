@@ -83,6 +83,15 @@ For same-origin production deployments, keep `window.EVOPILOT_DASHBOARD_CONFIG.a
 
 On Linux hosts where the dashboard Compose project is separate from the EvoPilot API Compose project, prefer `compose.production.yaml` with `EVOPILOT_DOCKER_NETWORK=evopilot_default`. Use the default `compose.yaml` host-gateway mode only when direct service-network access is unavailable.
 
+If a host-level Nginx owns port 80, use `deploy/nginx/evopilot-dashboard.conf.example` as the routing shape:
+
+| Public path | Upstream |
+|---|---|
+| `/` | `127.0.0.1:18080` Dashboard |
+| `/api/*` | `127.0.0.1:19876` EvoPilot API |
+| `/health`, `/ready` | `127.0.0.1:19876` EvoPilot API |
+| `/dashboard-health` | `127.0.0.1:18080/health` Dashboard |
+
 ## Development
 
 ```bash

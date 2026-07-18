@@ -13,6 +13,7 @@ const nginx = fs.readFileSync("nginx.conf.template", "utf8");
 const ci = fs.readFileSync(".github/workflows/ci.yml", "utf8");
 const compose = fs.readFileSync("compose.yaml", "utf8");
 const productionCompose = fs.readFileSync("compose.production.yaml", "utf8");
+const hostNginx = fs.readFileSync("deploy/nginx/evopilot-dashboard.conf.example", "utf8");
 
 test("dashboard is a standalone API client", () => {
   assert.match(index, /config\.js/);
@@ -54,6 +55,10 @@ test("dashboard service has deployable CI and container contracts", () => {
   assert.match(productionCompose, /EVOPILOT_DOCKER_NETWORK:-evopilot_default/);
   assert.match(productionCompose, /http:\/\/evopilot-server:19876/);
   assert.match(productionCompose, /external: true/);
+  assert.match(hostNginx, /location \/api\//);
+  assert.match(hostNginx, /proxy_pass http:\/\/127\.0\.0\.1:19876/);
+  assert.match(hostNginx, /proxy_pass http:\/\/127\.0\.0\.1:18080/);
+  assert.match(hostNginx, /location = \/dashboard-health/);
 
   assert.match(dockerignore, /node_modules/);
   assert.match(dockerignore, /dist/);
