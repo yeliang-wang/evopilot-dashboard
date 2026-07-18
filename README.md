@@ -102,6 +102,21 @@ npm run check
 
 `npm run check` builds the dashboard and verifies that the static app still uses the EvoPilot API contract instead of backend internals.
 
+For split-project integration validation, run EvoPilot API on `127.0.0.1:19876`, start this Dashboard with `EVOPILOT_API_BASE_URL=http://127.0.0.1:19876`, and smoke the Dashboard proxy path:
+
+```bash
+curl -fsS http://127.0.0.1:5174/health
+curl -fsS http://127.0.0.1:5174/ready
+curl -i http://127.0.0.1:5174/api/v1/summary
+curl -fsS \
+  -H "Authorization: Bearer <token>" \
+  -H "X-EvoPilot-Tenant: tenant-production" \
+  -H "X-EvoPilot-Workspace: workspace-agent-products" \
+  http://127.0.0.1:5174/api/v1/summary
+```
+
+The authoritative machine-readable API contract is `docs/openapi.json` in the EvoPilot repository. The human integration guide is `docs/dashboard-integration.md` in that same repository.
+
 ## Architecture Boundary
 
 - Dashboard calls EvoPilot HTTP APIs.

@@ -2921,7 +2921,7 @@ function renderSourceToGaInspector(node, loop, model) {
   const releaseRun = model.releaseRun;
   const finalizer = model.finalizer;
   const apiHints = {
-    project: ["/api/v1/projects", "/api/v1/deploy-connectors"],
+    project: ["/api/v1/projects", "/api/v1/connectors/deploy"],
     discovery: ["/api/v1/loop-target-runtime/summary", "/api/v1/evaluation-datasets"],
     target: ["/api/v1/loop-orchestration/targets"],
     executor: [`/api/v1/loops/${loop?.id ?? "{loopId}"}/executor-graph`, `/api/v1/loops/${loop?.id ?? "{loopId}"}/trace-tree`, `/api/v1/loops/${loop?.id ?? "{loopId}"}/events`],

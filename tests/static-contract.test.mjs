@@ -26,6 +26,8 @@ test("dashboard is a standalone API client", () => {
   assert.match(app, /apiFetch\(`\/api\/v1\/goals\/\$\{encodeURIComponent\(goalId\)\}\/snapshot`\)/);
   assert.match(app, /controlPlaneUrl: controlPlaneBaseUrl/);
   assert.doesNotMatch(app, /controlPlaneUrl: window\.location\.origin/);
+  assert.match(app, /\/api\/v1\/connectors\/deploy/);
+  assert.doesNotMatch(app, /\/api\/v1\/deploy-connectors/);
   assert.doesNotMatch(app, /apps\/dashboard/);
   assert.doesNotMatch(app, /\.codex-evidence/);
 });
