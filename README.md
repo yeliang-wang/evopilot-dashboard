@@ -54,6 +54,14 @@ docker run --rm -p 8080:8080 \
   evopilot-dashboard
 ```
 
+Or use the included Compose file:
+
+```bash
+EVOPILOT_API_BASE_URL=http://host.docker.internal:19876 \
+EVOPILOT_DASHBOARD_PORT=8080 \
+docker compose up -d --build
+```
+
 The container exposes:
 
 | Path | Owner |
@@ -63,6 +71,8 @@ The container exposes:
 | `/api/*` | Proxied to `EVOPILOT_API_BASE_URL` |
 
 For same-origin production deployments, keep `window.EVOPILOT_DASHBOARD_CONFIG.apiBaseUrl` empty and let Nginx proxy `/api/*`. For cross-origin deployments, update `/config.js` to the public EvoPilot API base URL and configure CORS on the API server.
+
+On Linux hosts where the dashboard Compose project is separate from the EvoPilot API Compose project, the included Compose file maps `host.docker.internal` to the Docker host so the dashboard can proxy to the API port published by EvoPilot.
 
 ## Development
 

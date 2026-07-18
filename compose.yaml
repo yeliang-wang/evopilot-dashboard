@@ -1,0 +1,16 @@
+services:
+  evopilot-dashboard:
+    build: .
+    image: evopilot-dashboard:prod-main
+    ports:
+      - "${EVOPILOT_DASHBOARD_PORT:-8080}:8080"
+    environment:
+      EVOPILOT_API_BASE_URL: "${EVOPILOT_API_BASE_URL:-http://host.docker.internal:19876}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health >/dev/null"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped

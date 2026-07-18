@@ -11,6 +11,7 @@ const dockerfile = fs.readFileSync("Dockerfile", "utf8");
 const dockerignore = fs.readFileSync(".dockerignore", "utf8");
 const nginx = fs.readFileSync("nginx.conf.template", "utf8");
 const ci = fs.readFileSync(".github/workflows/ci.yml", "utf8");
+const compose = fs.readFileSync("compose.yaml", "utf8");
 
 test("dashboard is a standalone API client", () => {
   assert.match(index, /config\.js/);
@@ -46,6 +47,9 @@ test("dashboard service has deployable CI and container contracts", () => {
   assert.match(dockerfile, /COPY nginx\.conf\.template \/etc\/nginx\/templates\/default\.conf\.template/);
   assert.match(nginx, /location \/api\//);
   assert.match(nginx, /proxy_pass \$\{EVOPILOT_API_BASE_URL\}/);
+  assert.match(compose, /EVOPILOT_DASHBOARD_PORT:-8080/);
+  assert.match(compose, /host\.docker\.internal:19876/);
+  assert.match(compose, /host-gateway/);
 
   assert.match(dockerignore, /node_modules/);
   assert.match(dockerignore, /dist/);
