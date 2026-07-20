@@ -14,6 +14,7 @@ const ci = fs.readFileSync(".github/workflows/ci.yml", "utf8");
 const compose = fs.readFileSync("compose.yaml", "utf8");
 const productionCompose = fs.readFileSync("compose.production.yaml", "utf8");
 const hostNginx = fs.readFileSync("deploy/nginx/evopilot-dashboard.conf.example", "utf8");
+const productionSmoke = fs.readFileSync("scripts/production-compat-smoke.mjs", "utf8");
 const readme = fs.readFileSync("README.md", "utf8");
 const docsIndex = fs.readFileSync("docs/README.md", "utf8");
 const docsUserGuide = fs.readFileSync("docs/user-guide.md", "utf8");
@@ -131,6 +132,15 @@ test("dashboard service has deployable CI and container contracts", () => {
   assert.match(dockerignore, /node_modules/);
   assert.match(dockerignore, /dist/);
   assert.match(dockerignore, /\.git/);
+});
+
+test("production smoke separates dashboard health from proxied API checks", () => {
+  assert.match(productionSmoke, /dashboard\.health/);
+  assert.match(productionSmoke, /expectDashboardHealth/);
+  assert.match(productionSmoke, /dashboard\.proxy\.version/);
+  assert.match(productionSmoke, /evopilot-version\/v1/);
+  assert.doesNotMatch(productionSmoke, /dashboard\.proxy\.health/);
+  assert.doesNotMatch(productionSmoke, /dashboard\.proxy\.ready/);
 });
 
 test("dashboard retains the loop workflow runtime UI", () => {

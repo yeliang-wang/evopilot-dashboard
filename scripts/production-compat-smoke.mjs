@@ -15,6 +15,10 @@ const startedAt = new Date().toISOString();
 
 await checkHttp("api.health", apiBaseUrl, "/health", { expectStatus: 200, expectField: ["status", "UP"] });
 await checkHttp("api.ready", apiBaseUrl, "/ready", { expectStatus: 200, expectField: ["status", "READY"] });
+await checkHttp("api.version", apiBaseUrl, "/api/v1/version", {
+  expectStatus: 200,
+  expectSchema: "evopilot-version/v1"
+});
 await checkHttp("api.summary.unauthorized", apiBaseUrl, "/api/v1/summary", { expectStatus: 401 });
 await checkHttp("api.summary.authenticated", apiBaseUrl, "/api/v1/summary", { token, expectStatus: 200 });
 
@@ -24,8 +28,11 @@ await checkExistingProjectOnboarding(projects);
 
 if (dashboardBaseUrl) {
   await checkHttp("dashboard.root", dashboardBaseUrl, "/", { expectStatus: 200, expectText: "EvoPilot" });
-  await checkHttp("dashboard.proxy.health", dashboardBaseUrl, "/health", { expectStatus: 200, expectField: ["status", "UP"] });
-  await checkHttp("dashboard.proxy.ready", dashboardBaseUrl, "/ready", { expectStatus: 200, expectField: ["status", "READY"] });
+  await checkHttp("dashboard.health", dashboardBaseUrl, "/health", { expectStatus: 200, expectDashboardHealth: true });
+  await checkHttp("dashboard.proxy.version", dashboardBaseUrl, "/api/v1/version", {
+    expectStatus: 200,
+    expectSchema: "evopilot-version/v1"
+  });
   await checkHttp("dashboard.proxy.summary.unauthorized", dashboardBaseUrl, "/api/v1/summary", { expectStatus: 401 });
   await checkHttp("dashboard.proxy.summary.authenticated", dashboardBaseUrl, "/api/v1/summary", { token, expectStatus: 200 });
   await checkOnboardingPlan("dashboard.proxy.onboarding.plan", dashboardBaseUrl, token);
@@ -142,6 +149,12 @@ async function checkHttp(id, baseUrl, route, options = {}) {
       if (json?.[field] !== expected) failures.push(`${field}=${json?.[field] ?? "missing"}`);
     }
     if (options.expectText && !text.includes(options.expectText)) failures.push(`textMissing=${options.expectText}`);
+    if (options.expectDashboardHealth) {
+      const trimmed = text.trim();
+      const isDashboardHealth = trimmed === "ok";
+      const isApiHealth = json?.status === "UP";
+      if (!isDashboardHealth && !isApiHealth) failures.push("dashboardHealth=missing");
+    }
     const record = {
       id,
       status: failures.length ? "FAIL" : "PASS",

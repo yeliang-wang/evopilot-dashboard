@@ -55,11 +55,13 @@ Use empty `apiBaseUrl` for same-origin `/api/*` proxy. Use an absolute URL only 
 ```bash
 curl -fsS http://127.0.0.1:18080/health
 curl -fsS http://127.0.0.1:19876/ready
+curl -fsS http://127.0.0.1:18080/api/v1/version
 curl -i http://127.0.0.1:18080/api/v1/summary
 ```
 
 Expected:
 
-- Dashboard health returns `UP`.
+- Dashboard container health returns `ok`.
 - EvoPilot readiness returns `READY`.
+- Dashboard `/api/v1/version` returns EvoPilot version through the proxy.
 - Unauthenticated API summary returns `401`.

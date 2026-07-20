@@ -47,8 +47,9 @@ npm run smoke:production
 Expected:
 
 - Dashboard root returns 200.
-- Dashboard health returns 200.
+- Dashboard health returns 200. Direct container checks can return `ok`; host-level routing can return EvoPilot API `UP`.
 - EvoPilot ready returns 200.
+- Dashboard `/api/v1/version` returns EvoPilot version through the proxy.
 - Unauthenticated summary returns 401.
 - Authenticated summary returns 200.
 - Non-mutating onboarding checklist can be called.
