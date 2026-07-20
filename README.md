@@ -24,6 +24,20 @@ EVOPILOT_API_BASE_URL=http://127.0.0.1:19876 npm run dev
 
 Open the Vite URL printed by the command. In development, `/api`, `/health`, and `/ready` are proxied to `EVOPILOT_API_BASE_URL`.
 
+## Documentation
+
+The Dashboard repository owns user-facing and AI-agent-facing UI operation docs:
+
+| Reader | Start here |
+|---|---|
+| New Dashboard user | [Getting Started](docs/getting-started.md) |
+| Product operator | [User Guide](docs/user-guide.md) |
+| Platform or tenant administrator | [Admin Guide](docs/admin-guide.md) |
+| WorkBuddy or digital human simulation | [AI Agents](docs/ai-agents/README.md) |
+| Production operator | [Deployment](docs/operations/deployment.md) |
+
+The EvoPilot repository remains the source of truth for API, CLI, OpenAPI, and backend control-plane semantics. Dashboard docs link to those contracts and do not duplicate them.
+
 ## Configuration
 
 The static app reads runtime configuration from `public/config.js`, which is copied to `/config.js` in the production build:
@@ -115,7 +129,7 @@ curl -fsS \
   http://127.0.0.1:5174/api/v1/summary
 ```
 
-The authoritative machine-readable API contract is `docs/api/openapi.json` in the EvoPilot repository. The human integration guide is `docs/guides/dashboard-integration.md` in that same repository.
+The authoritative machine-readable API contract is `docs/api/openapi.json` in the EvoPilot repository. The human integration guide is `docs/guides/dashboard-integration.md` in that same repository. Dashboard UI operation docs live under this repository's `docs/` directory.
 
 ## Architecture Boundary
 
@@ -133,3 +147,4 @@ The authoritative machine-readable API contract is `docs/api/openapi.json` in th
 - EvoPilot API and CLI: `git@github.com:yeliang-wang/evopilot.git`
 - Dashboard repository: `git@github.com:yeliang-wang/evopilot-dashboard.git`
 - Integration contract: `docs/guides/dashboard-integration.md` in the EvoPilot repository
+- Dashboard operation docs: `docs/README.md` in this repository

@@ -15,6 +15,12 @@ const compose = fs.readFileSync("compose.yaml", "utf8");
 const productionCompose = fs.readFileSync("compose.production.yaml", "utf8");
 const hostNginx = fs.readFileSync("deploy/nginx/evopilot-dashboard.conf.example", "utf8");
 const readme = fs.readFileSync("README.md", "utf8");
+const docsIndex = fs.readFileSync("docs/README.md", "utf8");
+const docsUserGuide = fs.readFileSync("docs/user-guide.md", "utf8");
+const docsAiAgents = fs.readFileSync("docs/ai-agents/README.md", "utf8");
+const docsDigitalHuman = fs.readFileSync("docs/ai-agents/digital-human-playbook.md", "utf8");
+const docsApiUsage = fs.readFileSync("docs/reference/api-usage.md", "utf8");
+const docsDevopsBoundary = fs.readFileSync("docs/workflows/credential-and-devops-boundary.md", "utf8");
 
 test("dashboard is a standalone API client", () => {
   assert.match(index, /config\.js/);
@@ -48,11 +54,48 @@ test("dashboard project onboarding follows current EvoPilot DevOps contract", ()
   assert.match(app, /getProjectOnboardingChecklist/);
   assert.match(readme, /docs\/api\/openapi\.json/);
   assert.match(readme, /docs\/guides\/dashboard-integration\.md/);
+  assert.match(readme, /docs\/README\.md/);
   assert.match(readme, /git@github\.com:yeliang-wang\/evopilot\.git/);
   assert.doesNotMatch(`${app}\n${styles}\n${readme}`, new RegExp(`${legacyCiName}|${legacyCiLower}`));
   assert.doesNotMatch(app, new RegExp(`provider:\\s*["']${legacyCiLower}["']`));
   assert.doesNotMatch(app, new RegExp(`executor:\\s*["']${legacyCiLower}["']`));
   assert.doesNotMatch(app, new RegExp(`${legacyProjectField.replace(".", "\\.")}|${legacyModeField}|${legacyCiLower}Job`));
+});
+
+test("dashboard repository owns UI operation and AI-agent docs", () => {
+  for (const file of [
+    "docs/README.md",
+    "docs/getting-started.md",
+    "docs/user-guide.md",
+    "docs/admin-guide.md",
+    "docs/workflows/first-login.md",
+    "docs/workflows/tenant-workspace-user-admin.md",
+    "docs/workflows/project-onboarding.md",
+    "docs/workflows/credential-and-devops-boundary.md",
+    "docs/workflows/source-to-ga-loop.md",
+    "docs/workflows/global-goal-loop-workflow.md",
+    "docs/workflows/release-decision-review.md",
+    "docs/workflows/audit-and-history.md",
+    "docs/ai-agents/README.md",
+    "docs/ai-agents/digital-human-playbook.md",
+    "docs/ai-agents/dashboard-page-map.md",
+    "docs/ai-agents/expected-ui-states.md",
+    "docs/operations/deployment.md",
+    "docs/operations/troubleshooting.md",
+    "docs/operations/smoke-test.md",
+    "docs/reference/api-usage.md",
+    "docs/reference/roles-and-permissions.md"
+  ]) {
+    assert.equal(fs.existsSync(file), true, `${file} should exist`);
+  }
+
+  assert.match(docsIndex, /Dashboard docs describe UI operations/);
+  assert.match(docsUserGuide, /Dashboard does not call CLI commands/);
+  assert.match(docsAiAgents, /WorkBuddy/);
+  assert.match(docsDigitalHuman, /登录 -> 租户\/工作区 -> 用户\/权限 -> 凭据 -> 接入项目/);
+  assert.match(docsApiUsage, /Do not copy OpenAPI schema/);
+  assert.match(docsDevopsBoundary, /devopsOwner/);
+  assert.match(docsDevopsBoundary, /fork-validated-pr/);
 });
 
 test("production build includes runtime dashboard scripts", () => {
