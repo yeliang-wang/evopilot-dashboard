@@ -115,19 +115,21 @@ curl -fsS \
   http://127.0.0.1:5174/api/v1/summary
 ```
 
-The authoritative machine-readable API contract is `docs/openapi.json` in the EvoPilot repository. The human integration guide is `docs/dashboard-integration.md` in that same repository.
+The authoritative machine-readable API contract is `docs/api/openapi.json` in the EvoPilot repository. The human integration guide is `docs/guides/dashboard-integration.md` in that same repository.
 
 ## Architecture Boundary
 
 - Dashboard calls EvoPilot HTTP APIs.
 - Dashboard must not call the EvoPilot CLI.
 - Dashboard must not read EvoPilot data files, database tables, or `.codex-evidence` directly.
+- Project onboarding calls `POST /api/v1/onboarding/project/checklist` before `POST /api/v1/projects`, then rechecks `GET /api/v1/projects/{projectId}/onboarding-checklist`.
+- Project DevOps uses repository-native GitHub Actions or GitLab CI through EvoPilot API state.
 - Release status comes from EvoPilot release decisions, not from UI-side inference.
 - GlobalGoal workflow views should consume server projections such as `run-status`, `snapshot`, `graph`, `timeline`, and `evidence-matrix`.
 - Workflow actions send `controlPlaneUrl` from the configured API base URL, falling back to the current origin only for same-origin proxy deployments.
 
 ## Related Repositories
 
-- EvoPilot API and CLI: `git@github.com:yeliang-wang/EvoPilot.git`
+- EvoPilot API and CLI: `git@github.com:yeliang-wang/evopilot.git`
 - Dashboard repository: `git@github.com:yeliang-wang/evopilot-dashboard.git`
-- Integration contract: `docs/dashboard-integration.md` in the EvoPilot repository
+- Integration contract: `docs/guides/dashboard-integration.md` in the EvoPilot repository

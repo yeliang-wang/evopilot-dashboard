@@ -9,7 +9,8 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "check": "npm run build && node tests/static-contract.test.mjs"
+    "check": "npm run build && node tests/static-contract.test.mjs",
+    "smoke:production": "node scripts/production-compat-smoke.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0"

@@ -14,6 +14,7 @@ const ci = fs.readFileSync(".github/workflows/ci.yml", "utf8");
 const compose = fs.readFileSync("compose.yaml", "utf8");
 const productionCompose = fs.readFileSync("compose.production.yaml", "utf8");
 const hostNginx = fs.readFileSync("deploy/nginx/evopilot-dashboard.conf.example", "utf8");
+const readme = fs.readFileSync("README.md", "utf8");
 
 test("dashboard is a standalone API client", () => {
   assert.match(index, /config\.js/);
@@ -27,9 +28,31 @@ test("dashboard is a standalone API client", () => {
   assert.match(app, /controlPlaneUrl: controlPlaneBaseUrl/);
   assert.doesNotMatch(app, /controlPlaneUrl: window\.location\.origin/);
   assert.match(app, /\/api\/v1\/connectors\/deploy/);
+  assert.match(app, /\/api\/v1\/onboarding\/project\/checklist/);
+  assert.match(app, /\/api\/v1\/projects\/\$\{encodeURIComponent\(projectId\)\}\/onboarding-checklist/);
   assert.doesNotMatch(app, /\/api\/v1\/deploy-connectors/);
   assert.doesNotMatch(app, /apps\/dashboard/);
   assert.doesNotMatch(app, /\.codex-evidence/);
+});
+
+test("dashboard project onboarding follows current EvoPilot DevOps contract", () => {
+  const legacyCiName = ["Jen", "kins"].join("");
+  const legacyCiLower = legacyCiName.toLowerCase();
+  const legacyProjectField = ["project", "cicd"].join(".");
+  const legacyModeField = ["cicd", "Mode"].join("");
+  assert.match(app, /evopilot-project-onboarding-checklist\/v1/);
+  assert.match(app, /GitHub Actions/);
+  assert.match(app, /GitLab CI/);
+  assert.match(app, /provider,\s*\n\s*tokenRef/);
+  assert.match(app, /postProjectOnboardingChecklist/);
+  assert.match(app, /getProjectOnboardingChecklist/);
+  assert.match(readme, /docs\/api\/openapi\.json/);
+  assert.match(readme, /docs\/guides\/dashboard-integration\.md/);
+  assert.match(readme, /git@github\.com:yeliang-wang\/evopilot\.git/);
+  assert.doesNotMatch(`${app}\n${styles}\n${readme}`, new RegExp(`${legacyCiName}|${legacyCiLower}`));
+  assert.doesNotMatch(app, new RegExp(`provider:\\s*["']${legacyCiLower}["']`));
+  assert.doesNotMatch(app, new RegExp(`executor:\\s*["']${legacyCiLower}["']`));
+  assert.doesNotMatch(app, new RegExp(`${legacyProjectField.replace(".", "\\.")}|${legacyModeField}|${legacyCiLower}Job`));
 });
 
 test("production build includes runtime dashboard scripts", () => {

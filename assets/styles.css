@@ -2956,6 +2956,7 @@ td {
 .autopilot-cockpit,
 .action-inbox,
 .onboarding-guide,
+.project-onboarding-checklist,
 .field-evidence-kit,
 .manual-hero,
 .manual-role-map,
@@ -3013,6 +3014,7 @@ td {
 .canvas-node,
 .release-check,
 .onboarding-step,
+.checklist-step,
 .provider-card,
 .inbox-item,
 .autopilot-side > div,
@@ -3038,6 +3040,7 @@ td {
 
 .route-node span,
 .onboarding-step span,
+.checklist-step span,
 .canvas-node span {
   display: grid;
   place-items: center;
@@ -3058,6 +3061,9 @@ td {
 .release-check strong,
 .release-check small,
 .release-check span,
+.checklist-step strong,
+.checklist-step small,
+.checklist-step b,
 .provider-card strong,
 .provider-card span,
 .inbox-item strong,
@@ -3073,6 +3079,7 @@ td {
 .provider-card span,
 .inbox-item small,
 .autopilot-side small,
+.checklist-step small,
 .onboarding-step small {
   color: var(--muted);
   font-size: 12px;
@@ -3120,6 +3127,7 @@ td {
 
 .action-inbox,
 .onboarding-guide,
+.project-onboarding-checklist,
 .field-evidence-kit,
 .manual-hero,
 .manual-scene-map,
@@ -4017,7 +4025,10 @@ td {
 }
 
 .provider-switcher,
-.onboarding-steps {
+.onboarding-steps,
+.checklist-steps,
+.checklist-detail-grid,
+.checklist-meta {
   display: grid;
   gap: 10px;
 }
@@ -4087,6 +4098,65 @@ td {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.checklist-meta,
+.checklist-detail-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.checklist-meta > div,
+.checklist-detail {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f8fafb;
+}
+
+.checklist-meta span,
+.checklist-detail span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.checklist-meta strong,
+.checklist-detail strong,
+.checklist-detail code {
+  overflow-wrap: anywhere;
+}
+
+.checklist-detail code {
+  display: block;
+  padding: 5px 6px;
+  border-radius: 5px;
+  background: #eef2f5;
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.checklist-detail.good {
+  border-color: #bde7ce;
+  background: #eef8f2;
+}
+
+.checklist-detail.warn {
+  border-color: #f0d7a8;
+  background: #fffaf0;
+}
+
+.checklist-detail.bad {
+  border-color: #efb5af;
+  background: #fff5f4;
+}
+
+.checklist-steps {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
 .onboarding-step {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
@@ -4095,22 +4165,53 @@ td {
 }
 
 .onboarding-step small,
-.onboarding-step b {
+.onboarding-step b,
+.checklist-step small,
+.checklist-step b {
   grid-column: 2;
 }
 
-.onboarding-step b {
+.onboarding-step b,
+.checklist-step b {
   font-size: 12px;
 }
 
-.onboarding-step.ready {
+.onboarding-step.ready,
+.checklist-step.ready {
   border-color: #bde7ce;
   background: #eef8f2;
 }
 
-.onboarding-step.ready span {
+.onboarding-step.ready span,
+.checklist-step.ready span {
   background: var(--good);
   color: #ffffff;
+}
+
+.checklist-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 4px 8px;
+  padding: 12px;
+}
+
+.checklist-step.warn {
+  border-color: #f0d7a8;
+  background: #fffaf0;
+}
+
+.checklist-step.blocked {
+  border-color: #efb5af;
+  background: #fff5f4;
+}
+
+.checklist-step.blocked span {
+  background: var(--bad);
+  color: #ffffff;
+}
+
+.modal-checklist {
+  margin-bottom: 12px;
 }
 
 .loop-canvas {
@@ -5704,7 +5805,7 @@ td {
   align-items: start;
 }
 
-.jenkins-panel {
+.delivery-panel {
   padding: 12px;
 }
 
@@ -6289,6 +6390,9 @@ td {
   .autopilot-route,
   .loop-workspace-tabs,
   .field-kit-grid,
+  .checklist-meta,
+  .checklist-steps,
+  .checklist-detail-grid,
   .canvas-lane,
   .release-checklist,
   .onboarding-steps,
@@ -6587,6 +6691,9 @@ td {
   .brief-metrics,
   .field-kit-grid,
   .field-kit-card,
+  .checklist-meta,
+  .checklist-steps,
+  .checklist-detail-grid,
   .workspace-grid,
   .connector-grid,
   .cloud-form-grid,

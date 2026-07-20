@@ -98,6 +98,8 @@ const state = {
     message: "",
     status: ""
   },
+  projectOnboardingDraft: undefined,
+  projectOnboardingChecklists: {},
   deployConnectors: [],
   releaseTargets: [],
   sourceReleaseRuns: [],
@@ -1037,7 +1039,7 @@ function loopTemplateCards(model) {
     {
       badge: "已有系统",
       title: "已有 CI 项目接入",
-      detail: "复用 Jenkins/GitLab/local Git，把代码升级和 CI/CD 接进 Loop。",
+      detail: "复用 GitHub Actions、GitLab CI 或 local Git，把代码升级和仓库原生 CI/CD 接进 Loop。",
       page: "项目",
       cta: "配置项目"
     },
@@ -2803,7 +2805,7 @@ function sourceToGaModel(loop) {
     sourceToGaNode("worker", "Runtime", "Worker + Sandbox", `${loop?.workerLease?.workerId ?? "等待 claim"} / ${loop?.sandbox?.runtime ?? "sandbox"}`, loop?.workerLease ? "CLAIMED" : (loop ? "UNCLAIMED" : "PENDING"), "pos-worker", loop?.workerLease ? "ready" : loop ? "running" : "pending", currentId),
     sourceToGaNode("humanGate", "Gate", "Human Gate", loopStatus === "WAITING_APPROVAL" ? "等待批准继续或发布" : "按策略触发", loopStatus === "WAITING_APPROVAL" ? "WAITING_APPROVAL" : "CONDITIONAL", "pos-gate", loopStatus === "WAITING_APPROVAL" ? "blocked" : "pending", currentId),
     sourceToGaNode("closure", "Closure", "Source Closure", `${closure.repositoryProvider ?? "scm"} / ${closure.targetVersion ?? "target version pending"}`, releaseStatus, "pos-closure", sourceToGaTone(releaseStatus), currentId),
-    sourceToGaNode("deploy", "Deploy", "CI/CD + Deploy", finalizer?.connectorId ?? releaseRun?.deploy?.connectorId ?? "Jenkins / deploy connector", finalizer?.status ?? releaseRun?.deploy?.status ?? "PENDING", "pos-deploy", sourceToGaTone(finalizer?.status ?? releaseRun?.deploy?.status ?? releaseStatus), currentId),
+    sourceToGaNode("deploy", "Deploy", "CI/CD + Deploy", finalizer?.connectorId ?? releaseRun?.deploy?.connectorId ?? "native DevOps / deploy connector", finalizer?.status ?? releaseRun?.deploy?.status ?? "PENDING", "pos-deploy", sourceToGaTone(finalizer?.status ?? releaseRun?.deploy?.status ?? releaseStatus), currentId),
     sourceToGaNode("decision", "Decision", "Release Decision", releaseRun?.policy?.status ?? state.intelligence.latestReleaseDecisionStatus ?? "未判定", releaseDecisionLabel(releaseRun), "pos-decision", releaseDecisionTone(releaseRun), currentId),
     sourceToGaNode("ga", "GA", "GA Release", releaseRun?.review?.mergeCommitSha ?? releaseRun?.id ?? "等待 release evidence", gaStatusLabel(releaseRun), "pos-ga", gaTone(releaseRun), currentId)
   ];
@@ -3362,6 +3364,7 @@ function renderProjects() {
   return `
     ${renderFlowHeader()}
     ${renderGuidedOnboardingPanel()}
+    ${renderProjectOnboardingChecklistPanel()}
     ${renderFieldEvidenceKitPanel()}
     ${renderProjectDetailWorkspace()}
     ${renderConnectorMarketplaceSettings()}
@@ -3377,22 +3380,81 @@ function renderProjects() {
         </div>
       </div>
       ${!state.showProjectRegistrationModal && state.projectRegistration.message ? `<div class="notice ${state.projectRegistration.status}">${state.projectRegistration.message}</div>` : ""}
-      ${table(["项目", "状态", "成熟度", "等级", "仓库注册", "源码凭据", "CI/CD", "验证", "最近信号", "建议动作", "操作"], state.projects.map((project) => [
+      ${table(["项目", "状态", "成熟度", "等级", "仓库注册", "源码凭据", "DevOps", "验证", "最近信号", "建议动作", "操作"], state.projects.map((project) => [
         `<strong>${project.name}</strong><span class="subtext">${project.id}</span>`,
         statusPill(project.status),
         scorePill(project.score),
         statusPill(project.level),
         project.repository,
         project.credentials,
-        project.cicd ?? "系统默认 Jenkins",
+        project.devopsLabel ?? "未配置 GitHub Actions/GitLab CI",
         statusPill(project.validation),
         project.lastSignal,
         project.recommendedAction ?? "等待更多证据",
-        project.hasRepository ? `<div class="row-actions"><button data-action="open-source-credential-config" data-id="${escapeHtml(project.id)}">配置凭据</button><button data-action="preflight-source-credentials" data-id="${escapeHtml(project.id)}">验证写回凭据</button></div>` : "-"
+        project.hasRepository ? `<div class="row-actions"><button data-action="inspect-project-onboarding" data-id="${escapeHtml(project.id)}">复核接入</button><button data-action="open-source-credential-config" data-id="${escapeHtml(project.id)}">配置凭据</button><button data-action="preflight-source-credentials" data-id="${escapeHtml(project.id)}">验证写回凭据</button></div>` : "-"
       ]))}
     </section>
     ${state.showProjectRegistrationModal ? renderProjectRegistrationModal() : ""}
     ${state.showSourceCredentialModal ? renderSourceCredentialModal() : ""}
+  `;
+}
+
+function renderProjectOnboardingChecklistPanel() {
+  const checklists = Object.values(state.projectOnboardingChecklists);
+  const checklist = state.projectOnboardingDraft ?? checklists.at(-1);
+  if (!checklist) return "";
+  return `
+    <section class="project-onboarding-checklist" aria-label="Project onboarding checklist">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">Onboarding checklist</span>
+          <h2>项目接入白盒检查</h2>
+          <p>来自 EvoPilot API 的接入计划、阻塞项、下一动作和建议命令。Dashboard 只展示服务端判断，不自行推断可运行状态。</p>
+        </div>
+        <span class="pill ${onboardingStatusClass(checklist.status)}">${escapeHtml(checklist.status ?? "UNKNOWN")}</span>
+      </div>
+      ${renderProjectOnboardingChecklist(checklist)}
+    </section>
+  `;
+}
+
+function renderProjectOnboardingChecklist(checklist) {
+  if (!checklist) return "";
+  const steps = checklist.steps ?? [];
+  const commands = checklist.commands ?? [];
+  const missingInputs = checklist.missingInputs ?? [];
+  const blockers = checklist.blockers ?? [];
+  return `
+    <div class="checklist-meta">
+      <div><span>项目</span><strong>${escapeHtml(checklist.projectId ?? "未填写")}</strong></div>
+      <div><span>Provider</span><strong>${escapeHtml(checklist.provider ?? "unknown")}</strong></div>
+      <div><span>Next action</span><strong>${escapeHtml(checklist.nextAction ?? "unknown")}</strong></div>
+      <div><span>Schema</span><strong>${escapeHtml(checklist.schema ?? "unknown")}</strong></div>
+    </div>
+    <div class="checklist-steps">
+      ${steps.map((step, index) => `
+        <article class="checklist-step ${onboardingStepClass(step.status)}">
+          <span>${index + 1}</span>
+          <strong>${escapeHtml(step.label ?? step.id ?? "step")}</strong>
+          <small>${escapeHtml([step.status, step.nextAction].filter(Boolean).join(" / "))}</small>
+          <b>${escapeHtml((step.evidence ?? []).slice(0, 2).join("；") || "waiting")}</b>
+        </article>
+      `).join("")}
+    </div>
+    <div class="checklist-detail-grid">
+      <div class="checklist-detail ${blockers.length ? "bad" : "good"}">
+        <strong>Blockers</strong>
+        ${blockers.length ? blockers.map((item) => `<code>${escapeHtml(item)}</code>`).join("") : "<span>none</span>"}
+      </div>
+      <div class="checklist-detail ${missingInputs.length ? "warn" : "good"}">
+        <strong>Missing inputs</strong>
+        ${missingInputs.length ? missingInputs.map((item) => `<code>${escapeHtml(item)}</code>`).join("") : "<span>none</span>"}
+      </div>
+      <div class="checklist-detail commands">
+        <strong>Suggested commands</strong>
+        ${commands.slice(0, 3).map((item) => `<code>${escapeHtml(item.command ?? item.id ?? "")}</code>`).join("") || "<span>no command</span>"}
+      </div>
+    </div>
   `;
 }
 
@@ -3428,7 +3490,7 @@ function fieldEvidenceKitItems() {
     {
       kind: "Product Kit",
       title: "使用示例 GitHub 项目",
-      detail: "预填 repo、默认分支、Jenkins 模式和 Node.js 验证命令；提交后调用 /api/v1/projects。",
+      detail: "预填 repo、默认分支、GitHub Actions 和 Node.js 验证命令；提交前先生成 onboarding checklist。",
       cta: "预填接入表单",
       action: "prefill-github-demo-project"
     },
@@ -3506,6 +3568,7 @@ function renderProjectDetailWorkspace() {
       </div>
       ${renderProjectReleaseTargets(project, releaseTargetModel)}
       <div class="workspace-actions">
+        ${project?.hasRepository ? `<button data-action="inspect-project-onboarding" data-id="${escapeHtml(project.id)}">复核接入 checklist</button>` : ""}
         ${project?.hasRepository ? `<button data-action="open-source-credential-config" data-id="${escapeHtml(project.id)}">配置源码凭据</button>` : ""}
         ${project?.hasRepository ? `<button data-action="preflight-source-credentials" data-id="${escapeHtml(project.id)}">验证写回凭据</button>` : ""}
         <button data-page-link="发现与目标">查看 Targets</button>
@@ -3534,7 +3597,7 @@ function renderProjectReleaseTargets(project, model) {
         <div>
           <span class="eyebrow">Project release governance</span>
           <h2>项目发布目标</h2>
-          <p>为当前 GitHub 项目选择 Experimental、Alpha、Beta、RC 或 GA 模板，再按项目证据生成独立 release decision。</p>
+          <p>为当前 GitHub/GitLab/local Git 项目选择 Experimental、Alpha、Beta、RC 或 GA 模板，再按项目证据生成独立 release decision。</p>
         </div>
         <span class="pill ${latestDecision?.status === "GO" ? "good" : latestDecision ? "warn" : ""}">${escapeHtml(latestDecision?.status ?? "等待判定")}</span>
       </div>
@@ -3584,7 +3647,7 @@ function renderConnectorMarketplaceSettings() {
       <div class="section-title">
         <div>
           <h2>连接器市场与设置</h2>
-          <p>把 GitHub、GitLab、Jenkins、ECS、K8s、LLM 和 Sandbox 统一管理，用户不需要在接入表单、发布面板和环境变量之间来回切换。</p>
+          <p>把 GitHub、GitLab、GitHub Actions、GitLab CI、ECS、K8s、LLM 和 Sandbox 统一管理，用户不需要在接入表单、发布面板和环境变量之间来回切换。</p>
         </div>
         <span class="pill ${connectors.filter((item) => item.status === "READY").length >= 3 ? "good" : "warn"}">${connectors.filter((item) => item.status === "READY").length}/${connectors.length} ready</span>
       </div>
@@ -3625,13 +3688,15 @@ function connectorMarketplaceModel() {
   const hasGithub = remoteProviders.has("github");
   const hasGitlab = remoteProviders.has("gitlab");
   const hasLocal = remoteProviders.has("local-git") || state.projects.some((project) => /local-git|本地/.test(`${project.credentials}${project.repository}`));
-  const hasJenkins = state.projects.some((project) => /Jenkins/.test(project.cicd ?? "")) || state.pipelines.length > 0;
+  const hasGithubActions = state.projects.some((project) => project.devops?.provider === "github-actions");
+  const hasGitlabCi = state.projects.some((project) => project.devops?.provider === "gitlab-ci");
   const hasDeploy = state.deployConnectors.length > 0;
   return [
     { category: "SCM", name: "GitHub", status: hasGithub ? "READY" : "CONFIGURE", detail: hasGithub ? "PR、tokenRef、source closure 可用" : "注册 GitHub 项目后启用 PR 写回" },
     { category: "SCM", name: "GitLab", status: hasGitlab ? "READY" : "CONFIGURE", detail: hasGitlab ? "MR、私有部署、tokenRef 可用" : "注册 GitLab 项目后启用 MR 写回" },
     { category: "SCM", name: "Local Git", status: hasLocal ? "READY" : "CONFIGURE", detail: hasLocal ? "本地目录验证可用" : "适合本机项目或离线调试" },
-    { category: "CI/CD", name: "Jenkins", status: hasJenkins ? "READY" : "CONFIGURE", detail: hasJenkins ? "流水线和 artifact 已接入" : "配置系统默认或项目级 Jenkins" },
+    { category: "CI/CD", name: "GitHub Actions", status: hasGithubActions ? "READY" : "CONFIGURE", detail: hasGithubActions ? "workflow、checks 和 artifact 已接入" : "GitHub 项目绑定 GitHub Actions" },
+    { category: "CI/CD", name: "GitLab CI", status: hasGitlabCi ? "READY" : "CONFIGURE", detail: hasGitlabCi ? "stages、jobs 和 artifact 已接入" : "GitLab 项目绑定 GitLab CI" },
     { category: "Deploy", name: "ECS / K8s / Webhook", status: hasDeploy ? "READY" : "CONFIGURE", detail: hasDeploy ? `${state.deployConnectors.length} 个 deploy connector` : "发布 gate 需要部署连接器" },
     { category: "Runtime", name: "LLM Route", status: state.apiStatus === "实时数据" ? "READY" : "CONFIGURE", detail: "用于 discovery、evaluator 和 code upgrade" },
     { category: "Runtime", name: "Sandbox", status: state.loops.some((loop) => loop.sandbox?.runtime) ? "READY" : "CONFIGURE", detail: "Docker/K8s 边界、网络、路径、凭据隔离" }
@@ -3641,7 +3706,7 @@ function connectorMarketplaceModel() {
 function renderGuidedOnboardingPanel() {
   const verified = state.projects.filter((project) => /已验证|健康/.test(`${project.validation}${project.status}`)).length;
   const withCredentials = state.projects.filter((project) => project.hasRepository && /已配置|tokenRef|inline token/.test(String(project.credentials))).length;
-  const deployReady = state.deployConnectors.filter((connector) => connector.tokenConfigured || connector.type).length;
+  const devopsReady = state.projects.filter((project) => project.devops?.provider === "github-actions" || project.devops?.provider === "gitlab-ci").length;
   const steps = [
     {
       title: "选择接入源",
@@ -3657,9 +3722,9 @@ function renderGuidedOnboardingPanel() {
     },
     {
       title: "绑定交付链路",
-      detail: "Jenkins、部署连接器、health/ready 探测。",
-      state: `${deployReady} 个部署连接器`,
-      ready: deployReady > 0
+      detail: "GitHub Actions/GitLab CI、部署连接器和 health/ready 探测。",
+      state: `${devopsReady} 个原生 DevOps`,
+      ready: devopsReady > 0
     },
     {
       title: "进入 Loop",
@@ -3673,7 +3738,7 @@ function renderGuidedOnboardingPanel() {
       <div class="section-title">
         <div>
           <h2>项目接入向导</h2>
-          <p>把仓库、凭据、CI/CD 和部署连接器按真实用户接入顺序拆成四步，降低第一次接入成本。</p>
+          <p>把仓库、凭据、仓库原生 DevOps 和部署连接器按真实用户接入顺序拆成四步，降低第一次接入成本。</p>
         </div>
         <button class="primary" data-action="open-project-registration">注册项目</button>
       </div>
@@ -3768,13 +3833,14 @@ function renderProjectRegistrationModal() {
       <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="project-registration-title">
         <div class="section-title">
           <div>
-            <h2 id="project-registration-title">注册项目</h2>
-            <p>填写 Git 仓库、用户名、密码或 token。EvoPilot 会先验证仓库可访问，验证通过后才允许进入下游流程。</p>
+            <h2 id="project-registration-title">接入项目</h2>
+            <p>先生成 onboarding checklist，确认仓库、源码写回凭据和 GitHub Actions/GitLab CI 前置条件，再注册并复核。</p>
           </div>
           <button data-action="close-project-registration" aria-label="关闭注册项目弹窗">关闭</button>
         </div>
-        <span class="pill warn modal-status">验证通过才可用</span>
+        <span class="pill warn modal-status">先检查，再注册</span>
         ${state.projectRegistration.message ? `<div class="notice ${state.projectRegistration.status}">${state.projectRegistration.message}</div>` : ""}
+        ${state.projectOnboardingDraft ? `<div class="modal-checklist">${renderProjectOnboardingChecklist(state.projectOnboardingDraft)}</div>` : ""}
         <form class="project-form" id="project-registration-form">
           <label>
             <span>项目 ID</span>
@@ -3821,27 +3887,49 @@ function renderProjectRegistrationModal() {
             <input name="tokenRef" placeholder="GITLAB_TOKEN" />
           </label>
           <label>
-            <span>CI/CD 配置</span>
-            <select name="cicdMode">
-              <option value="system-default">使用系统默认 Jenkins</option>
-              <option value="project-override">使用项目独立 Jenkins</option>
+            <span>DevOps Provider</span>
+            <select name="devopsProvider">
+              <option value="auto">自动匹配仓库</option>
+              <option value="github-actions">GitHub Actions</option>
+              <option value="gitlab-ci">GitLab CI</option>
+              <option value="none">local-git 不绑定</option>
             </select>
           </label>
           <label>
-            <span>Jenkins 地址</span>
-            <input name="jenkinsBaseUrl" placeholder="https://jenkins.example.com" />
+            <span>DevOps Token Ref</span>
+            <input name="devopsTokenRef" placeholder="默认复用源码 tokenRef" />
           </label>
           <label>
-            <span>Jenkins 用户名</span>
-            <input name="jenkinsUsername" autocomplete="username" />
+            <span>CI Workflow</span>
+            <input name="ciWorkflow" placeholder="ci.yml 或 .gitlab-ci.yml" />
           </label>
           <label>
-            <span>Jenkins API Token</span>
-            <input name="jenkinsApiToken" type="password" autocomplete="off" />
+            <span>CI Required Checks</span>
+            <input name="ciRequiredChecks" placeholder="build, test" />
           </label>
           <label>
-            <span>Jenkins Job</span>
-            <input name="jenkinsJob" placeholder="agent-product-evolution" />
+            <span>CI Required Stages</span>
+            <input name="ciRequiredStages" placeholder="test, build" />
+          </label>
+          <label>
+            <span>CI Required Jobs</span>
+            <input name="ciRequiredJobs" placeholder="unit-test, smoke" />
+          </label>
+          <label>
+            <span>CD Workflow</span>
+            <input name="cdWorkflow" placeholder="deploy-prod.yml" />
+          </label>
+          <label>
+            <span>部署环境</span>
+            <input name="deployEnvironment" placeholder="production" />
+          </label>
+          <label>
+            <span>Health URL</span>
+            <input name="healthUrl" placeholder="https://agent.example.com/health" />
+          </label>
+          <label>
+            <span>Ready URL</span>
+            <input name="readyUrl" placeholder="https://agent.example.com/ready" />
           </label>
           <label>
             <span>项目语言</span>
@@ -3877,9 +3965,24 @@ function renderProjectRegistrationModal() {
             <span>功能闭环测试命令</span>
             <input name="functionalCommands" placeholder="python3 scripts/functional.py" />
           </label>
+          <label>
+            <span>目标模板（可选）</span>
+            <select name="template">
+              <option value="">仅接入项目</option>
+              <option value="alpha">Alpha</option>
+              <option value="beta">Beta</option>
+              <option value="rc">RC</option>
+              <option value="ga">GA</option>
+            </select>
+          </label>
+          <label class="wide-field">
+            <span>Goal/Loop Objective（可选）</span>
+            <input name="objective" placeholder="Promote this project to GA with source closure and native DevOps evidence" />
+          </label>
           <div class="form-actions">
             <button data-action="close-project-registration" type="button">取消</button>
-            <button class="primary" type="submit">验证并注册</button>
+            <button data-action="plan-project-onboarding" type="button">生成接入检查</button>
+            <button class="primary" type="submit">注册并复核</button>
           </div>
         </form>
       </section>
@@ -4178,7 +4281,7 @@ function renderPipelines(options = {}) {
   return `
     ${includeFlowHeader ? renderFlowHeader() : ""}
     <div class="pipeline-layout">
-      <aside class="jenkins-panel card">
+      <aside class="delivery-panel card">
         <div class="delivery-context">
           <span>已确认进化方案</span>
           <strong>${confirmed[0]?.jobName ?? activeCodeUpgrade?.title ?? "等待代码升级"}</strong>
@@ -4240,12 +4343,12 @@ function renderPipelines(options = {}) {
 
 function renderDeliveryExecutionFlow(codeUpgrade, hasPipeline) {
   const upgradeStatus = codeUpgrade?.status ?? "PENDING";
-  const cicdStatus = upgradeStatus === "FAILED" ? "SKIPPED" : (hasPipeline ? "RUNNING" : "PENDING");
+  const nativeDevopsStatus = upgradeStatus === "FAILED" ? "SKIPPED" : (hasPipeline ? "RUNNING" : "PENDING");
   return `
     <div class="execution-flow">
       ${renderExecutionFlowStep("方案确认", "SUCCEEDED")}
       ${renderExecutionFlowStep("代码升级", upgradeStatus)}
-      ${renderExecutionFlowStep("CI/CD", cicdStatus)}
+      ${renderExecutionFlowStep("CI/CD", nativeDevopsStatus)}
       ${renderExecutionFlowStep("历史记录", hasPipeline ? "PENDING" : "SKIPPED")}
     </div>
   `;
@@ -4917,7 +5020,7 @@ function helpManualScenarios() {
         manualStep("形成机会点", "勾选相关评测集，点击形成机会点，生成带目标、影响、置信度和归因的候选演进。", "机会点进入待确认或可排期状态", "形成机会点", "工作区", "Opportunity draft", "评测集变成可执行机会点", navFor("工作区"), ["Eval Dataset", "Regression Suite", "形成机会点", "置信度"], "工作区", "评测集和目标不匹配"),
         manualStep("评审 Markdown 方案", "打开查看方案，阅读问题、决策、替代方案、影响和验证契约，必要时编辑 Markdown 方案正文。", "方案被确认，进入交付执行入口", "编辑进化方案", "工作区", "Review plan", "Markdown 方案正文和验证契约", navFor("工作区"), ["查看方案", "编辑进化方案", "提交方案修改", "确认进化"], "工作区", "方案缺少验证命令或范围过大"),
         manualStep("触发代码升级", "确认进化后选择马上开始或保存排期。EvoPilot 会启动 code upgrade run 并记录白盒执行事件。", "代码升级过程出现 execution-transcript 和 changed files", "代码升级过程", "发布证据", "Code upgrade", "白盒执行、文件变更、验证命令", navFor("发布证据"), ["根据方案进行代码升级", "白盒执行", "查看原始执行事件", "execution-transcript"], "发布证据", "allowed paths 或连接器权限不足"),
-        manualStep("检查 CI/CD 阶段", "在 CI/CD 阶段视图查看单元测试、冒烟测试、功能闭环测试和质量报告。", "每个阶段有状态、耗时和失败原因", "CI/CD 阶段视图", "发布证据", "Delivery pipeline", "代码升级进入流水线验证", navFor("发布证据"), ["单元测试", "冒烟测试", "功能闭环测试", "质量报告"], "发布证据", "测试失败或 Jenkins Job 配置错误")
+        manualStep("检查 CI/CD 阶段", "在 CI/CD 阶段视图查看单元测试、冒烟测试、功能闭环测试和质量报告。", "每个阶段有状态、耗时和失败原因", "CI/CD 阶段视图", "发布证据", "Delivery pipeline", "代码升级进入流水线验证", navFor("发布证据"), ["单元测试", "冒烟测试", "功能闭环测试", "质量报告"], "发布证据", "测试失败、required checks/jobs 未通过或 DevOps tokenRef 未就绪")
       ]
     },
     {
@@ -7089,6 +7192,7 @@ function bindProjectRegistration() {
   for (const button of content.querySelectorAll('[data-action="open-project-registration"]')) {
     button.addEventListener("click", () => {
       state.projectRegistration = { message: "", status: "" };
+      state.projectOnboardingDraft = undefined;
       state.showProjectRegistrationModal = true;
       render();
     });
@@ -7096,7 +7200,32 @@ function bindProjectRegistration() {
   for (const button of content.querySelectorAll('[data-action="close-project-registration"]')) {
     button.addEventListener("click", () => {
       state.showProjectRegistrationModal = false;
+      state.projectOnboardingDraft = undefined;
       render();
+    });
+  }
+  for (const button of content.querySelectorAll('[data-action="inspect-project-onboarding"]')) {
+    button.addEventListener("click", async () => {
+      const id = button.dataset.id;
+      if (!id) return;
+      button.disabled = true;
+      state.projectRegistration = { status: "warn", message: `正在复核 ${id} 的 onboarding checklist...` };
+      render();
+      try {
+        const checklist = await getProjectOnboardingChecklist(id);
+        rememberProjectOnboardingChecklist(checklist);
+        state.projectRegistration = {
+          status: onboardingStatusClass(checklist.status),
+          message: projectOnboardingChecklistMessage(checklist)
+        };
+      } catch (error) {
+        state.projectRegistration = {
+          status: "bad",
+          message: `接入复核失败：${error.message}`
+        };
+      } finally {
+        render();
+      }
     });
   }
   for (const button of content.querySelectorAll('[data-action="open-source-credential-config"]')) {
@@ -7171,25 +7300,64 @@ function bindProjectRegistration() {
   }
   const form = content.querySelector("#project-registration-form");
   if (!form) return;
+  for (const button of form.querySelectorAll('[data-action="plan-project-onboarding"]')) {
+    button.addEventListener("click", async () => {
+      const payload = projectRegistrationPayload(new FormData(form));
+      button.disabled = true;
+      state.projectRegistration = { status: "warn", message: "正在生成项目接入 checklist..." };
+      render();
+      try {
+        const checklist = await postProjectOnboardingChecklist(payload);
+        rememberProjectOnboardingChecklist(checklist);
+        state.projectRegistration = {
+          status: onboardingStatusClass(checklist.status),
+          message: projectOnboardingChecklistMessage(checklist)
+        };
+      } catch (error) {
+        state.projectRegistration = {
+          status: "bad",
+          message: `接入检查失败：${error.message}`
+        };
+      } finally {
+        render();
+      }
+    });
+  }
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const payload = projectRegistrationPayload(new FormData(form));
     const submit = form.querySelector("button[type='submit']");
     submit.disabled = true;
-    state.projectRegistration = { status: "warn", message: "正在验证 Git 仓库连接..." };
+    state.projectRegistration = { status: "warn", message: "正在生成项目接入 checklist..." };
     render();
     try {
+      const plan = await postProjectOnboardingChecklist(payload);
+      rememberProjectOnboardingChecklist(plan);
+      if (!canRegisterAfterChecklist(plan)) {
+        state.projectRegistration = {
+          status: onboardingStatusClass(plan.status),
+          message: `${projectOnboardingChecklistMessage(plan)}；已停止注册，避免写入半成品项目。`
+        };
+        state.showProjectRegistrationModal = true;
+        return;
+      }
+      state.projectRegistration = { status: "warn", message: "checklist 已通过，正在注册项目..." };
+      render();
       const response = await postJson("/api/v1/projects", payload);
+      const checklist = await getProjectOnboardingChecklist(response.data.id);
+      rememberProjectOnboardingChecklist(checklist);
       state.projectRegistration = {
-        status: "good",
-        message: `${response.data.name} 已验证并注册，文件数：${response.data.validation?.fileCount ?? "-"}`
+        status: onboardingStatusClass(checklist.status),
+        message: `${response.data.name} 已注册并完成复核；${projectOnboardingChecklistMessage(checklist)}；文件数：${response.data.validation?.fileCount ?? "-"}`
       };
       state.showProjectRegistrationModal = false;
       await loadProjects();
     } catch (error) {
+      const checklist = projectOnboardingChecklistFromBody(error.responseBody);
+      if (checklist) rememberProjectOnboardingChecklist(checklist);
       state.projectRegistration = {
-        status: "bad",
-        message: `项目注册失败：${error.message}`
+        status: checklist ? onboardingStatusClass(checklist.status) : "bad",
+        message: checklist ? `${projectOnboardingChecklistMessage(checklist)}；已停止注册。` : `项目注册失败：${error.message}`
       };
       state.showProjectRegistrationModal = true;
     } finally {
@@ -7305,8 +7473,9 @@ function sourceCredentialPayload(formData) {
 
 function projectRegistrationPayload(formData) {
   const value = (name) => String(formData.get(name) ?? "").trim();
+  const provider = value("provider");
   const repository = {
-    provider: value("provider"),
+    provider,
     gitUrl: value("gitUrl") || undefined,
     root: value("root") || undefined,
     defaultBranch: value("defaultBranch") || "main",
@@ -7315,22 +7484,13 @@ function projectRegistrationPayload(formData) {
     token: value("token") || undefined,
     tokenRef: value("tokenRef") || undefined
   };
+  const devops = projectDevopsPayload(formData, provider);
   return {
     id: value("id"),
     name: value("name"),
     profileId: "domainforge-fabric",
     repository,
-    cicd: {
-      provider: "jenkins",
-      mode: value("cicdMode") || "system-default",
-      jenkins: {
-        mode: value("cicdMode") || "system-default",
-        baseUrl: value("jenkinsBaseUrl") || undefined,
-        username: value("jenkinsUsername") || undefined,
-        apiToken: value("jenkinsApiToken") || undefined,
-        job: value("jenkinsJob") || undefined
-      }
-    },
+    devops,
     runtime: {
       language: value("runtimeLanguage") || "generic",
       unitCommands: commandList(value("unitCommands")),
@@ -7344,8 +7504,45 @@ function projectRegistrationPayload(formData) {
       } : undefined,
       smokeCommands: commandList(value("smokeCommands")),
       functionalCommands: commandList(value("functionalCommands"))
-    }
+    },
+    template: value("template") || undefined,
+    objective: value("objective") || undefined
   };
+}
+
+function projectDevopsPayload(formData, repositoryProvider) {
+  const value = (name) => String(formData.get(name) ?? "").trim();
+  const selected = value("devopsProvider") || "auto";
+  const provider = selected === "auto" ? nativeDevopsProvider(repositoryProvider)
+    : selected === "none" ? undefined
+      : selected;
+  if (!provider) return undefined;
+  const ci = {
+    workflow: value("ciWorkflow") || undefined,
+    ref: value("defaultBranch") || undefined,
+    requiredChecks: commandList(value("ciRequiredChecks")),
+    requiredStages: commandList(value("ciRequiredStages")),
+    requiredJobs: commandList(value("ciRequiredJobs"))
+  };
+  const cd = {
+    workflow: value("cdWorkflow") || undefined,
+    environment: value("deployEnvironment") || undefined,
+    healthUrl: value("healthUrl") || undefined,
+    readyUrl: value("readyUrl") || undefined
+  };
+  const cdConfigured = Object.values(cd).some(Boolean);
+  return {
+    provider,
+    tokenRef: value("devopsTokenRef") || value("tokenRef") || undefined,
+    ci,
+    cd: cdConfigured ? cd : undefined
+  };
+}
+
+function nativeDevopsProvider(repositoryProvider) {
+  if (repositoryProvider === "github") return "github-actions";
+  if (repositoryProvider === "gitlab") return "gitlab-ci";
+  return undefined;
 }
 
 function fillProjectRegistrationDemo(form) {
@@ -7360,8 +7557,15 @@ function fillProjectRegistrationDemo(form) {
   set("root", "");
   set("defaultBranch", "main");
   set("tokenRef", "EVOPILOT_GITHUB_TOKEN");
-  set("cicdMode", "system-default");
-  set("jenkinsJob", "evopilot-demo-node-api");
+  set("devopsProvider", "github-actions");
+  set("devopsTokenRef", "EVOPILOT_GITHUB_TOKEN");
+  set("ciWorkflow", "ci.yml");
+  set("ciRequiredChecks", "build, test");
+  set("cdWorkflow", "deploy-prod.yml");
+  set("deployEnvironment", "production");
+  set("healthUrl", "https://evopilot-demo.example.com/health");
+  set("template", "ga");
+  set("objective", "Promote EvoPilot GitHub Demo Node API to GA with source closure and GitHub Actions evidence");
   set("runtimeLanguage", "node");
   set("unitCommands", "npm test");
   set("serviceStartCommand", "npm start -- --host 127.0.0.1 --port 49318");
@@ -7441,13 +7645,11 @@ async function confirmOpportunity(id, options = {}) {
       const codeUpgradeRun = upgrade.data?.codeUpgradeRun;
       if (options.scheduled) {
         await postJson(`/api/v1/deliveries/${encodeURIComponent(opportunity.deliveryPlanId)}/schedule`, {
-          executor: "jenkins",
           scheduledAt: toIsoDateTime(options.scheduledAt),
           parameters: { VERSION: "dashboard-scheduled", PROPOSAL_MARKDOWN: proposalMarkdown(opportunity) }
         });
       } else if (codeUpgradeRun?.status === "SUCCEEDED") {
         await postJson(`/api/v1/deliveries/${encodeURIComponent(opportunity.deliveryPlanId)}/execute`, {
-          executor: "jenkins",
           parameters: { VERSION: "dashboard-now", PROPOSAL_MARKDOWN: proposalMarkdown(opportunity) }
         });
       }
@@ -7596,6 +7798,7 @@ async function loadProjects() {
     const { data } = await response.json();
     if (Array.isArray(data) && data.length > 0) {
       state.projects = data.map((project) => ({
+        ...project,
         id: project.id,
         name: project.name,
         status: project.validation?.status === "VERIFIED" ? "健康" : "接入失败",
@@ -7604,11 +7807,7 @@ async function loadProjects() {
         credentials: project.repository ? sourceCredentialLabel(project.repository) : "无需凭据",
         repositoryMeta: project.repository,
         hasRepository: Boolean(project.repository),
-        cicd: project.cicd?.mode === "project-override"
-          ? `项目独立 Jenkins：${project.cicd.job ?? project.cicd.connectorId ?? "已配置"}`
-          : project.cicd?.mode === "system-default"
-            ? "系统默认 Jenkins"
-            : "未配置 CI/CD",
+        devopsLabel: projectDevopsLabel(project, state.projectOnboardingChecklists[project.id]),
         lastSignal: project.validation?.message ?? "等待运行证据",
         score: project.score ?? 0,
         level: project.level ?? "待改进",
@@ -7660,6 +7859,31 @@ async function postJson(url, body) {
   return parsed;
 }
 
+async function postProjectOnboardingChecklist(payload) {
+  try {
+    const result = await postJson("/api/v1/onboarding/project/checklist", payload);
+    return result.data;
+  } catch (error) {
+    const checklist = projectOnboardingChecklistFromBody(error.responseBody);
+    if (checklist) return checklist;
+    throw error;
+  }
+}
+
+async function getProjectOnboardingChecklist(projectId) {
+  const response = await apiFetch(`/api/v1/projects/${encodeURIComponent(projectId)}/onboarding-checklist`);
+  const text = await response.text();
+  const parsed = text ? safeJsonParse(text) : {};
+  const checklist = projectOnboardingChecklistFromBody(parsed);
+  if (!response.ok && !checklist) {
+    const error = new Error(summarizeApiError(parsed, response.status));
+    error.responseBody = parsed;
+    error.status = response.status;
+    throw error;
+  }
+  return checklist ?? parsed.data;
+}
+
 async function patchJson(url, body) {
   const response = await apiFetch(url, {
     method: "PATCH",
@@ -7689,6 +7913,7 @@ function summarizeApiError(body, status) {
   if (body?.data?.schema === "evopilot-loop-orchestration-autopilot/v1") return summarizeAutopilotRun(body.data);
   if (body?.data?.schema === "evopilot-source-closure-preflight/v1") return summarizeSourceClosurePreflight(body.data);
   if (body?.data?.schema === "evopilot-source-credential-readiness/v1") return sourceCredentialReadinessMessage(body.data);
+  if (body?.data?.schema === "evopilot-project-onboarding-checklist/v1") return projectOnboardingChecklistMessage(body.data);
   const detail = body?.detail ?? body?.error ?? body?.message;
   return detail ? `${detail}` : `HTTP ${status}`;
 }
@@ -7721,9 +7946,63 @@ function sourceCredentialLabel(repository) {
   return "未配置写回凭据";
 }
 
+function projectDevopsLabel(project, checklist) {
+  const devops = project?.devops;
+  const repositoryProvider = project?.repository?.provider;
+  const readiness = checklist?.devops?.status;
+  const readinessSuffix = readiness ? ` / ${readiness}` : "";
+  if (repositoryProvider === "local-git") return "local-git 不需要仓库原生 DevOps";
+  if (devops?.provider === "github-actions") {
+    const workflow = devops.ci?.workflow ?? (devops.ci?.requiredChecks ?? []).join(", ");
+    return `GitHub Actions：${workflow || "checks"}${readinessSuffix}`;
+  }
+  if (devops?.provider === "gitlab-ci") {
+    const jobWorkflow = devops.ci?.workflow ?? (devops.ci?.requiredJobs ?? []).join(", ");
+    const stageWorkflow = (devops.ci?.requiredStages ?? []).join(", ");
+    const workflow = jobWorkflow || stageWorkflow || ".gitlab-ci.yml";
+    return `GitLab CI：${workflow}${readinessSuffix}`;
+  }
+  return "未配置 GitHub Actions/GitLab CI";
+}
+
 function sourceCredentialReadinessMessage(readiness) {
   const blocker = readiness?.blockers?.[0] ?? "none";
   return `源码写回凭据 ${readiness?.status ?? "UNKNOWN"}：${readiness?.nextAction ?? "unknown"} / ${blocker}`;
+}
+
+function projectOnboardingChecklistFromBody(body) {
+  return body?.data?.schema === "evopilot-project-onboarding-checklist/v1" ? body.data : undefined;
+}
+
+function rememberProjectOnboardingChecklist(checklist) {
+  if (!checklist) return;
+  state.projectOnboardingDraft = checklist;
+  if (checklist.projectId) state.projectOnboardingChecklists[checklist.projectId] = checklist;
+}
+
+function canRegisterAfterChecklist(checklist) {
+  return Boolean(checklist && (checklist.blockers ?? []).length === 0 && checklist.status !== "BLOCKED");
+}
+
+function projectOnboardingChecklistMessage(checklist) {
+  const blockers = checklist?.blockers ?? [];
+  const missingInputs = checklist?.missingInputs ?? [];
+  const firstBlocker = blockers[0] ? ` / blocker=${blockers[0]}` : "";
+  const missing = missingInputs.length ? ` / missing=${missingInputs.join(",")}` : "";
+  return `Onboarding checklist ${checklist?.status ?? "UNKNOWN"}：${checklist?.nextAction ?? "unknown"}${firstBlocker}${missing}`;
+}
+
+function onboardingStatusClass(status) {
+  if (status === "READY_TO_RUN" || status === "READY_TO_ONBOARD") return "good";
+  if (status === "BLOCKED") return "bad";
+  return "warn";
+}
+
+function onboardingStepClass(status) {
+  if (status === "PASS") return "ready";
+  if (status === "FAIL") return "blocked";
+  if (status === "WARN") return "warn";
+  return "pending";
 }
 
 function apiFetch(url, options = {}) {
