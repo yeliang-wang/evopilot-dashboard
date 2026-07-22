@@ -139,7 +139,8 @@ The authoritative machine-readable API contract is `docs/api/openapi.json` in th
 - Project onboarding calls `POST /api/v1/onboarding/project/checklist` before `POST /api/v1/projects`, then rechecks `GET /api/v1/projects/{projectId}/onboarding-checklist`.
 - Project DevOps uses repository-native GitHub Actions or GitLab CI through EvoPilot API state.
 - Release status comes from EvoPilot release decisions, not from UI-side inference.
-- GlobalGoal workflow views should consume server projections such as `run-status`, `snapshot`, `graph`, `timeline`, and `evidence-matrix`.
+- GlobalGoal workflow views should consume server projections such as `run-status`, `snapshot`, `graph`, `timeline`, `evidence-matrix`, and `llmUsage`.
+- Dashboard reads LLM provider, model, token totals, credits, and request IDs from EvoPilot API responses. It must not calculate LLM/token usage in browser code.
 - Workflow actions send `controlPlaneUrl` from the configured API base URL, falling back to the current origin only for same-origin proxy deployments.
 
 ## Related Repositories

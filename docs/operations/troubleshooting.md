@@ -15,6 +15,7 @@
 | GitHub project cannot write source | Missing tokenRef or read-only public mode | Configure source credentials. |
 | Checklist shows `connect-github-account` or `connect-gitlab-account` | No user/org/group execution principal is available for writeback or native DevOps | Connect or create the account/group, fork or authorize the upstream, store tokenRef, then rerun checklist. |
 | DevOps readiness blocked | devopsOwner does not match workflow repo owner | Correct execution boundary. |
+| LLM/token usage not visible for an LLM-backed run | Dashboard is using an older API response, wrong server, or loop trace has no usage evidence | Check the same goal/loop through `run-status` or loop trace, record requestId, and compare with EvoPilot CLI/API docs. |
 
 ## Network Checks
 
@@ -42,3 +43,4 @@ Use `http://8.153.72.80` for the current public EvoPilot API endpoint unless a T
 - requestId if visible or available in network logs.
 - tenant/workspace.
 - projectId, goalId, loopId, or release decision ID.
+- LLM provider/model and token totals when the issue involves Loop execution or cost visibility.

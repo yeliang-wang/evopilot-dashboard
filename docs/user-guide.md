@@ -19,7 +19,7 @@
 |---|---|---|
 | 租户总览 | Is the control plane healthy for this tenant/workspace? | `/api/v1/summary` |
 | 接入项目 | Is the project ready for source writeback and DevOps? | onboarding checklist and preflight APIs |
-| Loops | Which GoalTarget or LoopRun is active, blocked, waiting, or done? | goal run-status, loop runtime, trace APIs |
+| Loops | Which GoalTarget or LoopRun is active, blocked, waiting, or done? | goal run-status, loop runtime, trace APIs, llmUsage |
 | 发布证据 | Is this project or target GO, CONDITIONAL-GO, or NO-GO? | `/api/v1/release/decisions` |
 | 审计 | Can the operation be replayed and attributed? | `/api/v1/audit`, `/api/v1/history` |
 
@@ -50,6 +50,12 @@ Use these workflow docs in order:
 Dashboard progress views are explanatory. The release verdict comes from EvoPilot release decisions. Do not claim RC, GA, GO, or NO-GO from a UI color, local test output, or screenshot alone.
 
 For third-party open-source GitHub/GitLab projects, full Loop Target execution requires a user-owned or organization-owned account/group that can fork or maintain the repository. Without that principal, use read-only public onboarding and stop before PR, CI/CD, merge, deploy, or release-readiness claims.
+
+## LLM And Token Visibility
+
+Goal/Loop pages should use server-projected usage from `run-status` or loop trace when explaining a run. Report LLM provider, model, input tokens, output tokens, total tokens, credits consumed, and related loop/request identifiers when visible.
+
+Do not estimate tokens from page text. If an LLM-backed Loop reaches a terminal state but provider/model or token totals are missing, treat the evidence as incomplete and collect the page, goalId/loopId, requestId, and API server URL for troubleshooting.
 
 ## CLI Relationship
 

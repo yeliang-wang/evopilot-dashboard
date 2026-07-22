@@ -35,5 +35,6 @@
 - For project onboarding: project row and onboarding checklist status.
 - For DevOps boundary: executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary.
 - For Loop workflow: goalId or loopId plus nextAction.
+- For LLM-backed Loop workflow: provider, model, token totals, and visible requestId or loopId.
 - For approval: audit row or visible approval state.
 - For release: release decision status and decision ID.

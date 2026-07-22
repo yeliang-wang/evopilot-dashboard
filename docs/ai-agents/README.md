@@ -23,6 +23,7 @@ The Dashboard Agent is a UI operator. It clicks, types, reads states, and report
 - Never claim GA/RC/GO from UI color alone.
 - Stop when the server says human approval, missing credentials, `connect-github-account`, `connect-gitlab-account`, policy review, or repair is required.
 - For third-party GitHub/GitLab upstreams, confirm the visible execution mode, DevOps owner, working repository/fork, and credential principal before claiming PR, CI/CD, merge, deploy, or release readiness.
+- If an LLM-backed workflow reaches a terminal claim but visible provider/model/token usage is missing, report incomplete evidence instead of claiming completion.
 - Report page, field, action, state, blocker, and next action in every failure.
 
 ## What To Report
@@ -36,6 +37,8 @@ input=<field-summary-without-secrets>
 state=<READY|BLOCKED|WAITING_APPROVAL|GO|NO-GO|...>
 evidence=<visible-id-or-request-id-if-available>
 nextAction=<server-or-ui-next-action>
+llm=<provider/model-or-not-visible>
+tokens=<input/output/total-or-not-visible>
 ```
 
 ## CLI Boundary

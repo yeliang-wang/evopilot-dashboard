@@ -20,14 +20,16 @@
    `SCM/Git Project -> Discovery Candidate -> Target Backlog -> Executor Graph -> Worker + Sandbox -> Human Gate -> Source Closure -> CI/CD + Deploy -> Release Decision -> GA Release`.
 7. If a node is blocked, open its detail panel and follow `nextAction`.
 8. If the loop waits for approval, review evidence before approving.
-9. After source closure, check CI/CD and deploy evidence.
-10. Finish by reading the release decision.
+9. Check LLM provider/model and token totals if the loop executed an LLM-backed step.
+10. After source closure, check CI/CD and deploy evidence.
+11. Finish by reading the release decision.
 
 ## Expected Result
 
 - The active Loop has a loop ID.
 - The graph shows active, completed, pending, and blocked nodes.
 - Timeline and trace explain every state transition.
+- LLM usage shows provider, model, input tokens, output tokens, total tokens, and credits when the server has usage evidence.
 - Release decision is available or blockers explain why it is not.
 
 ## Failure Modes
@@ -38,6 +40,7 @@
 | `human-approval` | Governance requires a human decision. | Review evidence, then approve or reject. |
 | `policy-review` | Release policy blocks continuation. | Read policy blockers and repair evidence. |
 | `repair` | A source release run failed or is stale. | Open repair queue and execute repair. |
+| missing LLM/token usage | The UI cannot prove which LLM ran or how many tokens were used. | Record loopId/requestId, inspect trace, and compare against EvoPilot API/CLI docs. |
 
 ## Release Rule
 

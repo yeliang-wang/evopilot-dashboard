@@ -22,6 +22,7 @@ GlobalGoal makes long-running product goals visible. A user can see the plan, ea
 - User can explain which GoalTarget is running.
 - User can explain why the workflow is continuing, blocked, waiting, or complete.
 - Evidence matrix lists required evidence and current status.
+- If an LLM-backed target has run, provider/model and token usage are visible from server-projected usage fields.
 - Final report does not replace release decision.
 
 ## Digital Human Rule
@@ -31,6 +32,7 @@ When narrating progress, speak from server state:
 - "The current active target is..."
 - "The next action is..."
 - "This is waiting for human approval because..."
+- "This used <provider>/<model> and <totalTokens> tokens..." when usage is visible.
 - "The release verdict is..."
 
 Do not narrate assumptions from colors or layout alone.
@@ -42,3 +44,5 @@ Do not narrate assumptions from colors or layout alone.
 - `GET /api/v1/goals/{goalId}/graph`
 - `GET /api/v1/goals/{goalId}/timeline`
 - `GET /api/v1/goals/{goalId}/evidence-matrix`
+
+`run-status` is the preferred single projection for white-box workflow UI. It includes `llmUsage` when the server has usage evidence for the Goal/Loop chain.
