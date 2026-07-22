@@ -10,6 +10,8 @@
 | `OBSERVABLE` | The system can observe but may not be fully ready. | Read details before continuing. |
 | `READ_ONLY` | Source can be inspected but not written. | Configure credentials before writeback. |
 | `BLOCKED` | Required condition is missing. | Stop and report blocker. |
+| `connect-github-account` | GitHub account/org/service principal is required for writeback or Actions. | Stop until the operator connects the principal and stores tokenRef. |
+| `connect-gitlab-account` | GitLab account/group/deploy principal is required for writeback or CI. | Stop until the operator connects the principal and stores tokenRef. |
 | `WAITING_APPROVAL` | Governance stop. | Ask for approval or reject. |
 | `RUNNING` | Active execution. | Wait or refresh until terminal/blocker. |
 | `SUCCEEDED` | Step completed. | Continue to next step. |
@@ -31,7 +33,7 @@
 ## Evidence Needed Before Claiming Done
 
 - For project onboarding: project row and onboarding checklist status.
-- For DevOps boundary: executionMode, devopsOwner, workflowRepository, claimBoundary.
+- For DevOps boundary: executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary.
 - For Loop workflow: goalId or loopId plus nextAction.
 - For approval: audit row or visible approval state.
 - For release: release decision status and decision ID.

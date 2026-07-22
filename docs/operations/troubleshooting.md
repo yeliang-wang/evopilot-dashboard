@@ -13,6 +13,7 @@
 | `409` on workflow action | Server business guardrail blocked the action | Read blocker and nextAction. |
 | Release card disagrees with CLI | Different server URL or UI-side inference | Use release decisions from same API server. |
 | GitHub project cannot write source | Missing tokenRef or read-only public mode | Configure source credentials. |
+| Checklist shows `connect-github-account` or `connect-gitlab-account` | No user/org/group execution principal is available for writeback or native DevOps | Connect or create the account/group, fork or authorize the upstream, store tokenRef, then rerun checklist. |
 | DevOps readiness blocked | devopsOwner does not match workflow repo owner | Correct execution boundary. |
 
 ## Network Checks

@@ -3859,8 +3859,33 @@ function renderProjectRegistrationModal() {
             </select>
           </label>
           <label>
+            <span>执行模式</span>
+            <select name="executionMode">
+              <option value="owned-repository">自有仓库</option>
+              <option value="read-only-public">公开只读</option>
+              <option value="fork-validated-pr">Fork 验证 PR</option>
+              <option value="upstream-authorized">上游维护者授权</option>
+            </select>
+          </label>
+          <label>
+            <span>DevOps 账号/组织</span>
+            <input name="devopsOwner" placeholder="GitHub owner 或 GitLab group" />
+          </label>
+          <label>
             <span>Git URL</span>
             <input name="gitUrl" placeholder="https://gitlab.example.com/group/agent.git" />
+          </label>
+          <label>
+            <span>上游仓库</span>
+            <input name="upstreamRepo" placeholder="apache/skywalking 或 group/project" />
+          </label>
+          <label>
+            <span>工作仓库 / Fork</span>
+            <input name="workingRepo" placeholder="my-org/skywalking-fork" />
+          </label>
+          <label>
+            <span>Workflow 仓库</span>
+            <input name="workflowRepo" placeholder="默认同工作仓库" />
           </label>
           <label>
             <span>本地目录</span>
@@ -3899,6 +3924,13 @@ function renderProjectRegistrationModal() {
             <span>DevOps Token Ref</span>
             <input name="devopsTokenRef" placeholder="默认复用源码 tokenRef" />
           </label>
+          <label>
+            <span>凭据主体标签</span>
+            <input name="credentialPrincipal" placeholder="my-org-bot / GitHub App / deploy token" />
+          </label>
+          <div class="form-hint wide-field">
+            第三方开源项目需要用户或组织自己的 GitHub/GitLab 执行主体；无账号时请选择公开只读，不能声明 PR、CI/CD、merge、deploy 或 release readiness。
+          </div>
           <label>
             <span>CI Workflow</span>
             <input name="ciWorkflow" placeholder="ci.yml 或 .gitlab-ci.yml" />
@@ -7479,6 +7511,9 @@ function projectRegistrationPayload(formData) {
     gitUrl: value("gitUrl") || undefined,
     root: value("root") || undefined,
     defaultBranch: value("defaultBranch") || "main",
+    executionMode: value("executionMode") || undefined,
+    upstreamRepo: value("upstreamRepo") || undefined,
+    workingRepo: value("workingRepo") || undefined,
     username: value("username") || undefined,
     password: value("password") || undefined,
     token: value("token") || undefined,
@@ -7512,6 +7547,7 @@ function projectRegistrationPayload(formData) {
 
 function projectDevopsPayload(formData, repositoryProvider) {
   const value = (name) => String(formData.get(name) ?? "").trim();
+  if (value("executionMode") === "read-only-public") return undefined;
   const selected = value("devopsProvider") || "auto";
   const provider = selected === "auto" ? nativeDevopsProvider(repositoryProvider)
     : selected === "none" ? undefined
@@ -7534,6 +7570,12 @@ function projectDevopsPayload(formData, repositoryProvider) {
   return {
     provider,
     tokenRef: value("devopsTokenRef") || value("tokenRef") || undefined,
+    executionMode: value("executionMode") || undefined,
+    upstreamRepo: value("upstreamRepo") || undefined,
+    workingRepo: value("workingRepo") || undefined,
+    workflowRepo: value("workflowRepo") || value("workingRepo") || undefined,
+    devopsOwner: value("devopsOwner") || undefined,
+    credentialPrincipal: value("credentialPrincipal") || undefined,
     ci,
     cd: cdConfigured ? cd : undefined
   };
@@ -7556,9 +7598,14 @@ function fillProjectRegistrationDemo(form) {
   set("gitUrl", "https://github.com/yeliang-wang/evopilot-demo-node-api.git");
   set("root", "");
   set("defaultBranch", "main");
+  set("executionMode", "owned-repository");
+  set("devopsOwner", "yeliang-wang");
+  set("workingRepo", "yeliang-wang/evopilot-demo-node-api");
+  set("workflowRepo", "yeliang-wang/evopilot-demo-node-api");
   set("tokenRef", "EVOPILOT_GITHUB_TOKEN");
   set("devopsProvider", "github-actions");
   set("devopsTokenRef", "EVOPILOT_GITHUB_TOKEN");
+  set("credentialPrincipal", "yeliang-wang");
   set("ciWorkflow", "ci.yml");
   set("ciRequiredChecks", "build, test");
   set("cdWorkflow", "deploy-prod.yml");
@@ -7951,16 +7998,24 @@ function projectDevopsLabel(project, checklist) {
   const repositoryProvider = project?.repository?.provider;
   const readiness = checklist?.devops?.status;
   const readinessSuffix = readiness ? ` / ${readiness}` : "";
+  const boundary = devops?.boundary ?? {};
+  const owner = boundary.owner ?? checklist?.devops?.devopsOwner;
+  const workflowRepository = boundary.workflowRepository
+    ? [boundary.workflowRepository.owner, boundary.workflowRepository.repo].filter(Boolean).join("/") || boundary.workflowRepository.projectId
+    : checklist?.devops?.workflowRepository;
+  const executionMode = boundary.executionMode ?? checklist?.devops?.executionMode;
+  const boundarySuffix = [executionMode, owner, workflowRepository].filter(Boolean).join(" / ");
+  const detailSuffix = boundarySuffix ? ` (${boundarySuffix})` : "";
   if (repositoryProvider === "local-git") return "local-git 不需要仓库原生 DevOps";
   if (devops?.provider === "github-actions") {
     const workflow = devops.ci?.workflow ?? (devops.ci?.requiredChecks ?? []).join(", ");
-    return `GitHub Actions：${workflow || "checks"}${readinessSuffix}`;
+    return `GitHub Actions：${workflow || "checks"}${detailSuffix}${readinessSuffix}`;
   }
   if (devops?.provider === "gitlab-ci") {
     const jobWorkflow = devops.ci?.workflow ?? (devops.ci?.requiredJobs ?? []).join(", ");
     const stageWorkflow = (devops.ci?.requiredStages ?? []).join(", ");
     const workflow = jobWorkflow || stageWorkflow || ".gitlab-ci.yml";
-    return `GitLab CI：${workflow}${readinessSuffix}`;
+    return `GitLab CI：${workflow}${detailSuffix}${readinessSuffix}`;
   }
   return "未配置 GitHub Actions/GitLab CI";
 }

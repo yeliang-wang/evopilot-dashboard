@@ -14,7 +14,7 @@ Platform administrators, tenant administrators, and operations staff.
 | Tenant setup | 租户总览 | Tenant created, workspace assigned |
 | Workspace membership | 用户与权限 | User role, status, tenant, workspace |
 | Project credentials | 凭据, 接入项目 | Secret/tokenRef saved, preflight result |
-| DevOps boundary | 接入项目 | executionMode, devopsOwner, workflowRepository, claimBoundary |
+| DevOps boundary | 接入项目 | executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary |
 | Release governance | 发布证据, Loops | Human gate, policy evidence, release decision |
 | Audit | 审计 | requestId, actor, operation, result |
 
@@ -47,9 +47,12 @@ Every GitHub/GitLab project that claims CI/CD readiness must declare:
 - `devopsOwner`
 - `workflowRepository`
 - `credentialRef`
+- `credentialPrincipal`
 - `claimBoundary`
 
 For public upstream projects, prefer `fork-validated-pr`: upstream is read-only evidence, the working fork runs CI/CD, and the Dashboard must not claim upstream release completion.
+
+If the user has no GitHub/GitLab account or group, admins should onboard the upstream as `read-only-public` only. Do not create a shared EvoPilot-owned account or generic CI/CD fallback for third-party upstreams.
 
 ## Do Not Do
 

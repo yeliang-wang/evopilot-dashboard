@@ -56,4 +56,5 @@ Dashboard needs these categories:
 - Do not copy OpenAPI schema into this repository.
 - Do not reimplement release-decision logic in JavaScript.
 - Do not infer DevOps owner from repository URL.
+- Do not treat a public upstream as writable unless the EvoPilot API returns a non-read-only execution boundary and a resolvable GitHub/GitLab credential principal.
 - Do not read server files, database tables, or `.codex-evidence`.

@@ -26,8 +26,11 @@ Common fields:
 - Default branch
 - tokenRef
 - executionMode
+- upstreamRepo
+- workingRepo
 - devopsOwner
 - workflowRepository
+- credentialPrincipal
 - target template
 - objective
 

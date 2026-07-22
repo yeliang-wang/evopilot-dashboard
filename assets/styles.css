@@ -2849,6 +2849,16 @@ td {
   grid-column: 1 / -1;
 }
 
+.project-form .form-hint {
+  border: 1px solid #cfe0ee;
+  border-radius: 6px;
+  background: #f4f8fb;
+  color: var(--muted);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .project-form .checkbox-field {
   display: flex;
   align-items: center;

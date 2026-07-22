@@ -51,6 +51,16 @@ test("dashboard project onboarding follows current EvoPilot DevOps contract", ()
   assert.match(app, /GitHub Actions/);
   assert.match(app, /GitLab CI/);
   assert.match(app, /provider,\s*\n\s*tokenRef/);
+  assert.match(app, /name="executionMode"/);
+  assert.match(app, /name="upstreamRepo"/);
+  assert.match(app, /name="workingRepo"/);
+  assert.match(app, /name="devopsOwner"/);
+  assert.match(app, /name="credentialPrincipal"/);
+  assert.match(app, /executionMode: value\("executionMode"\)/);
+  assert.match(app, /upstreamRepo: value\("upstreamRepo"\)/);
+  assert.match(app, /workingRepo: value\("workingRepo"\)/);
+  assert.match(app, /devopsOwner: value\("devopsOwner"\)/);
+  assert.match(app, /credentialPrincipal: value\("credentialPrincipal"\)/);
   assert.match(app, /postProjectOnboardingChecklist/);
   assert.match(app, /getProjectOnboardingChecklist/);
   assert.match(readme, /docs\/api\/openapi\.json/);
@@ -97,6 +107,9 @@ test("dashboard repository owns UI operation and AI-agent docs", () => {
   assert.match(docsApiUsage, /Do not copy OpenAPI schema/);
   assert.match(docsDevopsBoundary, /devopsOwner/);
   assert.match(docsDevopsBoundary, /fork-validated-pr/);
+  assert.match(docsDevopsBoundary, /GitHub\/GitLab execution principal/);
+  assert.match(docsDevopsBoundary, /connect-github-account/);
+  assert.match(docsDevopsBoundary, /connect-gitlab-account/);
 });
 
 test("production build includes runtime dashboard scripts", () => {

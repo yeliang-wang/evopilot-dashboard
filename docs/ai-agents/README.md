@@ -21,7 +21,8 @@ The Dashboard Agent is a UI operator. It clicks, types, reads states, and report
 - Treat `BLOCKED`, `WAITING_APPROVAL`, `NO-GO`, and `403` as meaningful states, not generic failures.
 - Never paste GitHub PATs into login.
 - Never claim GA/RC/GO from UI color alone.
-- Stop when the server says human approval, missing credentials, policy review, or repair is required.
+- Stop when the server says human approval, missing credentials, `connect-github-account`, `connect-gitlab-account`, policy review, or repair is required.
+- For third-party GitHub/GitLab upstreams, confirm the visible execution mode, DevOps owner, working repository/fork, and credential principal before claiming PR, CI/CD, merge, deploy, or release readiness.
 - Report page, field, action, state, blocker, and next action in every failure.
 
 ## What To Report

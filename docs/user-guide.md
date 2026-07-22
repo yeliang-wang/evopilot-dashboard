@@ -7,7 +7,7 @@
 1. Log in with an EvoPilot Dashboard user.
 2. Confirm tenant and workspace in the top context area.
 3. Open **接入项目** and onboard a GitHub, GitLab, or local Git project.
-4. Configure source credentials and project DevOps boundary.
+4. Configure source credentials, execution mode, DevOps owner, and project DevOps boundary.
 5. Open **Loops** and start or inspect a Source-to-GA workflow.
 6. Approve human gates only when evidence and scope are clear.
 7. Open **发布证据** and read the server release decision.
@@ -48,6 +48,8 @@ Use these workflow docs in order:
 ## Release Truth
 
 Dashboard progress views are explanatory. The release verdict comes from EvoPilot release decisions. Do not claim RC, GA, GO, or NO-GO from a UI color, local test output, or screenshot alone.
+
+For third-party open-source GitHub/GitLab projects, full Loop Target execution requires a user-owned or organization-owned account/group that can fork or maintain the repository. Without that principal, use read-only public onboarding and stop before PR, CI/CD, merge, deploy, or release-readiness claims.
 
 ## CLI Relationship
 
