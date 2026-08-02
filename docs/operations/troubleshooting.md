@@ -5,7 +5,7 @@
 ## First Checks
 
 1. Confirm Dashboard URL is correct.
-2. Confirm the page loads **Projects / Runs / Ops**.
+2. Confirm the page loads **Agent Console v2** with the left rail, stage bar, conversation, composer, and session/evidence drawer entry.
 3. Confirm `public/config.js` points at the intended EvoPilot API server or uses same-origin proxy.
 4. Log in again if the API status is `401`.
 5. Open **Ops** and click **Refresh Projections**.

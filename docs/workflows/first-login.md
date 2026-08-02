@@ -15,7 +15,7 @@ Use this when a user, WorkBuddy browser operator, or digital human opens Dashboa
 ## Steps
 
 1. Open the Dashboard URL.
-2. Confirm the page shows **Projects / Runs / Ops** navigation and the **Auth Session** panel.
+2. Confirm the page shows **Agent Console v2** with the stage bar and a session chip that opens the session drawer.
 3. Enter username and password.
 4. Click **Login**.
 5. If the server requires password change, enter current and new password, then submit.

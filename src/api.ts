@@ -262,12 +262,22 @@ export const apiSurface = {
   projectHarnessProfiles: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles`,
   projectHarnessProfileGenerate: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/generate`,
   projectHarnessProfileValidate: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/validate`,
+  projectHarnessProfile: (projectId: string, profileId: string) =>
+    `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/${encodeURIComponent(profileId)}`,
   projectHarnessProfileActivate: (projectId: string, profileId: string) =>
     `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/${encodeURIComponent(profileId)}/activate`,
   goals: "/api/v1/goals",
+  goal: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}`,
   goalPlan: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/plan`,
   goalPlanApply: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/plan/apply`,
   goalApprovePlan: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/approve-plan`,
+  goalPhases: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/phases`,
+  goalTargets: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/targets`,
+  goalPhasePackages: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/phase-packages`,
+  goalPhasePackage: (goalId: string, phase: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/phase-packages/${encodeURIComponent(phase)}`,
+  goalTargetPackages: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/target-packages`,
+  goalTargetPackage: (goalId: string, targetId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/target-packages/${encodeURIComponent(targetId)}`,
+  goalSnapshot: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/snapshot`,
   goalAdvance: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/advance`,
   goalRunStatus: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/run-status`,
   goalPhasePlan: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/phase-plan`,
@@ -285,6 +295,7 @@ export const apiSurface = {
   loopSourceClosurePreflight: (loopId: string) => `/api/v1/loops/${encodeURIComponent(loopId)}/source-closure/preflight`,
   releaseDecisions: "/api/v1/release/decisions",
   releaseEvidence: "/api/v1/release/evidence",
+  releaseEvidenceItem: (evidenceId: string) => `/api/v1/release/evidence/${encodeURIComponent(evidenceId)}`,
   sourceClosureExecute: (loopId: string) => `/api/v1/loops/${encodeURIComponent(loopId)}/source-closure/execute`,
   sourceClosureReviewDecision: (loopId: string) => `/api/v1/loops/${encodeURIComponent(loopId)}/source-closure/review-decision`,
   harnessTemplateEvolutionAdvance: (evolutionId: string) => `/api/v1/harness/template-evolutions/${encodeURIComponent(evolutionId)}/advance`,
@@ -325,8 +336,14 @@ export async function loadDashboardApiSnapshot(
   ];
   if (projectId) calls.push(["profiles", apiSurface.projectHarnessProfiles(projectId)]);
   if (goalId) {
+    calls.push(["goal", apiSurface.goal(goalId)]);
     calls.push(["goalRunStatus", apiSurface.goalRunStatus(goalId)]);
     calls.push(["goalPhasePlan", apiSurface.goalPhasePlan(goalId)]);
+    calls.push(["goalPhases", apiSurface.goalPhases(goalId)]);
+    calls.push(["goalTargets", apiSurface.goalTargets(goalId)]);
+    calls.push(["goalPhasePackages", apiSurface.goalPhasePackages(goalId)]);
+    calls.push(["goalTargetPackages", apiSurface.goalTargetPackages(goalId)]);
+    calls.push(["goalSnapshot", apiSurface.goalSnapshot(goalId)]);
     calls.push(["goalEvidenceMatrix", apiSurface.goalEvidenceMatrix(goalId)]);
     calls.push(["goalFinalReport", apiSurface.goalFinalReport(goalId)]);
   }

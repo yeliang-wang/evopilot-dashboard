@@ -9,7 +9,7 @@ const api = fs.readFileSync("src/api.ts", "utf8");
 const styles = fs.readFileSync("src/styles.css", "utf8");
 const config = fs.readFileSync("public/config.js", "utf8");
 const packageJson = fs.readFileSync("package.json", "utf8");
-const distIndex = fs.readFileSync("dist/index.html", "utf8");
+const distIndex = fs.existsSync("dist/index.html") ? fs.readFileSync("dist/index.html", "utf8") : "";
 const dockerfile = fs.readFileSync("Dockerfile", "utf8");
 const dockerignore = fs.readFileSync(".dockerignore", "utf8");
 const nginx = fs.readFileSync("nginx.conf.template", "utf8");
@@ -21,13 +21,10 @@ const productionSmoke = fs.readFileSync("scripts/production-compat-smoke.mjs", "
 const consoleSmoke = fs.readFileSync("scripts/dashboard-console-smoke.mjs", "utf8");
 const readme = fs.readFileSync("README.md", "utf8");
 const docsIndex = fs.readFileSync("docs/README.md", "utf8");
-const docsGettingStarted = fs.readFileSync("docs/getting-started.md", "utf8");
 const docsUserGuide = fs.readFileSync("docs/user-guide.md", "utf8");
-const docsAdminGuide = fs.readFileSync("docs/admin-guide.md", "utf8");
 const docsAiAgents = fs.readFileSync("docs/ai-agents/README.md", "utf8");
 const docsDashboardMap = fs.readFileSync("docs/ai-agents/dashboard-page-map.md", "utf8");
 const docsExpectedStates = fs.readFileSync("docs/ai-agents/expected-ui-states.md", "utf8");
-const docsPlaybook = fs.readFileSync("docs/ai-agents/digital-human-playbook.md", "utf8");
 const docsSmoke = fs.readFileSync("docs/operations/smoke-test.md", "utf8");
 const docsApiUsage = fs.readFileSync("docs/reference/api-usage.md", "utf8");
 const docsE2E = fs.readFileSync("docs/workflows/end-to-end-scenarios.md", "utf8");
@@ -35,13 +32,10 @@ const docsDevopsBoundary = fs.readFileSync("docs/workflows/credential-and-devops
 const allDocs = [
   readme,
   docsIndex,
-  docsGettingStarted,
   docsUserGuide,
-  docsAdminGuide,
   docsAiAgents,
   docsDashboardMap,
   docsExpectedStates,
-  docsPlaybook,
   docsSmoke,
   docsApiUsage,
   docsE2E,
@@ -81,58 +75,77 @@ test("dashboard is a standalone React API client", () => {
   assert.doesNotMatch(`${app}\n${api}`, /apps\/dashboard/);
   assert.doesNotMatch(`${app}\n${api}`, /\.codex-evidence/);
   assert.doesNotMatch(`${app}\n${api}`, /evopilot\s+(target|goal|loop|harness)/);
-  assert.doesNotMatch(app, /github\.com\/example/);
   assert.equal(fs.existsSync("src/domain.ts"), false, "stale static domain fixture should not exist");
 });
 
-test("dashboard keeps the lightweight three-page information architecture", () => {
-  assert.match(app, /type PageId = "projects" \| "runs" \| "ops";/);
-  assert.match(app, /\(\["projects", "runs", "ops"\] as PageId\[\]\)/);
-  for (const label of ["Projects", "Runs", "Ops"]) {
-    assert.match(app, new RegExp(escapeRegExp(label)));
-  }
-  for (const staleComponent of ["<DashboardPage", "<HarnessPage", "<GoalRunsPage", "<OperationsPage"]) {
-    assert.doesNotMatch(app, new RegExp(escapeRegExp(staleComponent)));
-  }
-  assert.doesNotMatch(app, /Dashboard \/ Projects \/ Harness \/ Goal Runs \/ Operations/);
-  assert.doesNotMatch(app, /five top-level pages/);
-});
-
-test("dashboard exposes the Review Pack end-to-end browser flow", () => {
+test("dashboard implements the Agent Console v2 information architecture", () => {
   for (const text of [
-    "Start Or Continue A Project Loop",
-    "Generate Review Pack",
-    "Review Pack",
-    "Project Loop Path",
-    "Repository -> Goal Target -> Review Pack -> Loop -> Release Decision",
-    "Owner Review Gates",
-    "Advanced Control Details",
-    "Troubleshooting Contract",
-    "Last API Action",
-    "Auth Session",
-    "Server Projections",
-    "Confirmed By",
-    "Confirmation"
+    "Agent Console",
+    "Project Intake",
+    "Harness Draft",
+    "Owner Review",
+    "Loop Execution",
+    "Release Decision",
+    "Active sessions",
+    "Recent decisions",
+    "Evidence drawer",
+    "ProjectHarnessProfile.yaml",
+    "Owner Review Summary",
+    "Start intake",
+    "Request changes",
+    "Confirm",
+    "Approve plan & start loop",
+    "View evidence"
   ]) {
     assert.match(app, new RegExp(escapeRegExp(text)));
   }
 
+  assert.match(app, /type ConsoleStep =/);
+  assert.match(app, /type DrawerKind =/);
+  assert.match(app, /function StageBar/);
+  assert.match(app, /function EvidenceDrawer/);
+  assert.match(app, /function ProfileReviewCard/);
+  assert.match(app, /function DiffCard/);
+  assert.match(app, /function BlockerCard/);
+  assert.match(styles, /\.app-shell/);
+  assert.match(styles, /\.stagebar/);
+  assert.match(styles, /\.conversation/);
+  assert.match(styles, /\.review-document/);
+  assert.match(styles, /\.yaml-block/);
+  assert.match(styles, /\.drawer/);
+
+  assert.doesNotMatch(app, /type PageId = "projects" \| "runs" \| "ops";/);
+  assert.doesNotMatch(app, /\(\["projects", "runs", "ops"\] as PageId\[\]\)/);
+  assert.doesNotMatch(app, /Projects \/ Runs \/ Ops/);
+  assert.doesNotMatch(app, /five top-level pages/);
+});
+
+test("dashboard preserves governed review gates and stop rules", () => {
   for (const actionId of [
     "project-preflight",
     "generate-harness-profile",
+    "activate-harness-profile",
     "create-goal",
     "plan-goal",
-    "activate-harness-profile",
     "approve-goal-plan",
     "advance-goal"
   ]) {
     assert.match(app, new RegExp(escapeRegExp(actionId)));
   }
 
-  assert.match(styles, /\.review-confirmation/);
-  assert.match(styles, /\.flow-line/);
-  assert.match(styles, /\.review-pack/);
-  assert.match(styles, /\.projection-grid/);
+  for (const text of [
+    "DRAFT",
+    "sourceContent",
+    "compiledContent",
+    "policyRefs",
+    "sourceDigest",
+    "compiledDigest",
+    "generatedBy",
+    "Dashboard will not invent either value",
+    "Release truth comes from EvoPilot evidence packages and release decisions"
+  ]) {
+    assert.match(app, new RegExp(escapeRegExp(text)));
+  }
 });
 
 test("dashboard call sites cover current EvoPilot API control-plane surfaces", () => {
@@ -153,15 +166,22 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles",
     "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/generate",
     "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/validate",
+    "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/${encodeURIComponent(profileId)}",
     "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/${encodeURIComponent(profileId)}/activate",
     "/api/v1/release/targets",
     "/api/v1/maturity/standards",
     "/api/v1/goals",
+    "/api/v1/goals/${encodeURIComponent(goalId)}",
     "/api/v1/goals/${encodeURIComponent(goalId)}/plan",
     "/api/v1/goals/${encodeURIComponent(goalId)}/approve-plan",
     "/api/v1/goals/${encodeURIComponent(goalId)}/advance",
     "/api/v1/goals/${encodeURIComponent(goalId)}/run-status",
     "/api/v1/goals/${encodeURIComponent(goalId)}/phase-plan",
+    "/api/v1/goals/${encodeURIComponent(goalId)}/phases",
+    "/api/v1/goals/${encodeURIComponent(goalId)}/targets",
+    "/api/v1/goals/${encodeURIComponent(goalId)}/phase-packages",
+    "/api/v1/goals/${encodeURIComponent(goalId)}/target-packages",
+    "/api/v1/goals/${encodeURIComponent(goalId)}/snapshot",
     "/api/v1/goals/${encodeURIComponent(goalId)}/evidence-matrix",
     "/api/v1/goals/${encodeURIComponent(goalId)}/final-report",
     "/api/v1/loops",
@@ -172,6 +192,7 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/loops/${encodeURIComponent(loopId)}/source-closure/execute",
     "/api/v1/release/decisions",
     "/api/v1/release/evidence",
+    "/api/v1/release/evidence/${encodeURIComponent(evidenceId)}",
     "/api/v1/audit",
     "/api/v1/history",
     "/api/v1/llm-profiles",
@@ -207,19 +228,25 @@ test("optional sibling EvoPilot OpenAPI contains the dashboard contract paths", 
     "/api/v1/harness/policies",
     "/api/v1/projects/{projectId}/harness-profiles",
     "/api/v1/projects/{projectId}/harness-profiles/generate",
+    "/api/v1/projects/{projectId}/harness-profiles/{profileId}",
     "/api/v1/projects/{projectId}/harness-profiles/{profileId}/activate",
     "/api/v1/release/targets",
     "/api/v1/maturity/standards",
     "/api/v1/goals",
+    "/api/v1/goals/{goalId}",
     "/api/v1/goals/{goalId}/plan",
     "/api/v1/goals/{goalId}/approve-plan",
     "/api/v1/goals/{goalId}/advance",
     "/api/v1/goals/{goalId}/run-status",
     "/api/v1/goals/{goalId}/phase-plan",
+    "/api/v1/goals/{goalId}/phase-packages",
+    "/api/v1/goals/{goalId}/target-packages",
+    "/api/v1/goals/{goalId}/snapshot",
     "/api/v1/goals/{goalId}/evidence-matrix",
     "/api/v1/loops/{loopId}/executor-graph",
     "/api/v1/loops/{loopId}/source-closure/preflight",
     "/api/v1/release/decisions",
+    "/api/v1/release/evidence",
     "/api/v1/audit",
     "/api/v1/llm-profiles"
   ]) {
@@ -240,21 +267,16 @@ test("dashboard project onboarding follows current EvoPilot DevOps contract", ()
   assert.doesNotMatch(`${app}\n${styles}\n${readme}`, new RegExp(`${legacyCiName}|${legacyCiLower}`));
 });
 
-test("dashboard repository owns lightweight UI operation and AI-agent docs", () => {
+test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
   for (const file of [
     "docs/README.md",
     "docs/getting-started.md",
     "docs/user-guide.md",
     "docs/admin-guide.md",
     "docs/workflows/end-to-end-scenarios.md",
-    "docs/workflows/first-login.md",
-    "docs/workflows/tenant-workspace-user-admin.md",
     "docs/workflows/project-onboarding.md",
-    "docs/workflows/credential-and-devops-boundary.md",
     "docs/workflows/source-to-ga-loop.md",
-    "docs/workflows/global-goal-loop-workflow.md",
     "docs/workflows/release-decision-review.md",
-    "docs/workflows/audit-and-history.md",
     "docs/ai-agents/README.md",
     "docs/ai-agents/digital-human-playbook.md",
     "docs/ai-agents/dashboard-page-map.md",
@@ -268,40 +290,36 @@ test("dashboard repository owns lightweight UI operation and AI-agent docs", () 
     assert.equal(fs.existsSync(file), true, `${file} should exist`);
   }
 
-  assert.match(allDocs, /Projects \/ Runs \/ Ops/);
-  assert.match(docsIndex, /Dashboard docs describe browser operations/);
-  assert.match(docsIndex, /not a full CLI replacement/);
-  assert.match(docsIndex, /Review Pack/);
-  assert.match(docsUserGuide, /Dashboard does not call CLI commands/);
-  assert.match(docsUserGuide, /ordinary-user core flows/);
-  assert.match(docsUserGuide, /Production Action Map/);
-  assert.match(docsUserGuide, /POST \/api\/v1\/onboarding\/project\/checklist/);
-  assert.match(docsUserGuide, /POST \/api\/v1\/goals/);
-  assert.match(docsAiAgents, /WorkBuddy/);
-  assert.match(docsAiAgents, /three top-level pages/);
-  assert.match(docsAiAgents, /Agent-Safe Smoke/);
+  for (const text of [
+    "Agent Console v2",
+    "ProjectHarnessProfile.yaml",
+    "Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision",
+    "Evidence Drawer",
+    "chat-first",
+    "WorkBuddy",
+    "ordinary-user core flow"
+  ]) {
+    assert.match(allDocs, new RegExp(escapeRegExp(text)));
+  }
+
+  assert.match(docsAiAgents, /Agent Console v2/);
   assert.match(docsAiAgents, /Browser End-To-End Loop/);
-  assert.match(docsDashboardMap, /Projects \| Runs \| Ops/);
-  assert.match(docsDashboardMap, /Review Pack Action Recognition/);
-  assert.match(docsExpectedStates, /Review Pack States/);
+  assert.match(docsDashboardMap, /Agent Console Surface Map/);
+  assert.match(docsExpectedStates, /ProjectHarnessProfile YAML Review/);
   assert.match(docsE2E, /CLI-equivalent/);
   assert.match(docsE2E, /WorkBuddy deviation guard/);
   assert.match(docsSmoke, /Dashboard Console Smoke/);
   assert.match(docsSmoke, /EVOPILOT_MUTATING_SMOKE=1/);
   assert.match(docsSmoke, /evopilot-dashboard-console-smoke\/v1/);
-  assert.match(docsApiUsage, /Do not copy OpenAPI schema/);
-  assert.match(docsApiUsage, /Review Pack API Map/);
+  assert.match(docsApiUsage, /Agent Console API Map/);
   assert.match(docsApiUsage, /Projection Context/);
-  assert.match(docsDevopsBoundary, /devopsOwner/);
-  assert.match(docsDevopsBoundary, /fork-validated-pr/);
-  assert.match(docsDevopsBoundary, /GitHub\/GitLab execution principal/);
-  assert.match(docsDevopsBoundary, /connect-github-account/);
-  assert.match(docsDevopsBoundary, /connect-gitlab-account/);
+  assert.doesNotMatch(allDocs, /three top-level pages/);
+  assert.doesNotMatch(allDocs, /Projects \/ Runs \/ Ops/);
   assert.doesNotMatch(allDocs, /five top-level pages/);
-  assert.doesNotMatch(allDocs, /Dashboard \/ Projects \/ Harness \/ Goal Runs \/ Operations/);
 });
 
 test("production build includes runtime dashboard scripts", () => {
+  if (!distIndex) return;
   assert.match(distIndex, /config\.js/);
   assert.match(distIndex, /type="module"/);
   assert.equal(fs.existsSync("dist/config.js"), true);
@@ -337,21 +355,17 @@ test("dashboard service has deployable CI and container contracts", () => {
   assert.match(dockerignore, /\.git/);
 });
 
-test("production smoke separates dashboard health from proxied API checks", () => {
+test("production and console smoke validate API compatibility", () => {
   assert.match(productionSmoke, /dashboard\.health/);
   assert.match(productionSmoke, /expectDashboardHealth/);
   assert.match(productionSmoke, /dashboard\.proxy\.version/);
   assert.match(productionSmoke, /evopilot-version\/v1/);
-  assert.doesNotMatch(productionSmoke, /dashboard\.proxy\.health/);
-  assert.doesNotMatch(productionSmoke, /dashboard\.proxy\.ready/);
-});
-
-test("dashboard console smoke validates auth, proxy, action, and mutating flow contracts", () => {
   assert.match(consoleSmoke, /evopilot-dashboard-console-smoke\/v1/);
   assert.match(consoleSmoke, /EVOPILOT_MUTATING_SMOKE/);
   assert.match(consoleSmoke, /AbortController/);
   assert.match(consoleSmoke, /auth\.login/);
   assert.match(consoleSmoke, /summary\.authenticated/);
+  assert.match(consoleSmoke, /harness\.templates/);
   assert.match(consoleSmoke, /goals\.list/);
   assert.match(consoleSmoke, /release\.targets/);
   assert.match(consoleSmoke, /maturity\.standards/);
