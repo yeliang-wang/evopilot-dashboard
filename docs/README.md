@@ -40,7 +40,8 @@ Ordinary users do not choose public `HarnessTemplate` files manually. Template m
 
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v1.0.1 Release Notes](releases/1.0.1.md) is the GitHub Release body for the current public production baseline.
+- [EvoPilot Dashboard v1.0.2 Release Notes](releases/1.0.2.md) is the current immutable release artifact body for the public production baseline.
+- [EvoPilot Dashboard v1.0.1 Release Notes](releases/1.0.1.md) is the publication-hardening release body for the previous public production baseline.
 - [Open Source Readiness](reference/open-source-readiness.md) tracks repository trust assets.
 - [Open Source Maturity Report](reference/open-source-maturity-report.md) states the current product maturity boundary.
 - [GitHub Metadata](reference/github-metadata.md) keeps About, topics, and social preview aligned with the README.

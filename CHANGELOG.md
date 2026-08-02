@@ -4,6 +4,21 @@ All notable changes to EvoPilot Dashboard are documented here.
 
 Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
 
+## 1.0.2 - 2026-08-02
+
+### Added
+
+- Added immutable release artifact publishing for the Dashboard: release archive with built `dist/`, SPDX SBOM, provenance, SHA256 checksums, and GHCR image digest metadata.
+- Added tag-triggered GitHub Actions release artifact workflow.
+- Added ECS immutable compose template that deploys a pinned Dashboard image digest.
+
+### Validation
+
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `npm run check`
+- `git diff --check`
+
 ## 1.0.1 - 2026-08-02
 
 ### Changed

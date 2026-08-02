@@ -9,6 +9,7 @@ const requiredFiles = [
   "CONTRIBUTING.md",
   "CODE_OF_CONDUCT.md",
   "SECURITY.md",
+  ".github/workflows/release-artifacts.yml",
   ".github/ISSUE_TEMPLATE/bug_report.yml",
   ".github/ISSUE_TEMPLATE/feature_request.yml",
   ".github/ISSUE_TEMPLATE/config.yml",
@@ -19,7 +20,10 @@ const requiredFiles = [
   "docs/reference/github-metadata.md",
   "docs/operations/self-hosting.md",
   "docs/operations/release-management.md",
-  "docs/releases/1.0.0.md",
+  "docs/releases/1.0.2.md",
+  "deploy/ecs/compose.immutable.yaml",
+  "scripts/build-release-artifacts.mjs",
+  "scripts/verify-release-artifacts.mjs",
   "docs/workflows/example-project-walkthroughs.md",
 ];
 
@@ -100,7 +104,7 @@ for (const phrase of ["15 Minute Path", "Upgrade Path", "Acceptance Checklist"])
 }
 
 const releaseManagement = await readRequired("docs/operations/release-management.md");
-for (const phrase of ["Release Policy", "Versioning", "Release Checklist", "Tag And Push"]) {
+for (const phrase of ["Release Policy", "Versioning", "Release Checklist", "Tag And Push", "Immutable Release Artifacts"]) {
   if (!releaseManagement.includes(phrase)) {
     failures.push(`docs/operations/release-management.md must include ${phrase}`);
   }

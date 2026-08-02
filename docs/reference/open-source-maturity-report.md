@@ -17,8 +17,8 @@ It should not claim community parity with the most established public AI-agent c
 | Documentation shape | Concise product README plus role-based docs index, workflow guides, and AI Agent operation docs. | `README.md`, `docs/README.md`, `docs/ai-agents/README.md` |
 | User flows | Project intake, EvoPilot template auto-match, `ProjectHarnessProfile.yaml` DRAFT review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
 | AI Agent readiness | WorkBuddy-readable page map, expected UI states, stop rules, AGENTS entrypoint. | `AGENTS.md`, `docs/ai-agents/` |
-| Distribution | Dockerfile, production compose, Nginx template, self-hosting docs. | `Dockerfile`, `compose.production.yaml`, `deploy/nginx/`, `docs/operations/self-hosting.md` |
-| Release readiness | Versioned release notes, changelog, release checklist, smoke validation. | `CHANGELOG.md`, `docs/releases/1.0.1.md`, `docs/operations/release-management.md` |
+| Distribution | Dockerfile, production compose, Nginx template, self-hosting docs, immutable release archive, SBOM, provenance, checksum, and image digest metadata. | `Dockerfile`, `compose.production.yaml`, `deploy/`, `.github/workflows/release-artifacts.yml`, `docs/operations/self-hosting.md` |
+| Release readiness | Versioned release notes, changelog, release checklist, smoke validation, immutable artifact workflow. | `CHANGELOG.md`, `docs/releases/1.0.2.md`, `docs/operations/release-management.md` |
 | Community shell | License, notice, contribution guide, security policy, code of conduct, issue forms, PR template. | Root governance files and `.github/` |
 
 ## Top-Tier Gap Assessment
@@ -29,7 +29,7 @@ It should not claim community parity with the most established public AI-agent c
 | API compatibility | Enforced by static and smoke checks | Keep pace with EvoPilot OpenAPI changes. |
 | Self-hosting | Documented and containerized | Add published deployment examples as users adopt it. |
 | Community | Governance shell present | Build issue triage, contributor activity, and public demos. |
-| Trust evidence | Local and production smoke paths present | Add public case studies and release screenshots over time. |
+| Trust evidence | Local and production smoke paths plus immutable release artifact evidence present | Add public case studies and release screenshots over time. |
 
 ## Maturity Target
 

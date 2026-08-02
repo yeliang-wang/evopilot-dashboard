@@ -19,6 +19,7 @@ EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned u
 | Security policy | Present | `SECURITY.md` |
 | Code of conduct | Present | `CODE_OF_CONDUCT.md` |
 | CI workflow | Present | `.github/workflows/ci.yml` |
+| Release artifact workflow | Present | `.github/workflows/release-artifacts.yml` |
 | Issue forms | Present | `.github/ISSUE_TEMPLATE/` |
 | Pull request template | Present | `.github/pull_request_template.md` |
 | AI Agent entrypoint | Present | `docs/ai-agents/README.md` |
@@ -26,7 +27,8 @@ EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned u
 | Root agent instructions | Present | `AGENTS.md`, `llms.txt` |
 | Self-hosting guide | Present | `docs/operations/self-hosting.md` |
 | Release playbook | Present | `docs/operations/release-management.md` |
-| Release notes | Present | `docs/releases/1.0.1.md` |
+| Release notes | Present | `docs/releases/1.0.2.md` |
+| Immutable release artifacts | Present | `scripts/build-release-artifacts.mjs`, `scripts/verify-release-artifacts.mjs`, `deploy/ecs/compose.immutable.yaml` |
 | Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
 
 ## Documentation Shape
@@ -48,11 +50,14 @@ The public documentation model is:
 | Smoke validation | `scripts/dashboard-console-smoke.mjs`, `scripts/production-compat-smoke.mjs` |
 | Example walkthroughs | `docs/workflows/example-project-walkthroughs.md` |
 | Self-hosting and upgrade | `docs/operations/self-hosting.md`, `docs/operations/release-management.md` |
+| Immutable deployment evidence | `docs/operations/release-management.md`, `deploy/ecs/compose.immutable.yaml`, `npm run release:artifact` |
 
 ## Validation Commands
 
 ```bash
 npm run check
+npm run release:artifact
+npm run verify:release-artifact
 npm run smoke:console
 git diff --check
 ```

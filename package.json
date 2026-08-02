@@ -1,6 +1,6 @@
 {
   "name": "evopilot-dashboard",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Chat-first Agent Console for EvoPilot project evolution loops through its HTTP API control plane.",
   "license": "Apache-2.0",
@@ -11,6 +11,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run build && node tests/static-contract.test.mjs && npm run verify:oss-governance",
+    "release:artifact": "node scripts/build-release-artifacts.mjs",
+    "verify:release-artifact": "node scripts/verify-release-artifacts.mjs",
     "smoke:console": "node scripts/dashboard-console-smoke.mjs",
     "smoke:production": "node scripts/production-compat-smoke.mjs",
     "verify:oss-governance": "node scripts/verify-open-source-governance.mjs"
