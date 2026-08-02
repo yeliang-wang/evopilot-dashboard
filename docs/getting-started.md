@@ -67,6 +67,8 @@ npm run check
 
 This type-checks the React app, builds the production bundle, and runs static contract tests that keep Dashboard aligned with EvoPilot API and CLI semantics.
 
+For a complete self-hosted stack, use [Self-Hosting](operations/self-hosting.md). For public release validation, use [Release Management](operations/release-management.md).
+
 ## Agent-Safe Smoke
 
 When shell access is available, prefer the JSON smoke report over screenshots:

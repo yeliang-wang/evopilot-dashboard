@@ -11,7 +11,7 @@
 
 Run project intake, harness review, loop execution, blocker repair, evidence review, and release decisions from a browser.
 
-[Quickstart](./docs/getting-started.md) | [Docs](./docs/README.md) | [User Guide](./docs/user-guide.md) | [AI Agents](./docs/ai-agents/README.md) | [Changelog](./CHANGELOG.md) | [Security](./SECURITY.md)
+[Quickstart](./docs/getting-started.md) | [Self-Hosting](./docs/operations/self-hosting.md) | [Docs](./docs/README.md) | [User Guide](./docs/user-guide.md) | [AI Agents](./docs/ai-agents/README.md) | [Changelog](./CHANGELOG.md) | [Security](./SECURITY.md)
 
 ![EvoPilot Dashboard Agent Console](./docs/assets/agent-console.png)
 
@@ -88,11 +88,15 @@ EVOPILOT_MUTATING_SMOKE=1 npm run smoke:console
 ## More Docs
 
 - [End-to-end scenarios](./docs/workflows/end-to-end-scenarios.md)
+- [Example project walkthroughs](./docs/workflows/example-project-walkthroughs.md)
 - [AI Agent browser operation guide](./docs/ai-agents/README.md)
 - [API usage map](./docs/reference/api-usage.md)
+- [Self-hosting](./docs/operations/self-hosting.md)
+- [Release management](./docs/operations/release-management.md)
 - [Smoke test guide](./docs/operations/smoke-test.md)
 - [Troubleshooting](./docs/operations/troubleshooting.md)
 - [Open source readiness](./docs/reference/open-source-readiness.md)
+- [Open source maturity report](./docs/reference/open-source-maturity-report.md)
 
 ## License
 

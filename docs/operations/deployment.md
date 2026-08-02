@@ -2,6 +2,8 @@
 
 > Deploy EvoPilot Dashboard as a standalone static service that talks to EvoPilot API.
 
+For the complete operator path, start with [Self-Hosting](self-hosting.md). Release versioning, tags, compatibility notes, and rollback rules are in [Release Management](release-management.md).
+
 ## Production Shape
 
 Recommended routing:

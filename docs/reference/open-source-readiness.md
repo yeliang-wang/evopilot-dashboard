@@ -23,6 +23,11 @@ EvoPilot Dashboard is a chat-first Agent Console for EvoPilot project evolution 
 | Pull request template | Present | `.github/pull_request_template.md` |
 | AI Agent entrypoint | Present | `docs/ai-agents/README.md` |
 | API compatibility docs | Present | `docs/reference/api-usage.md` |
+| Root agent instructions | Present | `AGENTS.md`, `llms.txt` |
+| Self-hosting guide | Present | `docs/operations/self-hosting.md` |
+| Release playbook | Present | `docs/operations/release-management.md` |
+| Release notes | Present | `docs/releases/1.0.0.md` |
+| Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
 
 ## Product Evidence Assets
 
@@ -33,6 +38,8 @@ EvoPilot Dashboard is a chat-first Agent Console for EvoPilot project evolution 
 | Evidence Drawer | `docs/reference/api-usage.md`, `docs/operations/troubleshooting.md` |
 | WorkBuddy operation | `docs/ai-agents/README.md`, `docs/workflows/end-to-end-scenarios.md` |
 | Smoke validation | `scripts/dashboard-console-smoke.mjs`, `scripts/production-compat-smoke.mjs` |
+| Example walkthroughs | `docs/workflows/example-project-walkthroughs.md` |
+| Self-hosting and upgrade | `docs/operations/self-hosting.md`, `docs/operations/release-management.md` |
 
 ## Validation Commands
 
@@ -41,6 +48,10 @@ npm run check
 npm run smoke:console
 git diff --check
 ```
+
+## Top-Tier Open Source Boundary
+
+The repository now provides the assets needed for external users and AI Agents to understand, deploy, operate, validate, and contribute to the Dashboard. This is the open-source productization baseline. Public community maturity still depends on sustained releases, external deployments, issue traffic, contributor activity, and real user case studies. Track the current assessment in [Open Source Maturity Report](open-source-maturity-report.md).
 
 ## What This Does Not Prove
 

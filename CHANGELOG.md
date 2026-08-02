@@ -4,7 +4,7 @@ All notable changes to EvoPilot Dashboard are documented here.
 
 Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
 
-## 0.1.0 - 2026-08-02
+## 1.0.0 - 2026-08-02
 
 ### Added
 
@@ -15,6 +15,8 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 - Dashboard smoke tests for local and production compatibility checks.
 - AI Agent docs for WorkBuddy and browser-operating agents.
 - GitHub README screenshot and Apache-2.0 license alignment with EvoPilot.
+- Root `AGENTS.md` and `llms.txt` entry points for AI Agent discovery.
+- Self-hosting guide, release management playbook, v1.0.0 release notes, example walkthroughs, and open-source maturity report.
 
 ### Validation
 

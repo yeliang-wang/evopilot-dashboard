@@ -1,0 +1,21 @@
+# EvoPilot Dashboard
+
+EvoPilot Dashboard is the standalone browser console for EvoPilot project evolution loops.
+
+Useful entry points for AI Agents:
+
+- AGENTS.md
+- docs/ai-agents/README.md
+- docs/workflows/end-to-end-scenarios.md
+- docs/workflows/example-project-walkthroughs.md
+- docs/reference/api-usage.md
+- docs/operations/self-hosting.md
+- docs/operations/release-management.md
+- docs/reference/open-source-maturity-report.md
+
+Rules:
+
+- EvoPilot API is the system of record.
+- Dashboard is an HTTP client only.
+- Do not bypass human approval, ProjectHarnessProfile review, phase plan approval, release policy, RBAC, tenant/workspace scope, or audit.
+- Stop on `nextAction`, blockers, `NO-GO`, `BLOCKED`, `FAILED`, or repair actions.
