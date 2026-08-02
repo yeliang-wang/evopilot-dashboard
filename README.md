@@ -7,6 +7,7 @@
 [![CI](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://react.dev/)
+[![Release](https://img.shields.io/badge/Release-v1.0.0%20GA-2ea043)](./docs/releases/1.0.0.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 Run project intake, harness review, loop execution, blocker repair, evidence review, and release decisions from a browser.
@@ -28,6 +29,12 @@ Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Dec
 Users describe a repository and goal loop target, review the generated `ProjectHarnessProfile.yaml`, approve the bound phase plan, monitor execution, repair blockers, and inspect release decisions through the **Evidence Drawer**.
 
 EvoPilot API remains the system of record. The Dashboard is a standalone React HTTP client; it does not own project, harness, loop, evidence, audit, or release state.
+
+## Release Status
+
+EvoPilot Dashboard is **v1.0.0 GA** for the Agent Console baseline: browser project intake, harness draft review, owner approval, loop execution, evidence inspection, blocker repair, release decision review, self-hosting docs, AI Agent docs, and smoke validation are ready for external adoption.
+
+Current phase: **Production Adoption and Public Trust Building**. Public case studies, independent deployments, contributor activity, and ecosystem reputation will grow through real usage and sustained releases.
 
 ## Core Capabilities
 
