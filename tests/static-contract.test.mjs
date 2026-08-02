@@ -90,7 +90,8 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
   for (const text of [
     "Agent Console",
     "Project Intake",
-    "Harness Draft",
+    "Template Auto-Match",
+    "ProjectHarnessProfile DRAFT",
     "Owner Review",
     "Loop Execution",
     "Release Decision",

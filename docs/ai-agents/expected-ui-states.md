@@ -23,7 +23,8 @@ The sidebar must not show workspace/project cards, active sessions, recent decis
 | Stage | Expected State Labels |
 |---|---|
 | Project Intake | `editing goal`, `done` |
-| Harness Draft | `matching template`, `drafting profile`, `done` |
+| Template Auto-Match | `matching template`, `done` |
+| ProjectHarnessProfile DRAFT | `drafting profile`, `done` |
 | Owner Review | `needs owner review`, `changes applied`, `done` |
 | Loop Execution | `planning`, `running`, `blocked repair`, `done` |
 | Release Decision | `not started`, `GO review`, `NO-GO`, `BLOCKED` |
