@@ -65,3 +65,13 @@ Expected:
 - EvoPilot readiness returns `READY`.
 - Dashboard `/api/v1/version` returns EvoPilot version through the proxy.
 - Unauthenticated API summary returns `401`.
+
+Then run Dashboard console smoke from the deployed checkout or CI runner:
+
+```bash
+EVOPILOT_DASHBOARD_BASE_URL=http://<public-dashboard-host> \
+EVOPILOT_API_BASE_URL=http://<api-host> \
+npm run smoke:console
+```
+
+Production deployment is not accepted from health checks alone. It must also prove auth/bootstrap, login or supplied session token, authenticated summary, templates/projects reads, worker queue, and a JSON smoke report. Run mutating smoke only against an approved disposable project/goal.

@@ -10,13 +10,12 @@
 
 ## Steps
 
-1. Open **租户总览**.
+1. Open **Ops**.
 2. Confirm the current tenant and workspace.
-3. Open **用户与权限**.
-4. Create or edit a user.
-5. Assign role, tenant, workspace, and status.
-6. Save and verify the user appears in the table.
-7. If needed, reset password and tell the user to change it on next login.
+3. Inspect user, tenant, and workspace projections.
+4. Use EvoPilot administrator flows for create/edit/reset when the current Dashboard build does not expose a direct form.
+5. Refresh projections and verify the user, tenant, or workspace state.
+6. Check audit when available.
 
 ## Expected Result
 
@@ -29,16 +28,5 @@
 | Symptom | Likely Cause | Next Action |
 |---|---|---|
 | Save returns 403 | Current user lacks admin role | Switch to platform or tenant admin. |
-| User cannot see project | Wrong workspace assignment | Edit user workspace. |
+| User cannot see project | Wrong workspace assignment | Edit user workspace through EvoPilot admin flow. |
 | User can see too much | Role too broad or platformAdmin set incorrectly | Downgrade role and review audit. |
-
-## Related API
-
-- `GET /api/v1/tenants`
-- `POST /api/v1/tenants`
-- `GET /api/v1/workspaces`
-- `POST /api/v1/workspaces`
-- `GET /api/v1/users`
-- `POST /api/v1/users`
-- `PATCH /api/v1/users/{userId}`
-- `POST /api/v1/users/{userId}/reset-password`

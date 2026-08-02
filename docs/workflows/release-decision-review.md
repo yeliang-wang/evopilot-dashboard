@@ -8,9 +8,9 @@ The release decision from EvoPilot API is authoritative. Dashboard cards, workfl
 
 ## Steps
 
-1. Open **发布证据**.
-2. Select project and target if filters are available.
-3. Read the current release decision.
+1. Open **Runs**.
+2. Select or confirm projectId, goalId, targetId, or loopId if filters are available.
+3. Read current release decision projections.
 4. Check status: `GO`, `CONDITIONAL-GO`, or `NO-GO`.
 5. Read failed criteria, open risks, scenario matrix, source release run, and CI/CD evidence.
 6. If the decision is `NO-GO`, route to the recommended repair workflow.
@@ -26,12 +26,6 @@ The release decision from EvoPilot API is authoritative. Dashboard cards, workfl
 
 | Symptom | Likely Cause | Next Action |
 |---|---|---|
-| No current decision | Target has not produced release evidence. | Run target or generate decision. |
-| Decision is stale | Evidence was updated after decision. | Regenerate release decision. |
+| No current decision | Target has not produced release evidence. | Run or advance the goal. |
+| Decision is stale | Evidence was updated after decision. | Regenerate release decision through EvoPilot-controlled flow. |
 | UI and CLI disagree | One client is deriving state or using a different server. | Check API server URL and release decision endpoint. |
-
-## Related API
-
-- `GET /api/v1/release/decisions`
-- `POST /api/v1/release/evidence`
-- `GET /api/v1/history`

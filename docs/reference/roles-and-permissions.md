@@ -8,7 +8,7 @@
 |---|---|---|
 | Platform administrator | Create tenants, workspaces, tenant admins, and cross-tenant audit views. | Bypass release gates. |
 | Tenant administrator | Manage users and project setup inside tenant/workspace. | Grant platform admin privileges. |
-| Workspace developer | Onboard projects, configure project credentials, start Loops. | Approve high-risk release gates without authority. |
+| Workspace developer | Onboard projects, configure project credentials, and start or advance reviewed goal loops from Projects/Runs. | Approve high-risk release gates without authority. |
 | Release owner | Review release decisions, approve release actions, repair failed release runs. | Change unrelated credentials or user roles. |
 | Loop operator | Inspect worker queue, replay, trace, sandbox proof, and runtime blockers. | Approve business release decisions. |
 | Audit viewer | Read tenant/workspace evidence and audit history. | Mutate state. |

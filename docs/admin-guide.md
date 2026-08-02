@@ -1,6 +1,6 @@
 # Admin Guide
 
-> Manage tenants, workspaces, users, credentials, and governance boundaries in the Dashboard.
+> Manage Dashboard access, credentials, governance boundaries, and compatibility checks without bypassing EvoPilot API.
 
 ## Audience
 
@@ -10,25 +10,29 @@ Platform administrators, tenant administrators, and operations staff.
 
 | Responsibility | Dashboard Area | Required Evidence |
 |---|---|---|
-| Bootstrap access | 登录页, 用户与权限 | Password changed, user role visible |
-| Tenant setup | 租户总览 | Tenant created, workspace assigned |
-| Workspace membership | 用户与权限 | User role, status, tenant, workspace |
-| Project credentials | 凭据, 接入项目 | Secret/tokenRef saved, preflight result |
-| DevOps boundary | 接入项目 | executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary |
-| Release governance | 发布证据, Loops | Human gate, policy evidence, release decision |
-| Audit | 审计 | requestId, actor, operation, result |
+| Bootstrap access | Auth Session / Ops | password changed, user role visible, tenant/workspace scope correct |
+| User and scope setup | Ops | user role, tenant, workspace, status, audit row |
+| Project credentials | Projects / Ops | server-side secret or tokenRef saved, checklist/preflight result |
+| DevOps boundary | Projects | executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary |
+| Harness governance | Projects Review Pack | templateRef, policyRefs, profile validation, source/compiled digest |
+| Phase governance | Projects Review Pack / Runs | Alpha/Beta/RC/GA phase plan, owner confirmation, approval audit |
+| Release governance | Runs | TargetEvidencePackage, PhasePackage, releaseDecision |
+| Troubleshooting | Ops | requestId, traceId, actor, operation, error, nextAction |
 
-## First Admin Path
+## Production Console Governance
 
-1. Open Dashboard login.
-2. Log in with the bootstrap platform admin account.
-3. Change the default password if prompted.
-4. Create or inspect the tenant.
-5. Create or inspect the workspace.
-6. Create tenant administrators and workspace users.
-7. Confirm each user has the correct role before project onboarding.
+The Dashboard exposes mutating controls, but EvoPilot API remains the enforcement point.
 
-See [First Login](workflows/first-login.md) and [Tenant Workspace User Admin](workflows/tenant-workspace-user-admin.md).
+| Control | Admin Responsibility | Dashboard Evidence |
+|---|---|---|
+| Login and password change | Issue Dashboard users through EvoPilot auth, not GitHub/GitLab PATs. | Auth Session shows username, role, tenant, workspace, and password-change state. |
+| Tenant/workspace scope | Ensure every admin, operator, and viewer belongs to the correct scope. | Header and Ops fields match the project owner. |
+| Project onboarding checklist | Require real repository provider/url/branch, tokenRef, DevOps owner, and LLM profile where needed. | Review Pack shows `POST /api/v1/onboarding/project/checklist`, requestId, blockers, and nextAction. |
+| Harness profile activation | Require owner review of the generated/edited DRAFT before activation. | Review Pack shows generated profile version/digest; Last API Action shows activate status. |
+| Goal plan approval | Require Alpha/Beta/RC/GA phase plan review before approval. | Review Pack requires `confirmedBy` and `confirmation`; Ops/audit can verify approval. |
+| Incident repair | Use requestId, traceId, failed node, root cause, and nextAction. | Ops shows troubleshooting contract; server logs remain authoritative. |
+
+If EvoPilot returns `403`, `409`, `PROJECT_HARNESS_PROFILE_POLICY_STALE`, `WAITING_APPROVAL`, `NO-GO`, or a repair-oriented `nextAction`, do not bypass it from the browser. Repair the server-side condition and rerun the same action.
 
 ## Credential Policy
 
@@ -36,7 +40,8 @@ Dashboard users may configure source and DevOps references, but secrets are owne
 
 - GitHub/GitLab project writeback credentials should be saved as EvoPilot secret refs or server-side `tokenRef`.
 - GitHub personal access tokens must not be stored in Dashboard static files.
-- Browser login uses username/password and session token, not GitHub PAT.
+- Browser login uses username/password and a server-issued session token, not GitHub PAT.
+- Manually entered Dashboard API bearer tokens are kept for the current browser session only.
 - AI Agent CLI API tokens belong to EvoPilot CLI/API docs, not Dashboard login.
 
 ## DevOps Boundary Policy
@@ -54,9 +59,33 @@ For public upstream projects, prefer `fork-validated-pr`: upstream is read-only 
 
 If the user has no GitHub/GitLab account or group, admins should onboard the upstream as `read-only-public` only. Do not create a shared EvoPilot-owned account or generic CI/CD fallback for third-party upstreams.
 
+## Validation Commands
+
+After deploying or upgrading the Dashboard, run:
+
+```bash
+npm run check
+EVOPILOT_DASHBOARD_BASE_URL=http://<dashboard-host> \
+EVOPILOT_API_BASE_URL=http://<api-host> \
+npm run smoke:console
+```
+
+Run the mutating smoke only against a test server or disposable tenant/workspace:
+
+```bash
+EVOPILOT_MUTATING_SMOKE=1 \
+EVOPILOT_MUTATING_SMOKE_TIMEOUT_MS=180000 \
+EVOPILOT_DASHBOARD_BASE_URL=http://<dashboard-host> \
+EVOPILOT_API_BASE_URL=http://<api-host> \
+npm run smoke:console
+```
+
+The mutating smoke creates a temporary project, generates/activates the returned `ProjectHarnessProfile`, creates a goal, plans it, and approves the plan through the Dashboard proxy. It may invoke real LLM-backed EvoPilot APIs.
+
 ## Do Not Do
 
 - Do not create users without tenant/workspace scope.
 - Do not approve human gates without reviewing evidence.
 - Do not treat health checks as release decisions.
 - Do not bypass blockers by manually editing browser state.
+- Do not treat a passing screenshot as production compatibility without `npm run check` and Dashboard console smoke evidence.

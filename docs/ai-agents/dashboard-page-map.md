@@ -6,41 +6,72 @@
 
 | Page | Purpose | Primary Evidence |
 |---|---|---|
-| 登录页 | Authenticate user and change default password when required. | Login result, user role |
-| 租户总览 | Inspect tenant/workspace health and release summaries. | Summary cards, release status |
-| 用户与权限 | Create users, edit roles, reset passwords. | User table, role/status |
-| 工作区 | Inspect workspace usage and scope. | Workspace ID, usage |
-| 凭据 | Manage secret refs and GitHub App installation evidence. | secretRef, installation status |
-| 接入项目 | Register projects and configure credentials/DevOps boundary. | projectId, readiness, blockers |
-| Loops | Operate GlobalGoal, GoalTarget, LoopRun, worker, trace, and source closure views. | goalId, targetId, loopId, nextAction |
-| 发布证据 | Read release decisions and repair release runs. | decision status, criteria, risks |
-| 审计 | Review actions and history. | actor, requestId, target, result |
-| 帮助手册 | In-app guided help. | Scenario steps and role map |
+| Projects | Start or continue a project loop through repository, goal target, Review Pack, owner gates, and loop advance. | projectId, checklist result, profileId/version, goalId, phase plan, requestId, blockers |
+| Runs | Inspect current Goal/Loop execution and release evidence. | run-status, phase-plan, evidence matrix, final report, release decision |
+| Ops | Troubleshoot system scope and server projections. | tenant/workspace/actor, requestId, traceId, failed projection, nextAction, audit |
+
+Projects | Runs | Ops is the complete top-level navigation.
+
+## Main Surfaces
+
+| Surface | Location | Use It For |
+|---|---|---|
+| Auth Session | Above every page | Login, password-change state, role/scope, sign-out. |
+| Repository | Projects | Enter the GitHub, GitLab, or local-git source. |
+| Goal Loop Target | Projects | Enter the business objective used to draft the harness and phase plan. |
+| Review Pack | Projects | Read project checklist, Harness DRAFT, GlobalGoal, Phase Plan, request IDs, blockers, and nextAction. |
+| Owner Review Gates | Projects | Activate reviewed harness, approve reviewed phase plan, and start/advance loop after explicit confirmation. |
+| Advanced Control Details | Projects | Inspect or edit projectId, tokenRef, DevOps, LLM profile, profileId/version, goalId, loopId, and template override. |
+| Server Projections | Runs / Ops | Read server-returned statuses and request IDs. |
+| Last API Action | Runs / Ops | Read method/path/status/schema/requestId/blockers/nextAction from the last mutating call. |
+| Troubleshooting Contract | Ops | Follow stop rules for credentials, stale harness policy, human gates, and release verdicts. |
 
 ## Field Recognition
 
 Common fields:
 
+- Repository
+- Goal Loop Target
 - Project ID
-- Repository URL
-- Default branch
+- Project Name
+- Provider
+- Default Branch
 - tokenRef
 - executionMode
-- upstreamRepo
-- workingRepo
 - devopsOwner
-- workflowRepository
-- credentialPrincipal
-- target template
-- objective
+- CI Workflow
+- CI Required Check
+- LLM Profile
+- Profile ID
+- Profile Version
+- Template ID Override
+- Goal ID
+- Loop ID
+- Confirmed By
+- Confirmation
+- requestId
+- nextAction
+- blockers
+
+## Review Pack Action Recognition
+
+| Visible Button | Expected API |
+|---|---|
+| Generate Review Pack | `POST /api/v1/onboarding/project/checklist`, then `POST /api/v1/projects/{projectId}/harness-profiles/generate`, then `POST /api/v1/goals`, then `POST /api/v1/goals/{goalId}/plan` |
+| Activate Reviewed Harness | `POST /api/v1/projects/{projectId}/harness-profiles/{profileId}/activate` |
+| Approve Phase Plan | `POST /api/v1/goals/{goalId}/approve-plan` |
+| Start Or Advance Loop | `POST /api/v1/goals/{goalId}/advance` |
+| Refresh Projections | summary/projects/templates/policies/maturity/goals/release/audit/LLM projection calls |
 
 ## Page Selection Rule
 
 If the task is about:
 
-- Login or password: use **登录页**.
-- User/tenant/workspace: use **用户与权限** or **租户总览**.
-- GitHub/GitLab project: use **接入项目**.
-- Goal/Loop execution: use **Loops**.
-- GO/NO-GO: use **发布证据**.
-- Who did what: use **审计**.
+- Login or password: use **Auth Session**.
+- New project loop: use **Projects**.
+- Harness DRAFT or phase-plan review: use **Projects** Review Pack.
+- Context values for action buttons: open **Advanced Control Details** in Projects, or use **Ops** for tenant/workspace/actor.
+- Goal/Loop execution: use **Runs**.
+- GO/NO-GO: use **Runs** and read release decisions/evidence packages.
+- Who did what or why it failed: use **Ops**.
+- CLI commands: leave this repository and read EvoPilot CLI docs.

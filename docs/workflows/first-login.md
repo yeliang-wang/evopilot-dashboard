@@ -15,29 +15,18 @@ Use this when a user, WorkBuddy browser operator, or digital human opens Dashboa
 ## Steps
 
 1. Open the Dashboard URL.
-2. Confirm the page shows the login form.
+2. Confirm the page shows **Projects / Runs / Ops** navigation and the **Auth Session** panel.
 3. Enter username and password.
-4. Submit the form.
-5. If the server requires password change, enter a new password and submit.
-6. Confirm the Dashboard loads the tenant/workspace context.
+4. Click **Login**.
+5. If the server requires password change, enter current and new password, then submit.
+6. Confirm tenant, workspace, actor, and role.
+7. Open **Ops** and click **Refresh Projections** if the API state did not load automatically.
 
 ## Expected Result
 
 - Login succeeds.
-- The user role is visible or implied by available navigation.
-- Protected pages can read `/api/v1/summary`.
-
-## Validation
-
-The browser should show tenant/workspace data. The API should return authenticated summary data through the Dashboard proxy:
-
-```bash
-curl -fsS \
-  -H "Authorization: Bearer <session-or-api-token>" \
-  -H "X-EvoPilot-Tenant: tenant-production" \
-  -H "X-EvoPilot-Workspace: workspace-agent-products" \
-  http://<dashboard-host>/api/v1/summary
-```
+- The user role is visible.
+- Protected projections can read `/api/v1/summary`.
 
 ## Failure Modes
 

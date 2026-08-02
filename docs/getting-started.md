@@ -1,62 +1,55 @@
 # Getting Started
 
-> Connect the standalone Dashboard to an EvoPilot API server and verify the UI can operate real API state.
+> Connect the standalone Dashboard to an EvoPilot API server and verify that the browser UI can operate real server state.
 
 ## Audience
 
-Dashboard users, product operators, WorkBuddy setup agents, and developers validating the split repository.
+Dashboard users, WorkBuddy setup agents, and developers validating the split dashboard repository.
 
 ## Prerequisites
 
-- Node.js 22.
-- An EvoPilot API server reachable by HTTP.
-- A Dashboard login user, not a CLI-only token.
-- Tenant and workspace scope assigned by EvoPilot.
+- A running EvoPilot API server.
+- A Dashboard login user, not a GitHub or GitLab PAT.
+- Tenant and workspace identifiers.
+- Node.js 22 for local development.
 
 ## Run Locally
 
-Start EvoPilot API:
-
-```bash
-cd /Users/wangyejing/project/harness/EvoPilot
-npm run build
-npm run server:debug
-```
-
-Start Dashboard:
-
 ```bash
 cd /Users/wangyejing/project/harness/evopilot-dashboard
-npm install
-EVOPILOT_API_BASE_URL=http://127.0.0.1:19876 npm run dev
+npm ci
+EVOPILOT_API_BASE_URL=http://127.0.0.1:19876 npm run dev -- --port 5174
 ```
 
-Open the Vite URL printed by the command.
+Open `http://127.0.0.1:5174`.
 
-## Connect To Production
-
-Use same-origin deployment when possible:
+Use empty `apiBaseUrl` when Dashboard and API share the same origin:
 
 ```text
 /       -> EvoPilot Dashboard
 /api/*  -> EvoPilot API
-/health -> EvoPilot API health
-/ready  -> EvoPilot API readiness
 ```
 
-If the Dashboard runs on a different origin, set `public/config.js`:
+For cross-origin development, set `public/config.js`:
 
 ```js
 window.EVOPILOT_DASHBOARD_CONFIG = {
-  apiBaseUrl: "http://8.153.72.80"
+  apiBaseUrl: "http://127.0.0.1:19876"
 };
 ```
 
-Use `http://8.153.72.80` for the current production API unless a TLS proxy is explicitly configured.
+Do not put bearer tokens, GitHub PATs, GitLab tokens, LLM keys, or deploy credentials in `public/config.js`.
 
-## First Verification
+## First Browser Check
 
-Run:
+1. Open the Dashboard URL.
+2. Confirm the left navigation shows **Projects**, **Runs**, and **Ops**.
+3. Log in through **Auth Session**.
+4. Confirm the top status changes from `API WAITING` to `API LIVE` after projections load.
+5. Open **Projects**, enter a repository URL and goal loop target, and click **Generate Review Pack** only when using a real or disposable EvoPilot server.
+6. Read Review Pack rows and stop at blockers or review gates.
+
+## Non-Mutating Compatibility Check
 
 ```bash
 curl -fsS http://127.0.0.1:5174/health
@@ -64,22 +57,31 @@ curl -fsS http://127.0.0.1:5174/ready
 curl -i http://127.0.0.1:5174/api/v1/summary
 ```
 
-Expected result:
+`/api/v1/summary` should be proxied to EvoPilot. An unauthenticated `401` is acceptable and proves the proxy reaches the API auth boundary.
 
-- `/health` returns `200`.
-- `/ready` returns `200`.
-- Unauthenticated `/api/v1/summary` returns `401`.
-- After login, Dashboard overview loads real tenant and workspace state.
+## Automated Check
+
+```bash
+npm run check
+```
+
+This type-checks the React app, builds the production bundle, and runs static contract tests that keep Dashboard aligned with EvoPilot API and CLI semantics.
+
+## Agent-Safe Smoke
+
+When shell access is available, prefer the JSON smoke report over screenshots:
+
+```bash
+EVOPILOT_DASHBOARD_BASE_URL=http://127.0.0.1:5174 \
+EVOPILOT_API_BASE_URL=http://127.0.0.1:19876 \
+npm run smoke:console
+```
+
+Use mutating smoke only against a disposable server or after explicit administrator approval.
 
 ## Do Not Do
 
 - Do not paste GitHub personal access tokens into Dashboard login.
-- Do not embed EvoPilot API tokens in `public/config.js`.
 - Do not use Dashboard docs as the OpenAPI source of truth.
-- Do not ask the browser UI to run the EvoPilot CLI.
-
-## Next
-
-- New user path: [User Guide](user-guide.md).
-- Admin path: [Admin Guide](admin-guide.md).
-- Digital human path: [AI Agents](ai-agents/README.md).
+- Do not claim CLI and Dashboard compatibility from health checks alone.
+- Do not continue when EvoPilot returns `nextAction`, blockers, `NO-GO`, `BLOCKED`, `FAILED`, or human approval.

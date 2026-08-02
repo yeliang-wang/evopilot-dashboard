@@ -1,46 +1,51 @@
 # Troubleshooting
 
-> Diagnose Dashboard UI, API proxy, authentication, and workflow-state issues.
+> Diagnose Dashboard browser, API proxy, auth, Review Pack, and EvoPilot compatibility failures.
 
-## Common Issues
+## First Checks
 
-| Symptom | Likely Cause | Fix |
+1. Confirm Dashboard URL is correct.
+2. Confirm the page loads **Projects / Runs / Ops**.
+3. Confirm `public/config.js` points at the intended EvoPilot API server or uses same-origin proxy.
+4. Log in again if the API status is `401`.
+5. Open **Ops** and click **Refresh Projections**.
+6. Read failed projection names, HTTP status, requestId, and error text.
+
+## Common Symptoms
+
+| Symptom | Likely Cause | Next Action |
 |---|---|---|
-| Dashboard loads but data is empty | API base URL or `/api/*` proxy is wrong | Check `public/config.js`, compose env, and Nginx route. |
-| Login rejected | Wrong Dashboard username/password | Reset password through admin workflow. |
-| `401` on API calls | Missing or expired session token | Re-login. |
-| `403` on write actions | Role or tenant/workspace scope denied | Ask admin to correct role/scope. |
-| `409` on workflow action | Server business guardrail blocked the action | Read blocker and nextAction. |
-| Release card disagrees with CLI | Different server URL or UI-side inference | Use release decisions from same API server. |
-| GitHub project cannot write source | Missing tokenRef or read-only public mode | Configure source credentials. |
-| Checklist shows `connect-github-account` or `connect-gitlab-account` | No user/org/group execution principal is available for writeback or native DevOps | Connect or create the account/group, fork or authorize the upstream, store tokenRef, then rerun checklist. |
-| DevOps readiness blocked | devopsOwner does not match workflow repo owner | Correct execution boundary. |
-| LLM/token usage not visible for an LLM-backed run | Dashboard is using an older API response, wrong server, or loop trace has no usage evidence | Check the same goal/loop through `run-status` or loop trace, record requestId, and compare with EvoPilot CLI/API docs. |
+| Login rejected | Wrong Dashboard username/password | Ask an EvoPilot admin to reset the user. |
+| API banner never reaches API LIVE | Wrong API base URL, proxy failure, or auth failure | Run `npm run smoke:console` and check `/api/v1/summary`. |
+| Generate Review Pack stops at checklist | Missing repository, tokenRef, DevOps boundary, LLM profile, or SCM principal | Read blockers and `nextAction`; repair server-side setup. |
+| Harness activation fails | DRAFT not reviewed, bad version, validation failure, or `PROJECT_HARNESS_PROFILE_POLICY_STALE` | Regenerate/apply a reviewed profile revision and retry activation. |
+| Approve Phase Plan disabled | goalId, confirmedBy, or confirmation missing | Generate Review Pack first and enter real owner confirmation. |
+| Approve Phase Plan returns `409` | Plan not reviewable, stale harness policy, or missing confirmation payload | Read Last API Action and repair the stated condition. |
+| Runs shows partial projections | goalId or loopId does not exist on this server | Open Advanced Control Details or Ops and correct the ID. |
+| UI and CLI disagree | Different server URL, tenant/workspace, actor, or token | Compare Dashboard config with EvoPilot CLI env vars. |
+| Release status seems inconsistent | UI color or local evidence is being used instead of release decision | Read release decisions, TargetEvidencePackage, and PhasePackage. |
 
-## Network Checks
+## Request ID Rule
 
-```bash
-curl -fsS http://<dashboard-host>/health
-curl -fsS http://<dashboard-host>/ready
-curl -i http://<dashboard-host>/api/v1/summary
+When reporting a failure, include:
+
+```text
+dashboardUrl=<url>
+apiBaseUrl=<url-or-same-origin>
+tenant=<tenant-id>
+workspace=<workspace-id>
+page=<Projects|Runs|Ops>
+action=<button-or-projection>
+status=<http-status-or-ui-state>
+requestId=<request-id-or-not-visible>
+nextAction=<server-next-action-or-not-visible>
+blockers=<server-blockers-or-not-visible>
 ```
 
-Expected:
+## Logging Rule
 
-- Health and ready return 200.
-- Summary without auth returns 401, not network failure.
+EvoPilot server logs are controlled by EvoPilot, not Dashboard. Use EvoPilot CLI/API docs for `logging inspect` and temporary debug changes. Only administrators should raise logging to `debug`, and they should restore `info` after diagnosis.
 
-## Production URL Rule
+## WorkBuddy Repair Rule
 
-Use `http://8.153.72.80` for the current public EvoPilot API endpoint unless a TLS proxy is configured. Do not use `https://8.153.72.80:19876` against a plain HTTP service.
-
-## Evidence To Collect
-
-- Page name.
-- Button or form action.
-- Visible state.
-- HTTP status.
-- requestId if visible or available in network logs.
-- tenant/workspace.
-- projectId, goalId, loopId, or release decision ID.
-- LLM provider/model and token totals when the issue involves Loop execution or cost visibility.
+WorkBuddy may retry after fixing a clear input error. It must stop and ask for owner/admin action when the failure is a governance gate, credential blocker, policy stale state, LLM profile repair, release NO-GO, or human approval.
