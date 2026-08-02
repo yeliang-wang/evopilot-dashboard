@@ -41,6 +41,7 @@ type ConsoleStep =
   | "release";
 
 type DrawerKind = "session" | "review" | "diff" | "blocker" | "release" | "api";
+type PageId = "console" | "tenants" | "workspaces" | "users" | "templates" | "audit";
 
 type MessageRole = "user" | "agent";
 
@@ -97,11 +98,46 @@ interface ReviewStep {
   result?: DashboardActionResult;
 }
 
+interface TenantForm {
+  tenantId: string;
+  workspaceId: string;
+  adminUser: string;
+  role: string;
+  platformAdmin: string;
+  password: string;
+}
+
+interface WorkspaceForm {
+  tenantId: string;
+  workspaceId: string;
+  owner: string;
+  projectLimit: string;
+  loopLimit: string;
+}
+
+interface UserForm {
+  username: string;
+  tenantId: string;
+  workspaceId: string;
+  role: string;
+  password: string;
+  status: string;
+}
+
+interface TemplateEvolutionForm {
+  baseTemplateId: string;
+  targetVersion: string;
+  intent: string;
+  sourceType: string;
+  sourceUri: string;
+}
+
 const storage = window.localStorage;
 const sessionStorage = window.sessionStorage;
 const query = new URLSearchParams(window.location.search);
 const demoMode = query.get("demo") === "1";
 const demoStep = normalizeDemoStep(query.get("step"));
+const demoPage = normalizePage(query.get("page"));
 
 const sampleGoal = "接入 GitHub 项目 github.com/acme/inventory-service，目标是把它提升到 GA-ready 的企业级 Python Web 服务：需要明确能力边界、异常处理、日志、监控、APM、CI/CD、发布门禁和回滚要求。";
 
@@ -109,7 +145,7 @@ const defaultScope: DashboardScope = {
   tenantId: storage.getItem("evopilot.tenantId") ?? "tenant-production",
   workspaceId: storage.getItem("evopilot.workspaceId") ?? "workspace-agent-products",
   actorId: storage.getItem("evopilot.actorId") ?? "workbuddy",
-  token: sessionStorage.getItem("evopilot.apiToken") ?? ""
+  token: sessionStorage.getItem("evopilot.apiToken") ?? (demoMode ? "demo-token" : "")
 };
 
 storage.removeItem("evopilot.apiToken");
@@ -137,6 +173,18 @@ const defaultContext: ProjectLoopContext = {
 };
 
 const initialStep: ConsoleStep = demoStep ?? (demoMode ? "review" : "intake");
+
+const demoSession: DashboardSession = {
+  token: "demo-token",
+  user: {
+    username: query.get("user") ?? "alice",
+    role: query.get("role") ?? "operator",
+    tenantId: "tenant-production",
+    workspaceId: "workspace-agent-products",
+    displayName: "Alice Operator",
+    platformAdmin: query.get("admin") === "1"
+  }
+};
 
 function readStoredSession(): DashboardSession | undefined {
   const raw = sessionStorage.getItem("evopilot.session");
@@ -169,6 +217,11 @@ function normalizeDemoStep(value: string | null): ConsoleStep | undefined {
     "9": "release"
   };
   return value ? map[value] : undefined;
+}
+
+function normalizePage(value: string | null): PageId | undefined {
+  const allowed: PageId[] = ["console", "tenants", "workspaces", "users", "templates", "audit"];
+  return allowed.find((page) => page === value);
 }
 
 function nowTime() {
@@ -204,6 +257,43 @@ function readableJson(value: unknown): string {
   } catch {
     return String(value);
   }
+}
+
+function resultItems(result: ApiResult | undefined, aliases: string[] = []): Record<string, unknown>[] {
+  if (!result?.data) return [];
+  return collectRecords(dataEnvelope(result.data), aliases);
+}
+
+function collectRecords(value: unknown, aliases: string[]): Record<string, unknown>[] {
+  if (Array.isArray(value)) return value.filter((item): item is Record<string, unknown> => Boolean(asRecord(item)));
+  const record = asRecord(value);
+  if (!record) return [];
+  for (const key of ["items", "records", "results", "data", ...aliases]) {
+    if (key in record) {
+      const nested = collectRecords(record[key], aliases.filter((alias) => alias !== key));
+      if (nested.length > 0) return nested;
+    }
+  }
+  return Object.keys(record).length > 0 ? [record] : [];
+}
+
+function fieldText(record: Record<string, unknown> | undefined, keys: string[], fallback = "-"): string {
+  if (!record) return fallback;
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value;
+    if (typeof value === "number" || typeof value === "boolean") return String(value);
+  }
+  return fallback;
+}
+
+function roleLabel(session?: DashboardSession): string {
+  if (session?.user?.platformAdmin) return "platform admin";
+  return session?.user?.role ?? "operator";
+}
+
+function isPlatformAdmin(session?: DashboardSession): boolean {
+  return Boolean(session?.user?.platformAdmin || session?.user?.role === "platform-admin" || session?.user?.role === "admin");
 }
 
 function extractHarnessDraft(value: unknown): HarnessProfileDraft | undefined {
@@ -471,6 +561,37 @@ export default function App() {
   const [busyAction, setBusyAction] = useState<string | undefined>();
   const [ownerChange, setOwnerChange] = useState("");
   const [composerGoal, setComposerGoal] = useState(defaultContext.goalLoopTarget);
+  const [activePage, setActivePage] = useState<PageId>(demoPage ?? "console");
+  const [tenantForm, setTenantForm] = useState<TenantForm>({
+    tenantId: "tenant-payments",
+    workspaceId: "workspace-payment-agents",
+    adminUser: "payments-admin",
+    role: "admin",
+    platformAdmin: "false",
+    password: ""
+  });
+  const [workspaceForm, setWorkspaceForm] = useState<WorkspaceForm>({
+    tenantId: defaultScope.tenantId,
+    workspaceId: "workspace-customer-success",
+    owner: "tenant-admin",
+    projectLimit: "20",
+    loopLimit: "100"
+  });
+  const [userForm, setUserForm] = useState<UserForm>({
+    username: "project-owner",
+    tenantId: defaultScope.tenantId,
+    workspaceId: defaultScope.workspaceId,
+    role: "operator",
+    password: "",
+    status: "ACTIVE"
+  });
+  const [templateForm, setTemplateForm] = useState<TemplateEvolutionForm>({
+    baseTemplateId: "python-enterprise-harness",
+    targetVersion: "1.2.0",
+    intent: "Upgrade observability, exception triage, release evidence, and AI-agent runbook coverage.",
+    sourceType: "admin-note",
+    sourceUri: "Administrator lifecycle note"
+  });
 
   const liveProjectionSummary = useMemo(() => {
     const entries = Object.entries(apiSnapshot);
@@ -484,8 +605,12 @@ export default function App() {
   const stages = useMemo(() => stageState(consoleStep), [consoleStep]);
   const activeDraft = profileDraft ?? defaultDraft(context);
   const focusedMessages = useMemo(() => focusMessages(consoleStep, messages), [consoleStep, messages]);
+  const effectiveSession = session ?? (demoMode ? demoSession : undefined);
+  const canEditScope = isPlatformAdmin(effectiveSession);
+  const signedIn = Boolean(effectiveSession?.token || scope.token);
 
   useEffect(() => {
+    if (demoMode) return;
     void refreshBootstrap();
     if (defaultScope.token) void refreshApiSnapshot(defaultScope, defaultContext);
   }, []);
@@ -927,81 +1052,147 @@ export default function App() {
     });
   }
 
+  async function runManagementAction(action: DashboardActionRequest) {
+    if (!scope.token) {
+      setDrawer("session");
+      setActivePage("console");
+      return;
+    }
+    const result = await runAction(action);
+    setDrawer("api");
+    if (!result.ok) setActivePage("console");
+  }
+
+  if (!demoMode && !session?.token) {
+    return (
+      <AuthScreen
+        authNotice={authNotice}
+        authLoading={authLoading}
+        loginForm={loginForm}
+        onLoginForm={setLoginForm}
+        onLogin={() => void performLogin()}
+      />
+    );
+  }
+
+  if (!demoMode && (session?.mustChangePassword || session?.user?.mustChangePassword)) {
+    return (
+      <PasswordChangeScreen
+        session={session}
+        authNotice={authNotice}
+        authLoading={authLoading}
+        passwordForm={passwordForm}
+        onPasswordForm={setPasswordForm}
+        onChangePassword={() => void performChangePassword()}
+        onSignOut={signOut}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
-      <Sidebar context={context} consoleStep={consoleStep} />
-      <section className="console-shell">
+      <Sidebar
+        activePage={activePage}
+        onNavigate={setActivePage}
+      />
+      <section className={`console-shell ${activePage === "console" ? "" : "management-mode"}`}>
         <Topbar
+          activePage={activePage}
           consoleStep={consoleStep}
           scope={scope}
-          session={session}
+          session={effectiveSession}
           apiOk={liveProjectionSummary.ok}
           apiFailed={liveProjectionSummary.failed.length}
           onOpenSession={() => setDrawer("session")}
           onRefresh={() => void refreshApiSnapshot()}
           refreshing={apiLoading}
         />
-        <StageBar stages={stages} />
-        <main className={`workspace ${drawer ? "" : "drawer-closed"}`}>
-          <section className="conversation" aria-label="EvoPilot Agent Console conversation">
-            <div className="thread">
-              {focusedMessages.map((message) => (
-                <ChatBubble
-                  key={message.id}
-                  message={message}
+        {activePage === "console" ? (
+          <>
+            <StageBar stages={stages} />
+            <main className={`workspace ${drawer ? "" : "drawer-closed"}`}>
+              <section className="conversation" aria-label="EvoPilot Agent Console conversation">
+                <div className="thread">
+                  {focusedMessages.map((message) => (
+                    <ChatBubble
+                      key={message.id}
+                      message={message}
+                      context={context}
+                      profileDraft={activeDraft}
+                      reviewSteps={reviewSteps}
+                      lastAction={lastAction}
+                    />
+                  ))}
+                </div>
+                <Composer
+                  consoleStep={consoleStep}
                   context={context}
-                  profileDraft={activeDraft}
-                  reviewSteps={reviewSteps}
-                  lastAction={lastAction}
+                  goal={composerGoal}
+                  ownerChange={ownerChange}
+                  busyAction={busyAction}
+                  onPatchContext={patchContext}
+                  onGoalChange={(goal) => {
+                    setComposerGoal(goal);
+                    patchContext({ goalLoopTarget: goal });
+                  }}
+                  onOwnerChange={setOwnerChange}
+                  onStart={() => void startIntake()}
+                  onRequestChanges={() => void requestProfileChanges()}
+                  onConfirm={() => void confirmAndActivateHarness()}
+                  onApproveAndAdvance={() => void approvePlanAndAdvance()}
+                  onViewEvidence={() => setDrawer(drawer ? undefined : "review")}
+                  onViewRelease={() => void refreshReleaseEvidence()}
                 />
-              ))}
-            </div>
-            <Composer
-              consoleStep={consoleStep}
-              context={context}
-              goal={composerGoal}
-              ownerChange={ownerChange}
-              busyAction={busyAction}
-              onPatchContext={patchContext}
-              onGoalChange={(goal) => {
-                setComposerGoal(goal);
-                patchContext({ goalLoopTarget: goal });
-              }}
-              onOwnerChange={setOwnerChange}
-              onStart={() => void startIntake()}
-              onRequestChanges={() => void requestProfileChanges()}
-              onConfirm={() => void confirmAndActivateHarness()}
-              onApproveAndAdvance={() => void approvePlanAndAdvance()}
-              onViewEvidence={() => setDrawer(drawer ? undefined : "review")}
-              onViewRelease={() => void refreshReleaseEvidence()}
-            />
-          </section>
-          {drawer && (
-            <EvidenceDrawer
-              kind={drawer}
-              scope={scope}
-              context={context}
-              session={session}
-              authNotice={authNotice}
-              authLoading={authLoading}
-              loginForm={loginForm}
-              passwordForm={passwordForm}
-              apiNotice={apiNotice}
-              apiLoading={apiLoading}
-              snapshot={apiSnapshot}
-              profileDraft={activeDraft}
-              lastAction={lastAction}
-              onLoginForm={setLoginForm}
-              onPasswordForm={setPasswordForm}
-              onLogin={() => void performLogin()}
-              onChangePassword={() => void performChangePassword()}
-              onSignOut={signOut}
-              onScopeChange={updateScope}
-              onPatchContext={patchContext}
-              onRefresh={() => void refreshApiSnapshot()}
-            />
-          )}
-        </main>
+              </section>
+              {drawer && (
+                <EvidenceDrawer
+                  kind={drawer}
+                  scope={scope}
+                  context={context}
+                  session={effectiveSession}
+                  canEditScope={canEditScope}
+                  signedIn={signedIn}
+                  authNotice={authNotice}
+                  authLoading={authLoading}
+                  loginForm={loginForm}
+                  passwordForm={passwordForm}
+                  apiNotice={apiNotice}
+                  apiLoading={apiLoading}
+                  snapshot={apiSnapshot}
+                  profileDraft={activeDraft}
+                  lastAction={lastAction}
+                  onLoginForm={setLoginForm}
+                  onPasswordForm={setPasswordForm}
+                  onLogin={() => void performLogin()}
+                  onChangePassword={() => void performChangePassword()}
+                  onSignOut={signOut}
+                  onScopeChange={updateScope}
+                  onPatchContext={patchContext}
+                  onRefresh={() => void refreshApiSnapshot()}
+                />
+              )}
+            </main>
+          </>
+        ) : (
+          <ManagementPage
+            page={activePage}
+            scope={scope}
+            session={effectiveSession}
+            snapshot={apiSnapshot}
+            lastAction={lastAction}
+            busyAction={busyAction}
+            tenantForm={tenantForm}
+            workspaceForm={workspaceForm}
+            userForm={userForm}
+            templateForm={templateForm}
+            onTenantForm={setTenantForm}
+            onWorkspaceForm={setWorkspaceForm}
+            onUserForm={setUserForm}
+            onTemplateForm={setTemplateForm}
+            onRunAction={(action) => void runManagementAction(action)}
+            onRefresh={() => void refreshApiSnapshot()}
+          />
+        )}
       </section>
     </div>
   );
@@ -1069,34 +1260,604 @@ function stageState(step: ConsoleStep) {
   return state;
 }
 
-function Sidebar({ context, consoleStep }: { context: ProjectLoopContext; consoleStep: ConsoleStep }) {
-  const projectName = context.projectName || context.projectId || projectIdFromRepository(context.repositoryUrl) || "New project";
-  const repo = context.repositoryUrl || "repository not set";
+function AuthScreen({
+  authNotice,
+  authLoading,
+  loginForm,
+  onLoginForm,
+  onLogin
+}: {
+  authNotice: string;
+  authLoading: boolean;
+  loginForm: { username: string; password: string };
+  onLoginForm: (form: { username: string; password: string }) => void;
+  onLogin: () => void;
+}) {
+  return (
+    <main className="auth-screen" aria-label="EvoPilot Dashboard sign in">
+      <section className="auth-brand">
+        <div className="brand-row">
+          <span className="brand-mark-small">E</span>
+          <strong>EvoPilot</strong>
+        </div>
+        <div>
+          <h1>Control plane access starts here.</h1>
+          <p>登录后，Dashboard 会用 EvoPilot 返回的用户身份锁定 tenant、workspace、actor scope，再进入 Agent Console。</p>
+        </div>
+        <div className="brand-evidence">
+          <div><strong>Auth</strong><span>Bearer session token stored in sessionStorage only.</span></div>
+          <div><strong>Scope</strong><span>Tenant and workspace come from the signed-in user.</span></div>
+          <div><strong>RBAC</strong><span>普通用户只看核心链路，管理员才看平台页面。</span></div>
+          <div><strong>Audit</strong><span>Every protected action reports requestId and nextAction.</span></div>
+        </div>
+      </section>
+      <section className="auth-panel">
+        <div className="panel-head">
+          <div>
+            <span className="eyebrow">EvoPilot Dashboard</span>
+            <h2>登录控制台</h2>
+          </div>
+          <span className="tag amber">API auth required</span>
+        </div>
+        <label>
+          <span>Username</span>
+          <input autoFocus value={loginForm.username} onChange={(event) => onLoginForm({ ...loginForm, username: event.currentTarget.value })} />
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" value={loginForm.password} onChange={(event) => onLoginForm({ ...loginForm, password: event.currentTarget.value })} onKeyDown={(event) => {
+            if (event.key === "Enter" && loginForm.username && loginForm.password) onLogin();
+          }} />
+        </label>
+        <button className="btn primary wide" type="button" onClick={onLogin} disabled={authLoading || !loginForm.username || !loginForm.password}>
+          <LogIn size={15} aria-hidden="true" /> {authLoading ? "Signing in..." : "登录"}
+        </button>
+        <div className="notice amber">
+          <strong>{authNotice}</strong>
+          <span>首次部署通常由平台管理员初始化 admin 账号；其他用户由平台管理员或租户管理员创建并分配 tenant/workspace。</span>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function PasswordChangeScreen({
+  session,
+  authNotice,
+  authLoading,
+  passwordForm,
+  onPasswordForm,
+  onChangePassword,
+  onSignOut
+}: {
+  session?: DashboardSession;
+  authNotice: string;
+  authLoading: boolean;
+  passwordForm: { currentPassword: string; newPassword: string };
+  onPasswordForm: (form: { currentPassword: string; newPassword: string }) => void;
+  onChangePassword: () => void;
+  onSignOut: () => void;
+}) {
+  return (
+    <main className="auth-screen centered" aria-label="EvoPilot Dashboard password change">
+      <section className="auth-panel lock-panel">
+        <div className="panel-head">
+          <div>
+            <span className="eyebrow">Password change required</span>
+            <h2>必须先修改默认密码</h2>
+          </div>
+          <span className="tag amber">{roleLabel(session)}</span>
+        </div>
+        <p className="panel-copy">{session?.user?.username ?? "signed-in user"} 已登录，但服务器要求先改密。完成后才能进入 Agent Console 或管理员页面。</p>
+        <label>
+          <span>Current Password</span>
+          <input type="password" value={passwordForm.currentPassword} onChange={(event) => onPasswordForm({ ...passwordForm, currentPassword: event.currentTarget.value })} />
+        </label>
+        <label>
+          <span>New Password</span>
+          <input type="password" value={passwordForm.newPassword} onChange={(event) => onPasswordForm({ ...passwordForm, newPassword: event.currentTarget.value })} />
+        </label>
+        <div className="actions split">
+          <button className="btn primary" type="button" onClick={onChangePassword} disabled={authLoading || !passwordForm.currentPassword || !passwordForm.newPassword}>完成改密</button>
+          <button className="btn" type="button" onClick={onSignOut}>退出</button>
+        </div>
+        <div className="notice green"><strong>{authNotice}</strong><span>改密成功后，新的 session token 会替换当前会话。</span></div>
+      </section>
+    </main>
+  );
+}
+
+function ManagementPage({
+  page,
+  scope,
+  session,
+  snapshot,
+  lastAction,
+  busyAction,
+  tenantForm,
+  workspaceForm,
+  userForm,
+  templateForm,
+  onTenantForm,
+  onWorkspaceForm,
+  onUserForm,
+  onTemplateForm,
+  onRunAction,
+  onRefresh
+}: {
+  page: Exclude<PageId, "console">;
+  scope: DashboardScope;
+  session?: DashboardSession;
+  snapshot: Record<string, ApiResult>;
+  lastAction?: DashboardActionResult;
+  busyAction?: string;
+  tenantForm: TenantForm;
+  workspaceForm: WorkspaceForm;
+  userForm: UserForm;
+  templateForm: TemplateEvolutionForm;
+  onTenantForm: (form: TenantForm) => void;
+  onWorkspaceForm: (form: WorkspaceForm) => void;
+  onUserForm: (form: UserForm) => void;
+  onTemplateForm: (form: TemplateEvolutionForm) => void;
+  onRunAction: (action: DashboardActionRequest) => void;
+  onRefresh: () => void;
+}) {
+  if (page === "tenants") return <TenantsPage form={tenantForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onTenantForm} onRunAction={onRunAction} />;
+  if (page === "workspaces") return <WorkspacesPage form={workspaceForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onWorkspaceForm} onRunAction={onRunAction} />;
+  if (page === "users") return <UsersPage form={userForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onUserForm} onRunAction={onRunAction} />;
+  if (page === "templates") return <TemplatesPage form={templateForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onTemplateForm} onRunAction={onRunAction} />;
+  return <AuditPage snapshot={snapshot} session={session} lastAction={lastAction} onRefresh={onRefresh} />;
+}
+
+function TenantsPage({
+  form,
+  snapshot,
+  busyAction,
+  lastAction,
+  onForm,
+  onRunAction
+}: {
+  form: TenantForm;
+  snapshot: Record<string, ApiResult>;
+  busyAction?: string;
+  lastAction?: DashboardActionResult;
+  onForm: (form: TenantForm) => void;
+  onRunAction: (action: DashboardActionRequest) => void;
+}) {
+  const rows = resultItems(snapshot.tenants, ["tenants"]).slice(0, 8);
+  return (
+    <main className="management-workspace">
+      <section className="management-layout">
+        <DataPanel
+          title="创建租户、工作区和租户管理员"
+          subtitle="只有 platform admin 能跨 tenant 管理边界。"
+          rows={rows}
+          columns={[
+            ["Tenant", ["id", "tenantId", "name"]],
+            ["Plan", ["plan", "tier"]],
+            ["Workspaces", ["workspaceCount", "workspaces"]],
+            ["Users", ["userCount", "users"]],
+            ["Status", ["status", "state"]]
+          ]}
+          empty="No tenants returned by EvoPilot."
+        />
+        <aside className="form-panel">
+          <PanelTitle eyebrow="Tenant registry" title="初始化新租户" />
+          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} /></label>
+          <label><span>Workspace ID</span><input value={form.workspaceId} onChange={(event) => onForm({ ...form, workspaceId: event.currentTarget.value })} /></label>
+          <label><span>租户管理员</span><input value={form.adminUser} onChange={(event) => onForm({ ...form, adminUser: event.currentTarget.value })} /></label>
+          <div className="form-two">
+            <label><span>角色</span><select value={form.role} onChange={(event) => onForm({ ...form, role: event.currentTarget.value })}><option value="admin">admin</option><option value="operator">operator</option></select></label>
+            <label><span>Platform Admin</span><select value={form.platformAdmin} onChange={(event) => onForm({ ...form, platformAdmin: event.currentTarget.value })}><option value="false">false</option><option value="true">true</option></select></label>
+          </div>
+          <label><span>初始密码</span><input type="password" value={form.password} onChange={(event) => onForm({ ...form, password: event.currentTarget.value })} /></label>
+          <button
+            className="btn green wide"
+            type="button"
+            disabled={busyAction === "admin-create-tenant" || !form.tenantId || !form.workspaceId || !form.adminUser}
+            onClick={() => onRunAction({
+              id: "admin-create-tenant",
+              label: "Create tenant/workspace/admin",
+              method: "POST",
+              path: apiSurface.tenants,
+              body: {
+                id: form.tenantId,
+                workspace: { id: form.workspaceId },
+                owner: {
+                  username: form.adminUser,
+                  role: form.role,
+                  platformAdmin: form.platformAdmin === "true",
+                  password: form.password || undefined,
+                  mustChangePassword: true
+                }
+              }
+            })}
+          >
+            创建并发放
+          </button>
+          <ActionEvidence lastAction={lastAction} />
+        </aside>
+      </section>
+    </main>
+  );
+}
+
+function WorkspacesPage({
+  form,
+  snapshot,
+  busyAction,
+  lastAction,
+  onForm,
+  onRunAction
+}: {
+  form: WorkspaceForm;
+  snapshot: Record<string, ApiResult>;
+  busyAction?: string;
+  lastAction?: DashboardActionResult;
+  onForm: (form: WorkspaceForm) => void;
+  onRunAction: (action: DashboardActionRequest) => void;
+}) {
+  const rows = resultItems(snapshot.workspaces, ["workspaces"]).slice(0, 8);
+  return (
+    <main className="management-workspace">
+      <section className="management-layout">
+        <DataPanel
+          title="工作区管理"
+          subtitle="Workspace 是用户、项目、凭据引用、loop 和审计的隔离边界。"
+          rows={rows}
+          columns={[
+            ["Workspace", ["id", "workspaceId", "name"]],
+            ["Tenant", ["tenantId", "tenant"]],
+            ["Projects", ["projectCount", "projects"]],
+            ["Loops", ["loopCount", "loops"]],
+            ["Status", ["status", "state"]]
+          ]}
+          empty="No workspaces returned by EvoPilot."
+        />
+        <aside className="form-panel">
+          <PanelTitle eyebrow="Workspace boundary" title="创建工作区" />
+          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} /></label>
+          <label><span>Workspace ID</span><input value={form.workspaceId} onChange={(event) => onForm({ ...form, workspaceId: event.currentTarget.value })} /></label>
+          <label><span>Owner</span><input value={form.owner} onChange={(event) => onForm({ ...form, owner: event.currentTarget.value })} /></label>
+          <div className="form-two">
+            <label><span>Project limit</span><input value={form.projectLimit} onChange={(event) => onForm({ ...form, projectLimit: event.currentTarget.value })} /></label>
+            <label><span>Loop limit</span><input value={form.loopLimit} onChange={(event) => onForm({ ...form, loopLimit: event.currentTarget.value })} /></label>
+          </div>
+          <button
+            className="btn green wide"
+            type="button"
+            disabled={busyAction === "admin-create-workspace" || !form.tenantId || !form.workspaceId}
+            onClick={() => onRunAction({
+              id: "admin-create-workspace",
+              label: "Create workspace",
+              method: "POST",
+              path: apiSurface.workspaces,
+              body: {
+                tenantId: form.tenantId,
+                id: form.workspaceId,
+                owner: form.owner,
+                quota: {
+                  projects: Number(form.projectLimit) || undefined,
+                  loops: Number(form.loopLimit) || undefined
+                }
+              }
+            })}
+          >
+            创建工作区
+          </button>
+          <ActionEvidence lastAction={lastAction} />
+        </aside>
+      </section>
+    </main>
+  );
+}
+
+function UsersPage({
+  form,
+  snapshot,
+  busyAction,
+  lastAction,
+  onForm,
+  onRunAction
+}: {
+  form: UserForm;
+  snapshot: Record<string, ApiResult>;
+  busyAction?: string;
+  lastAction?: DashboardActionResult;
+  onForm: (form: UserForm) => void;
+  onRunAction: (action: DashboardActionRequest) => void;
+}) {
+  const rows = resultItems(snapshot.users, ["users"]).slice(0, 8);
+  return (
+    <main className="management-workspace">
+      <section className="management-layout">
+        <DataPanel
+          title="创建 tenant/workspace scoped 用户"
+          subtitle="用户登录后 scope 锁定，普通用户不能跨租户切换。"
+          rows={rows}
+          columns={[
+            ["User", ["username", "id"]],
+            ["Role", ["role"]],
+            ["Tenant", ["tenantId"]],
+            ["Workspace", ["workspaceId"]],
+            ["Status", ["status", "state"]]
+          ]}
+          empty="No users returned by EvoPilot."
+        />
+        <aside className="form-panel">
+          <PanelTitle eyebrow="User registry" title="创建新用户" />
+          <label><span>Username</span><input value={form.username} onChange={(event) => onForm({ ...form, username: event.currentTarget.value })} /></label>
+          <div className="form-two">
+            <label><span>Role</span><select value={form.role} onChange={(event) => onForm({ ...form, role: event.currentTarget.value })}><option value="operator">operator</option><option value="admin">admin</option><option value="auditor">auditor</option></select></label>
+            <label><span>Status</span><select value={form.status} onChange={(event) => onForm({ ...form, status: event.currentTarget.value })}><option value="ACTIVE">ACTIVE</option><option value="DISABLED">DISABLED</option></select></label>
+          </div>
+          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} /></label>
+          <label><span>Workspace ID</span><input value={form.workspaceId} onChange={(event) => onForm({ ...form, workspaceId: event.currentTarget.value })} /></label>
+          <label><span>Initial password</span><input type="password" value={form.password} onChange={(event) => onForm({ ...form, password: event.currentTarget.value })} /></label>
+          <button
+            className="btn green wide"
+            type="button"
+            disabled={busyAction === "admin-create-user" || !form.username || !form.tenantId || !form.workspaceId}
+            onClick={() => onRunAction({
+              id: "admin-create-user",
+              label: "Create scoped user",
+              method: "POST",
+              path: apiSurface.users,
+              body: {
+                username: form.username,
+                tenantId: form.tenantId,
+                workspaceId: form.workspaceId,
+                role: form.role,
+                status: form.status,
+                password: form.password || undefined,
+                mustChangePassword: true
+              }
+            })}
+          >
+            创建用户
+          </button>
+          <ActionEvidence lastAction={lastAction} />
+        </aside>
+      </section>
+    </main>
+  );
+}
+
+function TemplatesPage({
+  form,
+  snapshot,
+  busyAction,
+  lastAction,
+  onForm,
+  onRunAction
+}: {
+  form: TemplateEvolutionForm;
+  snapshot: Record<string, ApiResult>;
+  busyAction?: string;
+  lastAction?: DashboardActionResult;
+  onForm: (form: TemplateEvolutionForm) => void;
+  onRunAction: (action: DashboardActionRequest) => void;
+}) {
+  const templates = resultItems(snapshot.templates, ["templates"]).slice(0, 8);
+  const evolutions = resultItems(snapshot.templateEvolutions, ["evolutions"]).slice(0, 5);
+  return (
+    <main className="management-workspace">
+      <section className="management-layout">
+        <DataPanel
+          title="企业级 HarnessTemplate 知识包"
+          subtitle="新项目自动匹配模板；管理员通过版本、changelog 和 evolution run 管理生命周期。"
+          rows={templates}
+          columns={[
+            ["Template", ["id", "templateId", "name"]],
+            ["Version", ["version"]],
+            ["Type", ["softwareType", "language", "category"]],
+            ["Status", ["status", "state"]]
+          ]}
+          empty="No templates returned by EvoPilot."
+        />
+        <aside className="form-panel">
+          <PanelTitle eyebrow="Template evolution" title="创建进化 run" />
+          <label><span>Base Template</span><input value={form.baseTemplateId} onChange={(event) => onForm({ ...form, baseTemplateId: event.currentTarget.value })} /></label>
+          <label><span>Target Version</span><input value={form.targetVersion} onChange={(event) => onForm({ ...form, targetVersion: event.currentTarget.value })} /></label>
+          <label><span>Intent</span><textarea value={form.intent} onChange={(event) => onForm({ ...form, intent: event.currentTarget.value })} /></label>
+          <div className="form-two">
+            <label><span>Source Type</span><select value={form.sourceType} onChange={(event) => onForm({ ...form, sourceType: event.currentTarget.value })}><option value="admin-note">admin-note</option><option value="github-repo">github-repo</option><option value="web-url">web-url</option><option value="attachment">attachment</option><option value="local-pack">local-pack</option></select></label>
+            <label><span>Source</span><input value={form.sourceUri} onChange={(event) => onForm({ ...form, sourceUri: event.currentTarget.value })} /></label>
+          </div>
+          <button
+            className="btn green wide"
+            type="button"
+            disabled={busyAction === "admin-create-template-evolution" || !form.baseTemplateId || !form.intent}
+            onClick={() => onRunAction({
+              id: "admin-create-template-evolution",
+              label: "Create HarnessTemplateEvolution",
+              method: "POST",
+              path: apiSurface.harnessTemplateEvolutions,
+              body: {
+                baseTemplateId: form.baseTemplateId,
+                targetVersion: form.targetVersion || undefined,
+                intent: form.intent,
+                sources: [{
+                  type: form.sourceType,
+                  name: form.sourceUri || form.sourceType,
+                  uri: form.sourceType === "admin-note" ? undefined : form.sourceUri,
+                  contentText: form.sourceType === "admin-note" ? form.sourceUri : undefined
+                }]
+              }
+            })}
+          >
+            创建 evolution draft
+          </button>
+          <div className="sub-list">
+            {evolutions.map((item, index) => <small key={index}>{fieldText(item, ["id", "evolutionId"])} · {fieldText(item, ["status", "state"])}</small>)}
+          </div>
+          <ActionEvidence lastAction={lastAction} />
+        </aside>
+      </section>
+    </main>
+  );
+}
+
+function AuditPage({
+  snapshot,
+  session,
+  lastAction,
+  onRefresh
+}: {
+  snapshot: Record<string, ApiResult>;
+  session?: DashboardSession;
+  lastAction?: DashboardActionResult;
+  onRefresh: () => void;
+}) {
+  const rows = resultItems(snapshot.audit, ["audit", "records"]).slice(0, 10);
+  return (
+    <main className="management-workspace">
+      <section className="summary-grid">
+        <SummaryCard label="Audit events" value={String(rows.length)} detail="server-returned rows in current scope" />
+        <SummaryCard label="Actor" value={session?.user?.username ?? defaultScope.actorId} detail={roleLabel(session)} />
+        <SummaryCard label="Last request" value={lastAction?.requestId ?? "none"} detail={lastAction?.nextAction ?? "no nextAction"} />
+      </section>
+      <section className="management-layout">
+        <DataPanel
+          title="审计与日志溯源"
+          subtitle="AI Agent 根据 requestId -> action -> scope -> nextAction/blockers 定位问题。"
+          rows={rows}
+          columns={[
+            ["Time", ["time", "timestamp", "createdAt"]],
+            ["Actor", ["actorId", "actor", "username"]],
+            ["Action", ["action", "operation", "event"]],
+            ["Target", ["target", "resource", "path"]],
+            ["Result", ["status", "result"]]
+          ]}
+          empty="No audit records returned by EvoPilot."
+        />
+        <aside className="form-panel">
+          <PanelTitle eyebrow="Failure trace" title="AI 可读证据" />
+          <EvidenceRow label="requestId" value={lastAction?.requestId ?? "not returned"} />
+          <EvidenceRow label="lastAction" value={lastAction ? `${lastAction.method} ${lastAction.path}` : "none"} />
+          <EvidenceRow label="nextAction" value={lastAction?.nextAction ?? "none"} />
+          <EvidenceRow label="blockers" value={lastAction?.blockers?.join(", ") || "none"} />
+          <LogLine level={lastAction?.ok ? "INFO" : lastAction ? "ERROR" : "INFO"} text={lastAction?.error ?? "No failing API action selected."} />
+          <button className="btn primary wide" type="button" onClick={onRefresh}><RefreshCw size={15} aria-hidden="true" /> Refresh audit</button>
+        </aside>
+      </section>
+    </main>
+  );
+}
+
+function SummaryCard({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <div className="summary-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+    </div>
+  );
+}
+
+function DataPanel({
+  title,
+  subtitle,
+  rows,
+  columns,
+  empty
+}: {
+  title: string;
+  subtitle: string;
+  rows: Record<string, unknown>[];
+  columns: Array<[string, string[]]>;
+  empty: string;
+}) {
+  return (
+    <section className="data-panel">
+      <PanelTitle eyebrow="Live projection" title={title} subtitle={subtitle} />
+      <div className="table">
+        <div className="table-head" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
+          {columns.map(([label]) => <strong key={label}>{label}</strong>)}
+        </div>
+        {rows.length === 0 ? (
+          <div className="empty-row">{empty}</div>
+        ) : rows.map((row, index) => (
+          <div key={index} className="table-row" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
+            {columns.map(([label, keys]) => <span key={label}>{fieldText(row, keys)}</span>)}
+          </div>
+        ))}
+      </div>
+      <div className="notice amber">
+        <strong>Dashboard 不绕过 EvoPilot 控制面。</strong>
+        <span>页面显示的是当前 API projection；最终状态以服务端返回的 requestId、status、nextAction 和 audit 为准。</span>
+      </div>
+    </section>
+  );
+}
+
+function PanelTitle({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
+  return (
+    <div className="panel-title">
+      <span>{eyebrow}</span>
+      <h3>{title}</h3>
+      {subtitle && <p>{subtitle}</p>}
+    </div>
+  );
+}
+
+function LockedScope({ scope }: { scope: DashboardScope }) {
+  return (
+    <div className="locked-scope">
+      <EvidenceRow label="Tenant" value={scope.tenantId} />
+      <EvidenceRow label="Workspace" value={scope.workspaceId} />
+      <EvidenceRow label="Actor" value={scope.actorId} />
+    </div>
+  );
+}
+
+function ActionEvidence({ lastAction }: { lastAction?: DashboardActionResult }) {
+  return (
+    <div className="drawer-card">
+      <strong>Last action evidence</strong>
+      <small>{lastAction ? `${lastAction.actionLabel}: ${lastAction.status}` : "No action on this page yet."}</small>
+      <EvidenceRow label="requestId" value={lastAction?.requestId ?? "not returned"} />
+      <EvidenceRow label="nextAction" value={lastAction?.nextAction ?? "none"} />
+    </div>
+  );
+}
+
+function Sidebar({
+  activePage,
+  onNavigate
+}: {
+  activePage: PageId;
+  onNavigate: (page: PageId) => void;
+}) {
+  const items: Array<[PageId, string]> = [
+    ["console", "# Agent Console"],
+    ["tenants", "Tenants"],
+    ["workspaces", "Workspaces"],
+    ["users", "Users"],
+    ["templates", "Harness Templates"],
+    ["audit", "Audit"]
+  ];
   return (
     <aside className="sidebar" aria-label="EvoPilot Agent Console sidebar">
       <div className="brand">
-        <h1>EvoPilot</h1>
-        <span>Agent Console</span>
-      </div>
-      <div className="project-switcher">
-        <span>Workspace / Project</span>
-        <strong>{projectName}</strong>
-        <code>{repo}</code>
-        <code>tenant: {defaultScope.tenantId} · ws: {defaultScope.workspaceId}</code>
-      </div>
-      <div className="sidebar-section">
-        <h2>Active sessions</h2>
-        <div className="session-list">
-          <SidebarSession active title="GA readiness loop" detail={sessionDetail(consoleStep)} tone="blue" />
-          <SidebarSession title="Observability hardening" detail="Paused at approval gate" tone="amber" />
-          <SidebarSession title="Release evidence audit" detail="Completed yesterday" tone="green" />
+        <div className="brand-row">
+          <span className="brand-mark-small">E</span>
+          <h1>EvoPilot</h1>
         </div>
       </div>
-      <div className="recent-decisions">
-        <h2>Recent decisions</h2>
-        <Decision tone="green" title="Template matched" detail="auto-match from project context" />
-        <Decision tone="blue" title="Owner gate" detail="ProjectHarnessProfile draft review" />
-        <Decision tone="amber" title="Evidence scope" detail="security, logs, tracing, deploy checks" />
+      <div className="sidebar-section">
+        <div className="nav-list">
+          {items.map(([page, label]) => (
+            <button
+              key={page}
+              type="button"
+              className={`nav-item ${activePage === page ? "active" : ""}`}
+              onClick={() => onNavigate(page)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
     </aside>
   );
@@ -1137,6 +1898,7 @@ function Decision({ tone, title, detail }: { tone: string; title: string; detail
 }
 
 function Topbar({
+  activePage,
   consoleStep,
   scope,
   session,
@@ -1146,6 +1908,7 @@ function Topbar({
   onOpenSession,
   onRefresh
 }: {
+  activePage: PageId;
   consoleStep: ConsoleStep;
   scope: DashboardScope;
   session?: DashboardSession;
@@ -1166,7 +1929,15 @@ function Topbar({
     blocker: ["Blocker repair", "异常出现时，AI Agent 能基于日志、requestId 和 evidence 追踪问题位置。"],
     release: ["Release decision", "Release Gate 汇总 profile coverage、evidence、风险和下一步动作。"]
   };
-  const [title, subtitle] = titleMap[consoleStep];
+  const pageTitleMap: Record<PageId, [string, string]> = {
+    console: titleMap[consoleStep],
+    tenants: ["平台租户管理", "创建租户、工作区和租户管理员；只有 platform admin 能跨 tenant 切换 scope。"],
+    workspaces: ["工作区管理", "按租户管理 workspace 边界、owner、项目配额和 loop 配额。"],
+    users: ["用户权限管理", "创建 tenant/workspace scoped 用户，首次登录必须改密，所有操作进入 audit。"],
+    templates: ["Harness Template 管理", "管理员查看公共模板、创建模板进化 run，并通过版本和 changelog 管理生命周期。"],
+    audit: ["审计与日志溯源", "按 requestId、actor、scope、action、nextAction 和 blocker 定位问题。"]
+  };
+  const [title, subtitle] = pageTitleMap[activePage];
   return (
     <header className="topbar">
       <div>
@@ -1176,8 +1947,11 @@ function Topbar({
       <div className="status-strip">
         <button type="button" className={`chip ${scope.token ? "green" : "amber"}`} onClick={onOpenSession}>
           <ShieldCheck size={14} aria-hidden="true" />
-          {scope.token ? session?.user?.role ?? "signed in" : "sign in required"}
+          {scope.token ? roleLabel(session) : "sign in required"}
         </button>
+        <span className="chip blue">scope locked</span>
+        <span className="chip mono">{scope.tenantId}</span>
+        <span className="chip mono">{scope.workspaceId}</span>
         <button type="button" className={`chip ${apiFailed ? "amber" : apiOk ? "green" : ""}`} onClick={onRefresh} disabled={refreshing}>
           <RefreshCw size={14} aria-hidden="true" />
           {refreshing ? "refreshing" : apiOk ? `${apiOk} API ok` : "API waiting"}
@@ -1670,6 +2444,8 @@ function EvidenceDrawer({
   scope,
   context,
   session,
+  canEditScope,
+  signedIn,
   authNotice,
   authLoading,
   loginForm,
@@ -1692,6 +2468,8 @@ function EvidenceDrawer({
   scope: DashboardScope;
   context: ProjectLoopContext;
   session?: DashboardSession;
+  canEditScope: boolean;
+  signedIn: boolean;
   authNotice: string;
   authLoading: boolean;
   loginForm: { username: string; password: string };
@@ -1716,7 +2494,7 @@ function EvidenceDrawer({
         <DrawerHead title="Session and scope" subtitle={authNotice} />
         <div className="drawer-body">
           <div className="drawer-card">
-            <strong>{scope.token ? "Signed in" : "Sign in required"}</strong>
+            <strong>{signedIn ? "Signed in" : "Sign in required"}</strong>
             <small>{session?.user?.username ?? scope.actorId}</small>
           </div>
           <label>
@@ -1743,9 +2521,14 @@ function EvidenceDrawer({
             </div>
           )}
           <div className="drawer-card">
-            <label><span>Tenant</span><input value={scope.tenantId} onChange={(event) => onScopeChange({ ...scope, tenantId: event.currentTarget.value })} /></label>
-            <label><span>Workspace</span><input value={scope.workspaceId} onChange={(event) => onScopeChange({ ...scope, workspaceId: event.currentTarget.value })} /></label>
-            <label><span>Actor</span><input value={scope.actorId} onChange={(event) => onScopeChange({ ...scope, actorId: event.currentTarget.value })} /></label>
+            <div className="drawer-card-head">
+              <strong>Scope locked</strong>
+              <span className={`tag ${canEditScope ? "amber" : "green"}`}>{canEditScope ? "admin editable" : "login scoped"}</span>
+            </div>
+            <label><span>Tenant</span><input disabled={!canEditScope} value={scope.tenantId} onChange={(event) => onScopeChange({ ...scope, tenantId: event.currentTarget.value })} /></label>
+            <label><span>Workspace</span><input disabled={!canEditScope} value={scope.workspaceId} onChange={(event) => onScopeChange({ ...scope, workspaceId: event.currentTarget.value })} /></label>
+            <label><span>Actor</span><input disabled={!canEditScope} value={scope.actorId} onChange={(event) => onScopeChange({ ...scope, actorId: event.currentTarget.value })} /></label>
+            <small>普通用户的 scope 来自登录会话；只有 platform admin 才允许切换 scope 做跨租户管理。</small>
           </div>
         </div>
       </aside>

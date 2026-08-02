@@ -11,11 +11,11 @@
 
 ## Steps
 
-1. Open **Projects**.
+1. Open **# Agent Console**.
 2. Fill **Repository**.
 3. Fill **Goal Loop Target**.
 4. Open **Advanced Control Details** only when real project, DevOps, credential, LLM, or profile IDs are known.
-5. Click **Generate Review Pack**.
+5. Click **Start intake**.
 6. Read **Project Onboarding Checklist** status, blockers, requestId, and nextAction.
 7. Continue only when the checklist allows harness profile generation and phase planning.
 

@@ -326,13 +326,17 @@ export async function loadDashboardApiSnapshot(
     ["summary", apiSurface.summary],
     ["projects", apiSurface.projects],
     ["templates", apiSurface.harnessTemplates],
+    ["templateEvolutions", apiSurface.harnessTemplateEvolutions],
     ["policies", apiSurface.harnessPolicies],
     ["releaseTargets", apiSurface.releaseTargets],
     ["maturityStandards", apiSurface.maturityStandards],
     ["goals", apiSurface.goals],
     ["releaseDecisions", apiSurface.releaseDecisions],
     ["audit", apiSurface.audit],
-    ["llmProfiles", apiSurface.llmProfiles]
+    ["llmProfiles", apiSurface.llmProfiles],
+    ["tenants", apiSurface.tenants],
+    ["workspaces", apiSurface.workspaces],
+    ["users", apiSurface.users]
   ];
   if (projectId) calls.push(["profiles", apiSurface.projectHarnessProfiles(projectId)]);
   if (goalId) {

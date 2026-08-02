@@ -1,6 +1,6 @@
 # EvoPilot Dashboard Docs
 
-Dashboard docs describe UI operations for **Agent Console v2**. The Dashboard is not a full CLI replacement; it is the ordinary-user browser surface for the core project evolution loop.
+Dashboard docs describe UI operations for **Agent Console v2**. The Dashboard is not a full CLI replacement; it is the login-scoped browser surface for the core project evolution loop and a small role-based administration surface.
 
 ```text
 Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision
@@ -15,6 +15,7 @@ Read these first:
 - [Dashboard Page Map](ai-agents/dashboard-page-map.md)
 - [Expected UI States](ai-agents/expected-ui-states.md)
 - [API Usage](reference/api-usage.md)
+- [Roles And Permissions](reference/roles-and-permissions.md)
 - [Self-Hosting](operations/self-hosting.md)
 - [Release Management](operations/release-management.md)
 - [Smoke Test](operations/smoke-test.md)
@@ -27,6 +28,8 @@ Read these first:
 The Dashboard is chat-first. Users describe a repository and goal loop target; EvoPilot generates a `ProjectHarnessProfile.yaml` DRAFT; users confirm or request changes; only then can the reviewed profile be activated and used for planning, loop execution, and release decisions.
 
 The **Evidence Drawer** is the agent-readable side channel for `requestId`, digests, policy refs, API action metadata, blockers, `nextAction`, and logs.
+
+Login is the first operation. After login, tenant/workspace/actor scope is locked by the EvoPilot session. Platform administrators can open Tenants, Workspaces, Users, Harness Templates, and Audit; ordinary users stay on Agent Console and use the Evidence Drawer or Audit for server-returned project state.
 
 ## Release And Self-Hosting
 

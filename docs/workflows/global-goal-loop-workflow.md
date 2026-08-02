@@ -8,8 +8,8 @@ GlobalGoal makes long-running product goals visible. A user can see the plan, ea
 
 ## Steps
 
-1. Open **Runs**.
-2. Confirm the selected goalId in the visible projections or Projects **Advanced Control Details**.
+1. Open **# Agent Console**.
+2. Confirm the selected goalId in the visible loop card, Evidence Drawer, or server-returned goal projection.
 3. Read goal objective, status, progress, and active target from run-status.
 4. Inspect phase-plan and evidence-matrix projections.
 5. If a blocker exists, read blocker type and `nextAction`.

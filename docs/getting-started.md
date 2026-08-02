@@ -43,11 +43,14 @@ Do not put bearer tokens, GitHub PATs, GitLab tokens, LLM keys, or deploy creden
 ## First Browser Check
 
 1. Open the Dashboard URL.
-2. Confirm the left navigation shows **Projects**, **Runs**, and **Ops**.
-3. Log in through **Auth Session**.
-4. Confirm the top status changes from `API WAITING` to `API LIVE` after projections load.
-5. Open **Projects**, enter a repository URL and goal loop target, and click **Generate Review Pack** only when using a real or disposable EvoPilot server.
-6. Read Review Pack rows and stop at blockers or review gates.
+2. Confirm the first screen is the EvoPilot login page.
+3. Log in with a Dashboard user issued by EvoPilot.
+4. If EvoPilot requires a password change, complete it before entering the console.
+5. Confirm the header shows `scope locked`, tenant, workspace, role, and API status.
+6. Confirm the left navigation shows only **# Agent Console**, **Tenants**, **Workspaces**, **Users**, **Harness Templates**, and **Audit**.
+7. Confirm it does not show project cards, active sessions, recent decisions, a user footer, or a **Projects** menu.
+8. Open **# Agent Console**, enter a repository URL and goal loop target, and click **Start intake** only when using a real or disposable EvoPilot server.
+9. Stop at the visible `ProjectHarnessProfile.yaml` DRAFT until the project owner confirms or requests changes.
 
 ## Non-Mutating Compatibility Check
 

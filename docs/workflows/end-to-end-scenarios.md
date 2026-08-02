@@ -8,12 +8,14 @@ Use when a user gives a GitHub repository and a business goal loop target.
 
 ### Browser Flow
 
-1. Open Dashboard and log in.
-2. Enter repository URL.
-3. Enter goal loop target.
-4. Click **Start intake**.
-5. Wait for the `ProjectHarnessProfile.yaml` DRAFT.
-6. Stop and show the DRAFT profile source/compiled content, validation, diff, digests, policy refs, generatedBy evidence, and request ID to the project owner.
+1. Open Dashboard and log in from the first screen.
+2. Complete password change if EvoPilot requires it.
+3. Confirm `scope locked`, tenant, workspace, actor, role, and API status in the header.
+4. Enter repository URL.
+5. Enter goal loop target.
+6. Click **Start intake**.
+7. Wait for the `ProjectHarnessProfile.yaml` DRAFT.
+8. Stop and show the DRAFT profile source/compiled content, validation, diff, digests, policy refs, generatedBy evidence, and request ID to the project owner.
 
 ### CLI-equivalent
 
@@ -109,3 +111,51 @@ release decisions
 ### WorkBuddy deviation guard
 
 Do not claim GO, RC, or GA from UI color, local tests, or CI success alone.
+
+## Scenario 6: Platform Admin Creates Tenant And User
+
+Use when a platform administrator prepares a tenant/workspace and user for a real project team.
+
+### Browser Flow
+
+1. Log in as a platform administrator.
+2. Confirm the left navigation includes **Tenants**, **Workspaces**, **Users**, **Harness Templates**, and **Audit**.
+3. Open **Tenants** and create the tenant, initial workspace, and tenant admin.
+4. Open **Users** and create project owner or operator users with `mustChangePassword=true`.
+5. Open **Audit** and verify the request IDs and actions are visible.
+
+### CLI-equivalent
+
+```text
+users/tenants/workspaces through EvoPilot API or CLI admin commands
+audit list
+```
+
+### WorkBuddy deviation guard
+
+Do not create cross-tenant users from an ordinary operator session. Stop on `403`, missing role, missing tenant/workspace id, or server `nextAction`.
+
+## Scenario 7: Platform Admin Starts Harness Template Evolution
+
+Use when an administrator wants to evolve a public HarnessTemplate knowledge pack without manually editing server state.
+
+### Browser Flow
+
+1. Log in as a platform administrator.
+2. Open **Harness Templates**.
+3. Review existing template versions returned by EvoPilot.
+4. Fill base template, target version, intent, source type, and source reference.
+5. Click **创建 evolution draft**.
+6. Open evidence or audit and report `evolutionId`, requestId, status, and nextAction when returned.
+
+### CLI-equivalent
+
+```text
+harness template evolution create
+harness template evolution advance
+# STOP before approve/publish until source coverage, generated pack, validation, diff, and project impact are shown
+```
+
+### WorkBuddy deviation guard
+
+Do not approve or publish a template evolution from Dashboard unless EvoPilot exposes that gate and the administrator has reviewed source coverage, generated pack, validation, diff, changelog, and project impact.

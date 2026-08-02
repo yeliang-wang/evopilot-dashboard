@@ -6,8 +6,8 @@
 
 1. Open Dashboard URL.
 2. Log in with assigned EvoPilot username and password.
-3. Confirm current tenant and workspace.
-4. Confirm the left navigation shows **Projects**, **Runs**, and **Ops**.
+3. Confirm current tenant, workspace, actor, role, and `scope locked`.
+4. Confirm the left navigation shows only **# Agent Console**, **Tenants**, **Workspaces**, **Users**, **Harness Templates**, and **Audit**.
 5. Start from the requested workflow document.
 
 ## Standard Step Format
@@ -26,17 +26,17 @@ For each UI action:
 
 ```text
 Login
-  -> Projects
+  -> # Agent Console
   -> Repository + Goal Loop Target
-  -> Generate Review Pack
+  -> Start Intake
   -> Review ProjectHarnessProfile DRAFT
   -> Review Alpha/Beta/RC/GA Phase Plan
   -> Owner Confirmation
   -> Activate Harness
   -> Approve Phase Plan
   -> Start Or Advance Loop
-  -> Runs Evidence
-  -> Ops Troubleshooting/Audit
+  -> Evidence Drawer
+  -> Audit
 ```
 
 ## Stop Conditions
@@ -65,10 +65,10 @@ Stop and report when the UI or API result shows:
 
 WorkBuddy must not deviate from the real UI in these ways:
 
-- Do not jump directly to Runs before Review Pack generation unless a user supplied an existing goalId.
+- Do not jump directly to loop execution before review pack generation unless a user supplied an existing goalId.
 - Do not approve a phase plan without visible `Confirmed By` and `Confirmation`.
 - Do not activate a harness before the DRAFT has been shown to the project owner.
-- Do not treat Ops projection failures as release failures; read the actual release decision.
+- Do not treat Audit projection failures as release failures; read the actual release decision.
 - Do not use CLI commands while claiming to operate the browser UI.
 
 ## Successful Completion

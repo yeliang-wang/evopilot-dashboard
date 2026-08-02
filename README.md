@@ -10,7 +10,7 @@
 [![Release](https://img.shields.io/badge/Release-v1.0.0%20GA-2ea043)](./docs/releases/1.0.0.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-Run project intake, harness review, loop execution, blocker repair, evidence review, and release decisions from a browser.
+Run login-scoped project intake, harness review, loop execution, blocker repair, evidence review, release decisions, and role-based administration from a browser.
 
 [Quickstart](./docs/getting-started.md) | [Self-Hosting](./docs/operations/self-hosting.md) | [Docs](./docs/README.md) | [User Guide](./docs/user-guide.md) | [AI Agents](./docs/ai-agents/README.md) | [Changelog](./CHANGELOG.md) | [Security](./SECURITY.md)
 
@@ -30,6 +30,8 @@ Users describe a repository and goal loop target, review the generated `ProjectH
 
 EvoPilot API remains the system of record. The Dashboard is a standalone React HTTP client; it does not own project, harness, loop, evidence, audit, or release state.
 
+Login is the first screen. The left navigation follows the fixed product baseline: `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, and `Audit`. Project context, sessions, decisions, and evidence stay inside the main console or drawer, not in the sidebar.
+
 ## Release Status
 
 EvoPilot Dashboard is **v1.0.0 GA** for the Agent Console baseline: browser project intake, harness draft review, owner approval, loop execution, evidence inspection, blocker repair, release decision review, self-hosting docs, AI Agent docs, and smoke validation are ready for external adoption.
@@ -44,6 +46,8 @@ Current phase: **Production Adoption and Public Trust Building**. Public case st
 | Harness review | Shows `ProjectHarnessProfile.yaml` as a human-readable DRAFT before activation. |
 | Loop operation | Starts or advances goal loops only after profile and phase-plan approval gates. |
 | Evidence | Exposes request IDs, digests, policy refs, logs, blockers, `nextAction`, and token usage. |
+| Auth and scope | Starts at login, locks tenant/workspace/actor from the EvoPilot session, and gates admin pages by role. |
+| Administration | Lets platform admins operate tenants, workspaces, users, template evolution, and audit through EvoPilot APIs. |
 | AI Agent use | Provides WorkBuddy-readable docs, page maps, expected UI states, and stop rules. |
 
 ## Quickstart

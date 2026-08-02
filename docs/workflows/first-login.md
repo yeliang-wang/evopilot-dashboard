@@ -15,12 +15,13 @@ Use this when a user, WorkBuddy browser operator, or digital human opens Dashboa
 ## Steps
 
 1. Open the Dashboard URL.
-2. Confirm the page shows **Agent Console v2** with the stage bar and a session chip that opens the session drawer.
+2. Confirm the page shows the EvoPilot login screen.
 3. Enter username and password.
-4. Click **Login**.
+4. Click **登录**.
 5. If the server requires password change, enter current and new password, then submit.
-6. Confirm tenant, workspace, actor, and role.
-7. Open **Ops** and click **Refresh Projections** if the API state did not load automatically.
+6. Confirm tenant, workspace, actor, role, and `scope locked` in the header.
+7. Confirm the left navigation shows only `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, and `Audit`.
+8. Click the API refresh chip if projections did not load automatically.
 
 ## Expected Result
 

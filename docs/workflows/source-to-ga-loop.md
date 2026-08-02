@@ -12,14 +12,14 @@
 
 ## Steps
 
-1. Open **Projects**.
-2. Generate the Review Pack if needed.
+1. Open **# Agent Console**.
+2. Click **Start intake** to generate the review pack if needed.
 3. Activate the reviewed harness profile.
 4. Approve the reviewed phase plan.
 5. Click **Start Or Advance Loop**.
-6. Open **Runs**.
+6. Stay in **# Agent Console** and open **View evidence** when details are needed.
 7. Read run-status, phase-plan, evidence matrix, final report, blockers, nextAction, and release decisions.
-8. If a node is blocked, open **Ops** and follow requestId/nextAction repair guidance.
+8. If a node is blocked, open **Audit** or the **Evidence Drawer** and follow requestId/nextAction repair guidance.
 
 ## Expected Result
 
@@ -36,7 +36,7 @@
 | `configure-source-credentials` | Source writeback cannot proceed. | Configure tokenRef and re-run Review Pack. |
 | `human-approval` | Governance requires a human decision. | Review evidence, then approve or reject. |
 | `policy-review` | Release policy blocks continuation. | Read policy blockers and repair evidence. |
-| `repair` | A source release run failed or is stale. | Open Ops and execute the server-directed repair path. |
+| `repair` | A source release run failed or is stale. | Open Audit or Evidence Drawer and execute only the server-directed repair path after approval. |
 | missing LLM/token usage | The UI cannot prove which LLM ran or how many tokens were used. | Record goalId/loopId/requestId and compare against EvoPilot API/CLI docs. |
 
 ## Release Rule

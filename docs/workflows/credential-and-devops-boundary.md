@@ -28,14 +28,14 @@ Dashboard users, WorkBuddy, and digital humans must not guess DevOps ownership f
 
 ## Steps
 
-1. Open **Projects**.
+1. Open **# Agent Console**.
 2. Fill repository and Goal Loop Target.
 3. Open **Advanced Control Details**.
 4. Fill `tokenRef` when writeback is needed.
 5. Fill `executionMode`.
 6. Fill `devopsOwner`.
 7. Fill CI workflow and required check if known.
-8. Click **Generate Review Pack**.
+8. Click **Start intake**.
 9. Continue only if the checklist status is acceptable and the displayed blocker is intentionally accepted.
 
 ## Expected Result

@@ -8,9 +8,9 @@ The release decision from EvoPilot API is authoritative. Dashboard cards, workfl
 
 ## Steps
 
-1. Open **Runs**.
-2. Select or confirm projectId, goalId, targetId, or loopId if filters are available.
-3. Read current release decision projections.
+1. Open **# Agent Console**.
+2. Select or confirm projectId, goalId, targetId, or loopId in the Evidence Drawer if the user supplied existing IDs.
+3. Read current release decision projections from the release card or Evidence Drawer.
 4. Check status: `GO`, `CONDITIONAL-GO`, or `NO-GO`.
 5. Read failed criteria, open risks, scenario matrix, source release run, and CI/CD evidence.
 6. If the decision is `NO-GO`, route to the recommended repair workflow.

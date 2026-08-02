@@ -10,14 +10,14 @@ Platform administrators, tenant administrators, and operations staff.
 
 | Responsibility | Dashboard Area | Required Evidence |
 |---|---|---|
-| Bootstrap access | Auth Session / Ops | password changed, user role visible, tenant/workspace scope correct |
-| User and scope setup | Ops | user role, tenant, workspace, status, audit row |
-| Project credentials | Projects / Ops | server-side secret or tokenRef saved, checklist/preflight result |
-| DevOps boundary | Projects | executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary |
-| Harness governance | Projects Review Pack | templateRef, policyRefs, profile validation, source/compiled digest |
-| Phase governance | Projects Review Pack / Runs | Alpha/Beta/RC/GA phase plan, owner confirmation, approval audit |
-| Release governance | Runs | TargetEvidencePackage, PhasePackage, releaseDecision |
-| Troubleshooting | Ops | requestId, traceId, actor, operation, error, nextAction |
+| Bootstrap access | Sign in / password change | password changed, user role visible, tenant/workspace scope correct |
+| User and scope setup | Tenants / Workspaces / Users | user role, tenant, workspace, status, audit row |
+| Project credentials | Agent Console | server-side secret or tokenRef saved, checklist/preflight result |
+| DevOps boundary | Agent Console | executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary |
+| Harness governance | Agent Console Review Pack / Harness Templates | templateRef, policyRefs, profile validation, source/compiled digest, template evolution evidence |
+| Phase governance | Agent Console | Alpha/Beta/RC/GA phase plan, owner confirmation, approval audit |
+| Release governance | Agent Console / Audit | TargetEvidencePackage, PhasePackage, releaseDecision |
+| Troubleshooting | Audit / Evidence Drawer | requestId, traceId, actor, operation, error, nextAction |
 
 ## Production Console Governance
 
@@ -25,12 +25,13 @@ The Dashboard exposes mutating controls, but EvoPilot API remains the enforcemen
 
 | Control | Admin Responsibility | Dashboard Evidence |
 |---|---|---|
-| Login and password change | Issue Dashboard users through EvoPilot auth, not GitHub/GitLab PATs. | Auth Session shows username, role, tenant, workspace, and password-change state. |
-| Tenant/workspace scope | Ensure every admin, operator, and viewer belongs to the correct scope. | Header and Ops fields match the project owner. |
+| Login and password change | Issue Dashboard users through EvoPilot auth, not GitHub/GitLab PATs. | Login page and password-change screen show the auth boundary before the console loads. |
+| Tenant/workspace scope | Ensure every admin, operator, and viewer belongs to the correct scope. | Header shows `scope locked`, tenant, workspace, actor, and role. |
 | Project onboarding checklist | Require real repository provider/url/branch, tokenRef, DevOps owner, and LLM profile where needed. | Review Pack shows `POST /api/v1/onboarding/project/checklist`, requestId, blockers, and nextAction. |
 | Harness profile activation | Require owner review of the generated/edited DRAFT before activation. | Review Pack shows generated profile version/digest; Last API Action shows activate status. |
-| Goal plan approval | Require Alpha/Beta/RC/GA phase plan review before approval. | Review Pack requires `confirmedBy` and `confirmation`; Ops/audit can verify approval. |
-| Incident repair | Use requestId, traceId, failed node, root cause, and nextAction. | Ops shows troubleshooting contract; server logs remain authoritative. |
+| Goal plan approval | Require Alpha/Beta/RC/GA phase plan review before approval. | Review Pack requires `confirmedBy` and `confirmation`; Audit can verify approval. |
+| Incident repair | Use requestId, traceId, failed node, root cause, and nextAction. | Audit and Evidence Drawer show troubleshooting contract; server logs remain authoritative. |
+| Harness template evolution | Use versioned template evolution runs before publish. | Harness Templates page creates evolution draft; approval/publish still requires administrator review of source coverage, generated pack, validation, diff, changelog, and impact. |
 
 If EvoPilot returns `403`, `409`, `PROJECT_HARNESS_PROFILE_POLICY_STALE`, `WAITING_APPROVAL`, `NO-GO`, or a repair-oriented `nextAction`, do not bypass it from the browser. Repair the server-side condition and rerun the same action.
 

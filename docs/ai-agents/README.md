@@ -10,24 +10,46 @@ The visible flow is:
 Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision
 ```
 
-The Dashboard is chat-first. The agent reads the conversation, stage bar, inline cards, and **Evidence Drawer**. It must not infer server state from color alone.
+The Dashboard is login-first and chat-first. The agent reads the login result, locked tenant/workspace scope, role-based left navigation, conversation, stage bar, inline cards, and **Evidence Drawer**. It must not infer server state from color alone.
 
 ## Browser End-To-End Loop
 
 1. Open the Dashboard URL.
-2. Open the session drawer and log in if required.
-3. Confirm tenant, workspace, and actor.
-4. Enter repository URL.
-5. Enter the user's goal loop target.
-6. Click **Start intake**.
-7. Wait for the inline `ProjectHarnessProfile.yaml` DRAFT.
-8. Stop and show the DRAFT to the user or project owner.
-9. If the user requests changes, enter the change request and click **Request changes**.
-10. Repeat review until the user confirms.
-11. Click **Confirm** to activate only the reviewed profile.
-12. Review phase plan binding, fill real `Confirmed By` and `Confirmation`, then approve.
-13. Start or advance the loop.
-14. Use the **Evidence Drawer** to report request IDs, profile digests, policy refs, blockers, next actions, and release decisions.
+2. Log in on the first screen. Do not use GitHub/GitLab/LLM/deploy secrets as Dashboard login credentials.
+3. Complete password change if shown.
+4. Confirm the header shows `scope locked`, tenant, workspace, actor, role, and API status.
+5. Confirm the fixed left navigation from the table below.
+6. Enter repository URL.
+7. Enter the user's goal loop target.
+8. Click **Start intake**.
+9. Wait for the inline `ProjectHarnessProfile.yaml` DRAFT.
+10. Stop and show the DRAFT to the user or project owner.
+11. If the user requests changes, enter the change request and click **Request changes**.
+12. Repeat review until the user confirms.
+13. Click **Confirm** to activate only the reviewed profile.
+14. Review phase plan binding, fill real `Confirmed By` and `Confirmation`, then approve.
+15. Start or advance the loop.
+16. Use the **Evidence Drawer** to report request IDs, profile digests, policy refs, blockers, next actions, and release decisions.
+
+| Expected left navigation |
+|---|
+| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `Audit` |
+
+The left navigation must not contain workspace/project cards, active sessions, recent decisions, a user footer, or a `Projects` menu.
+
+## Admin Browser Operations
+
+Only operate these pages when the signed-in user is a platform administrator and the server permits the action:
+
+| Page | Primary action | EvoPilot API |
+|---|---|---|
+| Tenants | Create tenant, workspace, tenant admin | `POST /api/v1/tenants` |
+| Workspaces | Create workspace boundary and quota | `POST /api/v1/workspaces` |
+| Users | Create scoped user with `mustChangePassword=true` | `POST /api/v1/users` |
+| Harness Templates | Create `HarnessTemplateEvolution` draft | `POST /api/v1/harness/template-evolutions` |
+| Audit | Read request/action/failure trace | `GET /api/v1/audit` |
+
+If RBAC hides a page or the server returns `403`, stop and report a scope or role problem. Do not try to switch tenant/workspace as an ordinary user.
 
 ## Stop Rules
 

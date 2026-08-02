@@ -21,11 +21,11 @@ Make the Node API service production-releasable by enforcing health/readiness ch
 Browser steps:
 
 1. Open Dashboard and log in.
-2. Open **Projects**.
+2. Open **# Agent Console**.
 3. Enter the repository URL for the disposable or owned Node API service.
 4. Select the execution boundary shown by the owner: owned repository, fork CI PR, or read-only public.
 5. Paste the goal loop target.
-6. Click **Generate Review Pack**.
+6. Click **Start intake**.
 7. Read the `ProjectHarnessProfile.yaml` draft.
 8. If the owner requests changes, edit through EvoPilot profile apply/diff flow and regenerate the review pack.
 9. Activate only after owner confirmation.
@@ -51,10 +51,10 @@ Keep EvoPilot Dashboard aligned with EvoPilot API and CLI semantics while preser
 
 Browser steps:
 
-1. Open **Projects** and enter `https://github.com/yeliang-wang/evopilot-dashboard`.
+1. Open **# Agent Console** and enter `https://github.com/yeliang-wang/evopilot-dashboard`.
 2. Choose `read-only-public` for analysis or `owned-repository` only with owner-approved credentials stored server-side.
 3. Paste the goal loop target.
-4. Generate the review pack.
+4. Click **Start intake** to generate the review pack.
 5. Inspect the YAML-like harness draft and ensure it covers React build, static contract, smoke, API compatibility, screenshots, and release docs.
 6. Show the draft to the owner.
 7. Activate the reviewed profile.

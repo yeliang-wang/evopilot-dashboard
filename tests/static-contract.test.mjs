@@ -27,7 +27,11 @@ const docsDashboardMap = fs.readFileSync("docs/ai-agents/dashboard-page-map.md",
 const docsExpectedStates = fs.readFileSync("docs/ai-agents/expected-ui-states.md", "utf8");
 const docsSmoke = fs.readFileSync("docs/operations/smoke-test.md", "utf8");
 const docsApiUsage = fs.readFileSync("docs/reference/api-usage.md", "utf8");
+const docsRoles = fs.readFileSync("docs/reference/roles-and-permissions.md", "utf8");
 const docsE2E = fs.readFileSync("docs/workflows/end-to-end-scenarios.md", "utf8");
+const docsGettingStarted = fs.readFileSync("docs/getting-started.md", "utf8");
+const docsAdmin = fs.readFileSync("docs/admin-guide.md", "utf8");
+const docsDigitalHuman = fs.readFileSync("docs/ai-agents/digital-human-playbook.md", "utf8");
 const docsDevopsBoundary = fs.readFileSync("docs/workflows/credential-and-devops-boundary.md", "utf8");
 const allDocs = [
   readme,
@@ -38,7 +42,11 @@ const allDocs = [
   docsExpectedStates,
   docsSmoke,
   docsApiUsage,
+  docsRoles,
   docsE2E,
+  docsGettingStarted,
+  docsAdmin,
+  docsDigitalHuman,
   docsDevopsBoundary
 ].join("\n");
 
@@ -86,8 +94,6 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Owner Review",
     "Loop Execution",
     "Release Decision",
-    "Active sessions",
-    "Recent decisions",
     "Evidence drawer",
     "ProjectHarnessProfile.yaml",
     "Owner Review Summary",
@@ -95,13 +101,30 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Request changes",
     "Confirm",
     "Approve plan & start loop",
-    "View evidence"
+    "View evidence",
+    "Control plane access starts here.",
+    "scope locked",
+    "Tenants",
+    "Workspaces",
+    "Users",
+    "Harness Templates",
+    "HarnessTemplateEvolution"
   ]) {
     assert.match(app, new RegExp(escapeRegExp(text)));
   }
 
   assert.match(app, /type ConsoleStep =/);
   assert.match(app, /type DrawerKind =/);
+  assert.match(app, /type PageId = "console" \| "tenants" \| "workspaces" \| "users" \| "templates" \| "audit"/);
+  assert.match(app, /function AuthScreen/);
+  assert.match(app, /function PasswordChangeScreen/);
+  assert.match(app, /function ManagementPage/);
+  assert.doesNotMatch(app, /function ProjectsPage/);
+  assert.match(app, /function TenantsPage/);
+  assert.match(app, /function WorkspacesPage/);
+  assert.match(app, /function UsersPage/);
+  assert.match(app, /function TemplatesPage/);
+  assert.match(app, /function AuditPage/);
   assert.match(app, /function StageBar/);
   assert.match(app, /function EvidenceDrawer/);
   assert.match(app, /function ProfileReviewCard/);
@@ -113,9 +136,19 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
   assert.match(styles, /\.review-document/);
   assert.match(styles, /\.yaml-block/);
   assert.match(styles, /\.drawer/);
+  assert.match(styles, /\.auth-screen/);
+  assert.match(styles, /\.nav-item/);
+  assert.match(styles, /grid-template-columns:\s*168px minmax\(0, 1fr\)/);
+  assert.match(styles, /\.management-workspace/);
+  assert.match(styles, /\.form-panel/);
 
   assert.doesNotMatch(app, /type PageId = "projects" \| "runs" \| "ops";/);
   assert.doesNotMatch(app, /\(\["projects", "runs", "ops"\] as PageId\[\]\)/);
+  assert.doesNotMatch(app, /"projects", "Projects"/);
+  assert.doesNotMatch(app, /page === "projects"/);
+  assert.doesNotMatch(app, /Workspace \/ Project/);
+  assert.doesNotMatch(app, /Active sessions/);
+  assert.doesNotMatch(app, /Recent decisions/);
   assert.doesNotMatch(app, /Projects \/ Runs \/ Ops/);
   assert.doesNotMatch(app, /five top-level pages/);
 });
@@ -197,6 +230,8 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/history",
     "/api/v1/llm-profiles",
     "/api/v1/secrets",
+    "/api/v1/tenants",
+    "/api/v1/workspaces",
     "/api/v1/users",
     "/api/v1/loop-workers/queue"
   ]) {
@@ -296,6 +331,13 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
     "Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision",
     "Evidence Drawer",
     "chat-first",
+    "login-scoped",
+    "scope locked",
+    "Tenants",
+    "Workspaces",
+    "Users",
+    "Harness Templates",
+    "HarnessTemplateEvolution",
     "WorkBuddy",
     "ordinary-user core flow"
   ]) {
@@ -304,17 +346,34 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
 
   assert.match(docsAiAgents, /Agent Console v2/);
   assert.match(docsAiAgents, /Browser End-To-End Loop/);
-  assert.match(docsDashboardMap, /Agent Console Surface Map/);
+  assert.match(docsAiAgents, /Admin Browser Operations/);
+  assert.match(docsDashboardMap, /Dashboard Page Map/);
+  assert.match(docsDashboardMap, /Left Navigation/);
+  assert.match(docsDashboardMap, /`# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `Audit`/);
   assert.match(docsExpectedStates, /ProjectHarnessProfile YAML Review/);
+  assert.match(docsExpectedStates, /Authentication States/);
+  assert.match(docsExpectedStates, /Admin Page States/);
   assert.match(docsE2E, /CLI-equivalent/);
+  assert.match(docsE2E, /Platform Admin Creates Tenant And User/);
+  assert.match(docsE2E, /Platform Admin Starts Harness Template Evolution/);
   assert.match(docsE2E, /WorkBuddy deviation guard/);
   assert.match(docsSmoke, /Dashboard Console Smoke/);
   assert.match(docsSmoke, /EVOPILOT_MUTATING_SMOKE=1/);
   assert.match(docsSmoke, /evopilot-dashboard-console-smoke\/v1/);
   assert.match(docsApiUsage, /Agent Console API Map/);
+  assert.match(docsApiUsage, /Role-Based API Boundary/);
   assert.match(docsApiUsage, /Projection Context/);
+  assert.match(docsRoles, /Dashboard Navigation By Role/);
+  assert.match(docsGettingStarted, /first screen is the EvoPilot login page/);
+  assert.match(docsAdmin, /Harness Templates page creates evolution draft/);
+  assert.match(docsDigitalHuman, /# Agent Console/);
   assert.doesNotMatch(allDocs, /three top-level pages/);
   assert.doesNotMatch(allDocs, /Projects \/ Runs \/ Ops/);
+  assert.doesNotMatch(allDocs, /Open \*\*Runs\*\*/);
+  assert.doesNotMatch(allDocs, /Open \*\*Ops\*\*/);
+  assert.doesNotMatch(allDocs, /Generate Review Pack/);
+  assert.doesNotMatch(allDocs, /Ordinary operator \| `# Agent Console`, `Projects`, `Audit`/);
+  assert.doesNotMatch(allDocs, /Left rail \| Role navigation, optional workspace\/project context, active sessions, recent decisions/);
   assert.doesNotMatch(allDocs, /five top-level pages/);
 });
 

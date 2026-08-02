@@ -10,12 +10,12 @@
 
 ## Steps
 
-1. Open **Ops**.
-2. Confirm the current tenant and workspace.
-3. Inspect user, tenant, and workspace projections.
-4. Use EvoPilot administrator flows for create/edit/reset when the current Dashboard build does not expose a direct form.
-5. Refresh projections and verify the user, tenant, or workspace state.
-6. Check audit when available.
+1. Log in as a platform administrator or authorized tenant administrator.
+2. Confirm `scope locked`, role, tenant, and workspace in the header.
+3. Open **Tenants** to create a tenant, initial workspace, and tenant admin when platform admin privileges are present.
+4. Open **Workspaces** to create or inspect workspace boundaries and quotas.
+5. Open **Users** to create scoped users with `mustChangePassword=true`.
+6. Open **Audit** and verify requestId, action, actor, scope, status, and nextAction when available.
 
 ## Expected Result
 
