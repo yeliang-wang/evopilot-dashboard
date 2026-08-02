@@ -4,6 +4,19 @@ All notable changes to EvoPilot Dashboard are documented here.
 
 Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
 
+## 1.0.1 - 2026-08-02
+
+### Changed
+
+- Published the latest README Agent Console screenshot as the patch-level GA publication baseline.
+- Aligned release notes and version metadata with the post-v1.0.0 public documentation state.
+
+### Validation
+
+- `npm run check`
+- `npm run smoke:console`
+- `git diff --check`
+
 ## 1.0.0 - 2026-08-02
 
 ### Added

@@ -26,7 +26,7 @@ EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned u
 | Root agent instructions | Present | `AGENTS.md`, `llms.txt` |
 | Self-hosting guide | Present | `docs/operations/self-hosting.md` |
 | Release playbook | Present | `docs/operations/release-management.md` |
-| Release notes | Present | `docs/releases/1.0.0.md` |
+| Release notes | Present | `docs/releases/1.0.1.md` |
 | Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
 
 ## Documentation Shape

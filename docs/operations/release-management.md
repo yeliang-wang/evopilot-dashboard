@@ -50,13 +50,13 @@ EVOPILOT_MUTATING_SMOKE=1 npm run smoke:console
 ## Tag And Push
 
 ```bash
-git tag -a v1.0.0 -m "EvoPilot Dashboard v1.0.0"
+git tag -a <version> -m "EvoPilot Dashboard <version>"
 git push origin main
-git push origin v1.0.0
-git ls-remote origin refs/heads/main refs/tags/v1.0.0
+git push origin <version>
+git ls-remote origin refs/heads/main refs/tags/<version>
 ```
 
-If `gh` is unavailable, create the GitHub Release manually from the pushed tag and paste the body from `docs/releases/1.0.0.md`.
+If `gh` is unavailable, create the GitHub Release manually from the pushed tag and paste the body from `docs/releases/<version>.md`.
 
 ## Rollback
 

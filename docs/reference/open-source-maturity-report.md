@@ -18,7 +18,7 @@ It should not claim community parity with the most established public AI-agent c
 | User flows | Project intake, EvoPilot template auto-match, `ProjectHarnessProfile.yaml` DRAFT review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
 | AI Agent readiness | WorkBuddy-readable page map, expected UI states, stop rules, AGENTS entrypoint. | `AGENTS.md`, `docs/ai-agents/` |
 | Distribution | Dockerfile, production compose, Nginx template, self-hosting docs. | `Dockerfile`, `compose.production.yaml`, `deploy/nginx/`, `docs/operations/self-hosting.md` |
-| Release readiness | Versioned release notes, changelog, release checklist, smoke validation. | `CHANGELOG.md`, `docs/releases/1.0.0.md`, `docs/operations/release-management.md` |
+| Release readiness | Versioned release notes, changelog, release checklist, smoke validation. | `CHANGELOG.md`, `docs/releases/1.0.1.md`, `docs/operations/release-management.md` |
 | Community shell | License, notice, contribution guide, security policy, code of conduct, issue forms, PR template. | Root governance files and `.github/` |
 
 ## Top-Tier Gap Assessment
