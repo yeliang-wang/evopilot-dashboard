@@ -4,9 +4,14 @@
 
 **The self-hosted Agent Console for EvoPilot project evolution loops.**
 
+[![CI](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml)
+[![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb)](https://react.dev/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+
 Run project intake, harness review, loop execution, blocker repair, evidence review, and release decisions from a browser.
 
-[Quickstart](./docs/getting-started.md) | [Docs](./docs/README.md) | [User Guide](./docs/user-guide.md) | [AI Agents](./docs/ai-agents/README.md) | [Deployment](./docs/operations/deployment.md)
+[Quickstart](./docs/getting-started.md) | [Docs](./docs/README.md) | [User Guide](./docs/user-guide.md) | [AI Agents](./docs/ai-agents/README.md) | [Changelog](./CHANGELOG.md) | [Security](./SECURITY.md)
 
 ![EvoPilot Dashboard Agent Console](./docs/assets/agent-console.png)
 
@@ -87,6 +92,7 @@ EVOPILOT_MUTATING_SMOKE=1 npm run smoke:console
 - [API usage map](./docs/reference/api-usage.md)
 - [Smoke test guide](./docs/operations/smoke-test.md)
 - [Troubleshooting](./docs/operations/troubleshooting.md)
+- [Open source readiness](./docs/reference/open-source-readiness.md)
 
 ## License
 

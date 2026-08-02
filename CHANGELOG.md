@@ -1,0 +1,26 @@
+# Changelog
+
+All notable changes to EvoPilot Dashboard are documented here.
+
+Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
+
+## 0.1.0 - 2026-08-02
+
+### Added
+
+- Agent Console v2 product model for the ordinary-user project evolution loop.
+- Chat-first flow for `Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision`.
+- Human-readable `ProjectHarnessProfile.yaml` DRAFT review card before activation.
+- Evidence Drawer for request IDs, profile digests, policy refs, blockers, next actions, logs, and token usage.
+- Dashboard smoke tests for local and production compatibility checks.
+- AI Agent docs for WorkBuddy and browser-operating agents.
+- GitHub README screenshot and Apache-2.0 license alignment with EvoPilot.
+
+### Validation
+
+- `npm run check`
+- `npm run smoke:console`
+
+## Unreleased
+
+Track future user-facing UI, API compatibility, documentation, and release changes here before tagging a release.

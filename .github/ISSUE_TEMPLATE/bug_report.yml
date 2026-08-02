@@ -1,0 +1,67 @@
+name: Bug report
+description: Report a reproducible Dashboard UI, API compatibility, or documentation defect.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Do not include tokens, credentials, private tenant data, or vulnerability details.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What failed, and what did you expect?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Agent Console UI
+        - Project intake
+        - ProjectHarnessProfile review
+        - Loop execution
+        - Evidence Drawer
+        - API compatibility
+        - AI Agent docs
+        - Deployment
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include browser steps, API base URL shape, and sanitized smoke output where possible.
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Include requestId, nextAction, blockers, screenshots, console output, or smoke report path with secrets removed.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: "0.1.0 or commit SHA"
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety checks
+      options:
+        - label: I removed tokens, credentials, private tenant data, and private repository content.
+          required: true
+        - label: This is not a vulnerability report. Security reports should follow SECURITY.md.
+          required: true

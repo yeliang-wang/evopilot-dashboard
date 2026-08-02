@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose a Dashboard UX, API compatibility, documentation, or open-source productization improvement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What ordinary-user, operator, project owner, or AI Agent problem should this solve?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Agent Console UX
+        - Harness review
+        - Evidence Drawer
+        - Loop execution
+        - API compatibility
+        - AI Agent docs
+        - Deployment
+        - Open-source productization
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the smallest useful change and the expected validation.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Boundary checks
+      options:
+        - label: This keeps EvoPilot API as the system of record.
+          required: true
+        - label: This does not bypass ProjectHarnessProfile review, phase-plan approval, RBAC, or stop rules.
+          required: true

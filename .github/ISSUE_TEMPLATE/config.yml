@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/yeliang-wang/evopilot-dashboard/security/policy
+    about: Do not report vulnerabilities in public issues. Follow SECURITY.md.
+  - name: AI Agent browser guide
+    url: https://github.com/yeliang-wang/evopilot-dashboard/blob/main/docs/ai-agents/README.md
+    about: Start here for WorkBuddy and browser-operating agents.

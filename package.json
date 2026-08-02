@@ -2,7 +2,7 @@
   "name": "evopilot-dashboard",
   "version": "0.1.0",
   "private": true,
-  "description": "Standalone EvoPilot dashboard for operating EvoPilot through its HTTP API control plane.",
+  "description": "Chat-first Agent Console for EvoPilot project evolution loops through its HTTP API control plane.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -10,9 +10,10 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build && node tests/static-contract.test.mjs",
+    "check": "npm run typecheck && npm run build && node tests/static-contract.test.mjs && npm run verify:oss-governance",
     "smoke:console": "node scripts/dashboard-console-smoke.mjs",
-    "smoke:production": "node scripts/production-compat-smoke.mjs"
+    "smoke:production": "node scripts/production-compat-smoke.mjs",
+    "verify:oss-governance": "node scripts/verify-open-source-governance.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

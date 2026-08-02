@@ -1,6 +1,6 @@
 # EvoPilot Dashboard Docs
 
-Dashboard docs describe browser operations for **Agent Console v2**. The Dashboard is not a full CLI replacement; it is the ordinary-user browser surface for the core project evolution loop.
+Dashboard docs describe UI operations for **Agent Console v2**. The Dashboard is not a full CLI replacement; it is the ordinary-user browser surface for the core project evolution loop.
 
 ```text
 Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision
@@ -15,6 +15,8 @@ Read these first:
 - [Expected UI States](ai-agents/expected-ui-states.md)
 - [API Usage](reference/api-usage.md)
 - [Smoke Test](operations/smoke-test.md)
+- [Open Source Readiness](reference/open-source-readiness.md)
+- [GitHub Metadata](reference/github-metadata.md)
 
 ## Core Principle
 
