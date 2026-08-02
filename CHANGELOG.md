@@ -4,6 +4,20 @@ All notable changes to EvoPilot Dashboard are documented here.
 
 Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
 
+## 1.0.3 - 2026-08-02
+
+### Fixed
+
+- Fixed immutable ECS compose defaults so the template keeps the `evopilot-dashboard` project name.
+- Updated immutable deployment docs to use explicit project name, env file, and no-build rollout commands for pinned image digests.
+
+### Validation
+
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `npm run check`
+- `git diff --check`
+
 ## 1.0.2 - 2026-08-02
 
 ### Added

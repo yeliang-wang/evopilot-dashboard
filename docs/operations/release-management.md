@@ -77,7 +77,7 @@ The release archive includes built `dist/` assets for static inspection. Product
 
 ```bash
 export EVOPILOT_DASHBOARD_IMAGE='ghcr.io/yeliang-wang/evopilot-dashboard@sha256:<digest>'
-docker compose -f deploy/ecs/compose.immutable.yaml up -d
+docker compose -p evopilot-dashboard --env-file .env -f deploy/ecs/compose.immutable.yaml up -d --no-build
 ```
 
 Before using release assets, verify checksums:

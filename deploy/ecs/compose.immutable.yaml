@@ -1,3 +1,5 @@
+name: evopilot-dashboard
+
 services:
   evopilot-dashboard:
     image: "${EVOPILOT_DASHBOARD_IMAGE:?set EVOPILOT_DASHBOARD_IMAGE to ghcr.io/...@sha256:...}"
