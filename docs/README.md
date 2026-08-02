@@ -1,38 +1,46 @@
 # EvoPilot Dashboard Docs
 
-Dashboard docs describe UI operations for **Agent Console v2**. The Dashboard is not a full CLI replacement; it is the login-scoped browser surface for the core project evolution loop and a small role-based administration surface.
+Dashboard docs describe the browser operation path for EvoPilot **Agent Console v2**. The root README stays short; this directory carries the human, administrator, AI Agent, operator, and maintainer details.
 
 ```text
-Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision
+Admin provisions user -> User logs in -> Project intake -> Template auto-match
+-> ProjectHarnessProfile.yaml DRAFT -> Owner review -> Loop execution -> Release decision
 ```
 
-Read these first:
+## Start Here
 
-- [User Guide](user-guide.md)
-- [End-To-End Scenarios](workflows/end-to-end-scenarios.md)
-- [Example Project Walkthroughs](workflows/example-project-walkthroughs.md)
-- [AI Agents](ai-agents/README.md)
-- [Dashboard Page Map](ai-agents/dashboard-page-map.md)
-- [Expected UI States](ai-agents/expected-ui-states.md)
-- [API Usage](reference/api-usage.md)
-- [Roles And Permissions](reference/roles-and-permissions.md)
-- [Self-Hosting](operations/self-hosting.md)
-- [Release Management](operations/release-management.md)
-- [Smoke Test](operations/smoke-test.md)
-- [Open Source Readiness](reference/open-source-readiness.md)
-- [Open Source Maturity Report](reference/open-source-maturity-report.md)
-- [GitHub Metadata](reference/github-metadata.md)
+| Reader | Start with |
+| --- | --- |
+| Project owner or ordinary user | [User Guide](user-guide.md) |
+| WorkBuddy or browser AI Agent | [AI Agents](ai-agents/README.md) |
+| Platform administrator | [Admin Guide](admin-guide.md) |
+| Self-hosting operator | [Self-Hosting](operations/self-hosting.md) |
+| Maintainer | [Release Management](operations/release-management.md) |
 
 ## Core Principle
 
-The Dashboard is chat-first. Users describe a repository and goal loop target; EvoPilot generates a `ProjectHarnessProfile.yaml` DRAFT; users confirm or request changes; only then can the reviewed profile be activated and used for planning, loop execution, and release decisions.
+The Dashboard is login-first and chat-first. Administrators create users and assign tenant/workspace scope. Users connect GitHub/GitLab projects and describe goal loop targets. EvoPilot automatically matches a `HarnessTemplate`, combines it with project context and the target, and returns a `ProjectHarnessProfile.yaml` DRAFT for review.
 
-The **Evidence Drawer** is the agent-readable side channel for `requestId`, digests, policy refs, API action metadata, blockers, `nextAction`, and logs.
+Users can request changes or confirm the DRAFT. Only after confirmation can EvoPilot activate the project harness profile, bind a phase plan, run the loop, and produce release evidence.
 
-Login is the first operation. After login, tenant/workspace/actor scope is locked by the EvoPilot session. Platform administrators can open Tenants, Workspaces, Users, Harness Templates, and Audit; ordinary users stay on Agent Console and use the Evidence Drawer or Audit for server-returned project state.
+Ordinary users do not choose public `HarnessTemplate` files manually. Template matching belongs to EvoPilot.
 
-## Release And Self-Hosting
+## Operation Guides
+
+- [End-to-end scenarios](workflows/end-to-end-scenarios.md) - WorkBuddy-readable primary flows.
+- [Example project walkthroughs](workflows/example-project-walkthroughs.md) - complete sample project runs.
+- [Dashboard page map](ai-agents/dashboard-page-map.md) - UI landmarks and expected controls.
+- [Expected UI states](ai-agents/expected-ui-states.md) - screenshots/states agents should recognize.
+- [API usage map](reference/api-usage.md) - Dashboard action to EvoPilot API mapping.
+- [Roles and permissions](reference/roles-and-permissions.md) - page access and scope rules.
+- [Smoke test](operations/smoke-test.md) - local, production, and mutating smoke.
+- [Troubleshooting](operations/troubleshooting.md) - request ID and Evidence Drawer diagnosis.
+
+## Release And Trust
 
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
 - [EvoPilot Dashboard v1.0.0 Release Notes](releases/1.0.0.md) is the GitHub Release body for the public production baseline.
+- [Open Source Readiness](reference/open-source-readiness.md) tracks repository trust assets.
+- [Open Source Maturity Report](reference/open-source-maturity-report.md) states the current product maturity boundary.
+- [GitHub Metadata](reference/github-metadata.md) keeps About, topics, and social preview aligned with the README.

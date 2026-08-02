@@ -5,7 +5,7 @@
 ## Shared Flow
 
 ```text
-Project Intake -> Harness Draft -> Owner Review -> Phase Plan -> Loop Execution -> Evidence Drawer -> Release Decision
+Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Phase Plan -> Loop Execution -> Evidence Drawer -> Release Decision
 ```
 
 Use these walkthroughs to train human users and browser-operating AI Agents. EvoPilot API remains the system of record.

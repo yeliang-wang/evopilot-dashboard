@@ -1,16 +1,18 @@
 # AI Agents
 
-> WorkBuddy and browser-operating agents use EvoPilot Dashboard as a UI adapter over EvoPilot API.
+> WorkBuddy and browser-operating agents use EvoPilot Dashboard as the browser path for administrator-provisioned users to connect GitHub/GitLab projects, submit goal loop targets, and review EvoPilot-generated project harness drafts.
 
 ## Agent Console v2
 
 The visible flow is:
 
 ```text
-Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision
+Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Loop Execution -> Release Decision
 ```
 
 The Dashboard is login-first and chat-first. The agent reads the login result, locked tenant/workspace scope, role-based left navigation, conversation, stage bar, inline cards, and **Evidence Drawer**. It must not infer server state from color alone.
+
+Assume the user account has already been created by an EvoPilot administrator. Do not self-register users, switch tenant/workspace scope, or ask for raw GitHub/GitLab/LLM/deploy secrets during the ordinary-user flow.
 
 ## Browser End-To-End Loop
 
@@ -19,10 +21,10 @@ The Dashboard is login-first and chat-first. The agent reads the login result, l
 3. Complete password change if shown.
 4. Confirm the header shows `scope locked`, tenant, workspace, actor, role, and API status.
 5. Confirm the fixed left navigation from the table below.
-6. Enter repository URL.
+6. Enter the GitHub/GitLab repository URL.
 7. Enter the user's goal loop target.
 8. Click **Start intake**.
-9. Wait for the inline `ProjectHarnessProfile.yaml` DRAFT.
+9. Wait while EvoPilot automatically matches a `HarnessTemplate` and returns the inline `ProjectHarnessProfile.yaml` DRAFT.
 10. Stop and show the DRAFT to the user or project owner.
 11. If the user requests changes, enter the change request and click **Request changes**.
 12. Repeat review until the user confirms.

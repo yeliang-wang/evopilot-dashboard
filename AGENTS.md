@@ -4,7 +4,9 @@ This file is for AI coding agents and browser-operating agents that read this re
 
 ## Product Boundary
 
-EvoPilot Dashboard is a standalone React HTTP client for EvoPilot. It is not the system of record. EvoPilot API owns tenants, workspaces, projects, harness profiles, goals, loops, evidence, audit, release decisions, users, and credentials.
+EvoPilot Dashboard is a standalone React HTTP client for EvoPilot. It is the browser surface where administrator-provisioned users sign in, connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` DRAFTs, and run governed loops.
+
+Dashboard is not the system of record. EvoPilot API owns tenants, workspaces, projects, harness profiles, goals, loops, evidence, audit, release decisions, users, and credentials.
 
 ## Operating Rules
 
@@ -13,6 +15,7 @@ EvoPilot Dashboard is a standalone React HTTP client for EvoPilot. It is not the
 - Use [docs/reference/api-usage.md](docs/reference/api-usage.md) to map UI operations to EvoPilot API calls.
 - Do not paste GitHub, GitLab, LLM, deploy, or password secrets into screenshots, public config, issue reports, or docs.
 - Do not bypass EvoPilot RBAC, tenant/workspace scope, human approval, profile review, source closure, release policy, or audit.
+- Do not ask ordinary users to choose a public `HarnessTemplate`; EvoPilot owns template matching from project context, policy, history when present, and the goal loop target.
 - Stop on EvoPilot `nextAction`, blockers, `NO-GO`, `BLOCKED`, `FAILED`, policy review, credential repair, LLM repair, deploy repair, or human approval.
 - Treat the Evidence Drawer as the primary operator-readable side channel for request IDs, digests, policy refs, token usage, blockers, and logs.
 - When claiming CLI and Dashboard parity, verify both the Dashboard static contract and EvoPilot OpenAPI or smoke evidence.

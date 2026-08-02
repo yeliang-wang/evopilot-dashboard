@@ -5,7 +5,7 @@ Use this file when updating the GitHub repository About panel, topics, and socia
 ## Description
 
 ```text
-Chat-first Agent Console for EvoPilot project intake, harness review, loop execution, evidence, and release governance.
+Chat-first Agent Console for provisioned users to connect GitHub/GitLab projects, review EvoPilot-generated harness drafts, and run governed goal loops.
 ```
 
 ## Website

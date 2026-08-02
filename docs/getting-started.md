@@ -1,6 +1,6 @@
 # Getting Started
 
-> Connect the standalone Dashboard to an EvoPilot API server and verify that the browser UI can operate real server state.
+> Connect the standalone Dashboard to an EvoPilot API server and verify that administrator-provisioned users can operate real server state from the browser.
 
 ## Audience
 
@@ -9,7 +9,7 @@ Dashboard users, WorkBuddy setup agents, and developers validating the split das
 ## Prerequisites
 
 - A running EvoPilot API server.
-- A Dashboard login user, not a GitHub or GitLab PAT.
+- A Dashboard login user created by an EvoPilot administrator, not a GitHub or GitLab PAT.
 - Tenant and workspace identifiers.
 - Node.js 22 for local development.
 
@@ -49,8 +49,9 @@ Do not put bearer tokens, GitHub PATs, GitLab tokens, LLM keys, or deploy creden
 5. Confirm the header shows `scope locked`, tenant, workspace, role, and API status.
 6. Confirm the left navigation shows only **# Agent Console**, **Tenants**, **Workspaces**, **Users**, **Harness Templates**, and **Audit**.
 7. Confirm it does not show project cards, active sessions, recent decisions, a user footer, or a **Projects** menu.
-8. Open **# Agent Console**, enter a repository URL and goal loop target, and click **Start intake** only when using a real or disposable EvoPilot server.
-9. Stop at the visible `ProjectHarnessProfile.yaml` DRAFT until the project owner confirms or requests changes.
+8. Open **# Agent Console**, enter a GitHub/GitLab repository URL and goal loop target, and click **Start intake** only when using a real or disposable EvoPilot server.
+9. Confirm EvoPilot auto-matches the `HarnessTemplate`; ordinary users do not pick the template manually.
+10. Stop at the visible `ProjectHarnessProfile.yaml` DRAFT until the project owner confirms or requests changes.
 
 ## Non-Mutating Compatibility Check
 

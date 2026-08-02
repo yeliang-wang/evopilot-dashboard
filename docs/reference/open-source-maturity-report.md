@@ -4,7 +4,7 @@
 
 ## Conclusion
 
-EvoPilot Dashboard has reached an enterprise open-source productization baseline for a standalone Agent Console. It has a focused browser product shape, screenshot-backed README, deployment docs, smoke validation, AI Agent operation docs, release process, security and contribution docs, and API compatibility boundaries.
+EvoPilot Dashboard has reached an enterprise open-source productization baseline for a standalone Agent Console. It has a focused browser product shape for administrator-provisioned users, screenshot-backed README, deployment docs, smoke validation, AI Agent operation docs, release process, security and contribution docs, and API compatibility boundaries.
 
 It should not claim community parity with the most established public AI-agent consoles until it has external users, issue activity, releases, independent deployments, and public case studies.
 
@@ -12,9 +12,10 @@ It should not claim community parity with the most established public AI-agent c
 
 | Area | Current State | Evidence |
 | --- | --- | --- |
-| Browser product | Chat-first Agent Console v2 for the core project evolution loop. | `src/App.tsx`, `docs/assets/agent-console.png` |
+| Browser product | Chat-first Agent Console v2 for users to connect GitHub/GitLab projects, submit goal loop targets, review generated harness DRAFTs, and run the core project evolution loop. | `src/App.tsx`, `docs/assets/agent-console.png` |
 | API boundary | Standalone HTTP client over EvoPilot API. | `src/api.ts`, `docs/reference/api-usage.md` |
-| User flows | Project intake, harness draft review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
+| Documentation shape | Concise product README plus role-based docs index, workflow guides, and AI Agent operation docs. | `README.md`, `docs/README.md`, `docs/ai-agents/README.md` |
+| User flows | Project intake, EvoPilot template auto-match, `ProjectHarnessProfile.yaml` DRAFT review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
 | AI Agent readiness | WorkBuddy-readable page map, expected UI states, stop rules, AGENTS entrypoint. | `AGENTS.md`, `docs/ai-agents/` |
 | Distribution | Dockerfile, production compose, Nginx template, self-hosting docs. | `Dockerfile`, `compose.production.yaml`, `deploy/nginx/`, `docs/operations/self-hosting.md` |
 | Release readiness | Versioned release notes, changelog, release checklist, smoke validation. | `CHANGELOG.md`, `docs/releases/1.0.0.md`, `docs/operations/release-management.md` |

@@ -1,25 +1,30 @@
 # User Guide
 
-EvoPilot Dashboard is an **Agent Console v2** for ordinary users. You operate the main flow through a conversation, not a dense admin menu. Login comes first; EvoPilot locks tenant/workspace/actor scope from the signed-in session.
+EvoPilot Dashboard is an **Agent Console v2** for users who have already been provisioned by an EvoPilot administrator. You operate the main flow through a conversation, not a dense admin menu. Login comes first; EvoPilot locks tenant/workspace/actor scope from the signed-in session.
 
 ## Ordinary-User Core Flow
 
+This is the ordinary-user core flow for provisioned project owners and operators.
+
 ```text
-Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision
+Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Loop Execution -> Release Decision
 ```
 
-1. Open Dashboard and sign in.
+1. Open Dashboard and sign in with the account assigned by an administrator.
 2. Complete password change when EvoPilot requires it.
 3. Confirm the header shows `scope locked`, tenant, workspace, role, and API status.
 4. Enter a GitHub, GitLab, or local repository URL.
 5. Describe the goal loop target in normal language.
 6. Click **Start intake**.
-7. Review the generated `ProjectHarnessProfile.yaml` DRAFT.
-8. Click **Request changes** when the harness definition is wrong or incomplete.
-9. Click **Confirm** only after the DRAFT harness is acceptable.
-10. Provide real `Confirmed By` and `Confirmation` text for phase-plan approval.
-11. Start or advance the loop.
-12. Open the **Evidence Drawer** for request IDs, digests, policy refs, blockers, next actions, and logs.
+7. Wait for EvoPilot to automatically match a `HarnessTemplate` and generate `ProjectHarnessProfile.yaml` DRAFT.
+8. Review the generated `ProjectHarnessProfile.yaml` DRAFT.
+9. Click **Request changes** when the harness definition is wrong or incomplete.
+10. Click **Confirm** only after the DRAFT harness is acceptable.
+11. Provide real `Confirmed By` and `Confirmation` text for phase-plan approval.
+12. Start or advance the loop.
+13. Open the **Evidence Drawer** for request IDs, digests, policy refs, blockers, next actions, and logs.
+
+Ordinary users do not choose the public `HarnessTemplate` manually. Template selection belongs to EvoPilot and is based on repository context, runtime signals, tenant/workspace policy, history when present, and the goal loop target.
 
 ## Role-Based Pages
 

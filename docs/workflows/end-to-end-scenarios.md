@@ -2,20 +2,21 @@
 
 > WorkBuddy-readable browser flows that must produce the same EvoPilot server effects as CLI operation.
 
-## Scenario 1: First-Time GitHub Project To Harness Review
+## Scenario 1: First-Time GitHub/GitLab Project To Harness Review
 
-Use when a user gives a GitHub repository and a business goal loop target.
+Use when an administrator-provisioned user gives a GitHub or GitLab repository and a business goal loop target.
 
 ### Browser Flow
 
 1. Open Dashboard and log in from the first screen.
 2. Complete password change if EvoPilot requires it.
 3. Confirm `scope locked`, tenant, workspace, actor, role, and API status in the header.
-4. Enter repository URL.
+4. Enter the GitHub/GitLab repository URL.
 5. Enter goal loop target.
 6. Click **Start intake**.
-7. Wait for the `ProjectHarnessProfile.yaml` DRAFT.
-8. Stop and show the DRAFT profile source/compiled content, validation, diff, digests, policy refs, generatedBy evidence, and request ID to the project owner.
+7. Wait for EvoPilot to automatically match the `HarnessTemplate`.
+8. Wait for the `ProjectHarnessProfile.yaml` DRAFT.
+9. Stop and show the DRAFT profile source/compiled content, validation, diff, digests, policy refs, generatedBy evidence, and request ID to the project owner.
 
 ### CLI-equivalent
 
@@ -28,6 +29,8 @@ harness profile generate
 ### WorkBuddy deviation guard
 
 Do not click **Confirm**, approve a phase plan, or start a loop until the user accepts the visible DRAFT.
+
+Do not ask the ordinary user to choose a public `HarnessTemplate`; EvoPilot owns template matching from project context, policy, history when present, and the goal loop target.
 
 ## Scenario 2: User Requests Harness Changes
 

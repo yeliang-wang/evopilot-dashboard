@@ -328,7 +328,7 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
   for (const text of [
     "Agent Console v2",
     "ProjectHarnessProfile.yaml",
-    "Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision",
+    "Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Loop Execution -> Release Decision",
     "Evidence Drawer",
     "chat-first",
     "login-scoped",

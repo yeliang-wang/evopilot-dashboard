@@ -33,7 +33,7 @@ Do not expect workspace/project cards, active sessions, recent decisions, user f
 |---|---|---|
 | Left rail | Fixed navigation only. | Use for orientation only. Do not infer release state from this rail. |
 | Top bar | Current page or stage title, locked scope, API/session chips, refresh. | Open session drawer only for session details or administrator scope repair. |
-| Stage bar | `Project Intake -> Harness Draft -> Owner Review -> Loop Execution -> Release Decision`. | This is workflow orientation, not server truth by itself. |
+| Stage bar | `Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Loop Execution -> Release Decision`. | This is workflow orientation, not server truth by itself. |
 | Conversation | Main ordinary-user interaction. | Read inline cards in order. |
 | ProjectHarnessProfile.yaml card | Human-readable harness DRAFT. | Stop for owner review before activation. |
 | Composer | Repository/goal input, change request, confirmation, loop/release actions. | Buttons map to EvoPilot APIs. |

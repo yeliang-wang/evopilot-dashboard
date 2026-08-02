@@ -4,7 +4,7 @@ This checklist defines EvoPilot Dashboard's public-product readiness baseline. I
 
 ## Positioning
 
-EvoPilot Dashboard is a chat-first Agent Console for EvoPilot project evolution loops. It is an HTTP API adapter over EvoPilot and must not become a separate system of record.
+EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned users to connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` DRAFTs, and run governed project evolution loops. It is an HTTP API adapter over EvoPilot and must not become a separate system of record.
 
 ## Public Trust Assets
 
@@ -28,6 +28,14 @@ EvoPilot Dashboard is a chat-first Agent Console for EvoPilot project evolution 
 | Release playbook | Present | `docs/operations/release-management.md` |
 | Release notes | Present | `docs/releases/1.0.0.md` |
 | Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
+
+## Documentation Shape
+
+The public documentation model is:
+
+- root `README.md` as the concise product entry with badges, screenshot, quickstart, architecture boundary, and selected docs links
+- `docs/README.md` as the role-based index for users, administrators, AI Agents, operators, and maintainers
+- workflow and AI Agent docs as the detailed operating source for browser automation and end-to-end scenarios
 
 ## Product Evidence Assets
 
