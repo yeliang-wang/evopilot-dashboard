@@ -41,7 +41,8 @@ Ordinary users do not choose public `HarnessTemplate` files manually. Template m
 
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v1.0.4 Release Notes](releases/1.0.4.md) is the current browser test-matrix and release-readiness body for the public production baseline.
+- [EvoPilot Dashboard v1.0.5 Release Notes](releases/1.0.5.md) is the current browser test-matrix, visual-regression stability, and release-readiness body for the public production baseline.
+- [EvoPilot Dashboard v1.0.4 Release Notes](releases/1.0.4.md) was superseded after Visual Regression CI exposed cross-platform mobile screenshot height variance.
 - [EvoPilot Dashboard v1.0.3 Release Notes](releases/1.0.3.md) is the immutable ECS deployment body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.2 Release Notes](releases/1.0.2.md) is the immutable release artifact body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.1 Release Notes](releases/1.0.1.md) is the publication-hardening release body for the previous public production baseline.

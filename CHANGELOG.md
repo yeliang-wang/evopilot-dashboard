@@ -4,7 +4,28 @@ All notable changes to EvoPilot Dashboard are documented here.
 
 Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
 
+## 1.0.5 - 2026-08-03
+
+### Fixed
+
+- Stabilized the mobile blocker visual regression baseline by using a viewport screenshot for the 390px blocker state.
+
+### Documented
+
+- Added v1.0.5 release notes and marked v1.0.4 as superseded for production rollout because its Visual Regression workflow failed on Ubuntu screenshot height variance.
+
+### Validation
+
+- `npm run check`
+- `npm run test:browser`
+- `npm run test:e2e:live` skipped without live API URL and credentials
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.4 - 2026-08-03
+
+Superseded by v1.0.5 after the tag-triggered Visual Regression workflow exposed cross-platform mobile full-page screenshot height variance.
 
 ### Added
 

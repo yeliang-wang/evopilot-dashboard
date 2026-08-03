@@ -15,7 +15,6 @@ test.describe("Agent Console visual regression", () => {
     await openStableDemo(page, "/?demo=1&step=8", { width: 390, height: 844 });
     await expect(page.getByText("Blocker located")).toBeVisible();
     await expect(page).toHaveScreenshot("agent-console-blocker-mobile.png", {
-      fullPage: true,
       animations: "disabled",
       caret: "hide"
     });
