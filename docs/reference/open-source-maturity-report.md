@@ -17,8 +17,8 @@ It should not claim community parity with the most established public AI-agent c
 | Documentation shape | Concise product README plus role-based docs index, workflow guides, and AI Agent operation docs. | `README.md`, `docs/README.md`, `docs/ai-agents/README.md` |
 | User flows | Project intake, EvoPilot template auto-match, `ProjectHarnessProfile.yaml` DRAFT review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
 | AI Agent readiness | WorkBuddy-readable page map, expected UI states, stop rules, AGENTS entrypoint. | `AGENTS.md`, `docs/ai-agents/` |
-| Distribution | Dockerfile, production compose, Nginx template, self-hosting docs, immutable release archive, SBOM, provenance, checksum, and image digest metadata. | `Dockerfile`, `compose.production.yaml`, `deploy/`, `.github/workflows/release-artifacts.yml`, `docs/operations/self-hosting.md` |
-| Release readiness | Versioned release notes, changelog, release checklist, smoke validation, browser test matrix, visual regression, PR artifacts, and immutable artifact workflow. | `CHANGELOG.md`, `docs/releases/1.0.5.md`, `docs/operations/release-management.md`, `docs/operations/test-matrix.md` |
+| Distribution | README CTA entries, local browser run, standalone container runner, tagged installer, self-hosted full-stack installer path, static deployment config, Dockerfile, production compose, Nginx template, immutable release archive, SBOM, provenance, checksum, and image digest metadata. | `README.md`, `install.sh`, `scripts/run-dashboard-container.mjs`, `docs/operations/distribution.md`, `Dockerfile`, `compose.production.yaml`, `deploy/`, `.github/workflows/release-artifacts.yml` |
+| Release readiness | Versioned release notes, changelog, release checklist, smoke validation, browser test matrix, visual regression, PR artifacts, and immutable artifact workflow. | `CHANGELOG.md`, `docs/releases/1.0.6.md`, `docs/operations/release-management.md`, `docs/operations/test-matrix.md` |
 | Community shell | License, notice, contribution guide, security policy, code of conduct, issue forms, PR template. | Root governance files and `.github/` |
 
 ## Top-Tier Gap Assessment
@@ -27,7 +27,7 @@ It should not claim community parity with the most established public AI-agent c
 | --- | --- | --- |
 | Product shape | Strong baseline | Continue UI hardening from real operators. |
 | API compatibility | Enforced by static and smoke checks | Keep pace with EvoPilot OpenAPI changes. |
-| Self-hosting | Documented and containerized | Add published deployment examples as users adopt it. |
+| Self-hosting | Documented, containerized, standalone-runner backed, and linked to the full-stack installer path | Add published deployment examples as users adopt it. |
 | Community | Governance shell present | Build issue triage, contributor activity, and public demos. |
 | Trust evidence | Local and production smoke paths plus immutable release artifact evidence present | Add public case studies and release screenshots over time. |
 
@@ -41,7 +41,7 @@ Make the Dashboard understandable, deployable, operable, and testable by externa
 
 Acceptance signals:
 
-- A new operator can deploy Dashboard next to EvoPilot API from docs.
+- A new operator can choose a README CTA and deploy Dashboard next to EvoPilot API from docs or tagged `install.sh`.
 - A browser-operating AI Agent can follow `AGENTS.md` and `docs/ai-agents/README.md`.
 - A maintainer can tag and publish a Dashboard release from `docs/operations/release-management.md`.
 - Dashboard and CLI lead to the same EvoPilot server state for core workflows.

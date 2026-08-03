@@ -140,6 +140,7 @@ run("tar", [
   "CODE_OF_CONDUCT.md",
   "CONTRIBUTING.md",
   "Dockerfile",
+  "install.sh",
   "LICENSE",
   "NOTICE",
   "README.md",

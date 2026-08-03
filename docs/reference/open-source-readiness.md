@@ -25,9 +25,11 @@ EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned u
 | AI Agent entrypoint | Present | `docs/ai-agents/README.md` |
 | API compatibility docs | Present | `docs/reference/api-usage.md` |
 | Root agent instructions | Present | `AGENTS.md`, `llms.txt` |
+| Distribution guide | Present | `docs/operations/distribution.md` |
+| Installable Dashboard runner | Present | `install.sh`, `scripts/run-dashboard-container.mjs`, `npm run verify:distribution` |
 | Self-hosting guide | Present | `docs/operations/self-hosting.md` |
 | Release playbook | Present | `docs/operations/release-management.md` |
-| Release notes | Present | `docs/releases/1.0.5.md` |
+| Release notes | Present | `docs/releases/1.0.6.md` |
 | Immutable release artifacts | Present | `scripts/build-release-artifacts.mjs`, `scripts/verify-release-artifacts.mjs`, `deploy/ecs/compose.immutable.yaml` |
 | Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
 
@@ -49,13 +51,14 @@ The public documentation model is:
 | WorkBuddy operation | `docs/ai-agents/README.md`, `docs/workflows/end-to-end-scenarios.md` |
 | Smoke validation | `scripts/dashboard-console-smoke.mjs`, `scripts/production-compat-smoke.mjs` |
 | Example walkthroughs | `docs/workflows/example-project-walkthroughs.md` |
-| Self-hosting and upgrade | `docs/operations/self-hosting.md`, `docs/operations/release-management.md` |
+| Distribution, self-hosting, and upgrade | `docs/operations/distribution.md`, `install.sh`, `scripts/run-dashboard-container.mjs`, `docs/operations/self-hosting.md`, `docs/operations/release-management.md` |
 | Immutable deployment evidence | `docs/operations/release-management.md`, `deploy/ecs/compose.immutable.yaml`, `npm run release:artifact` |
 
 ## Validation Commands
 
 ```bash
 npm run check
+npm run verify:distribution
 npm run release:artifact
 npm run verify:release-artifact
 npm run smoke:console

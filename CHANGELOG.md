@@ -4,6 +4,33 @@ All notable changes to EvoPilot Dashboard are documented here.
 
 Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
 
+## Unreleased
+
+No unreleased changes yet.
+
+## 1.0.6 - 2026-08-03
+
+### Added
+
+- Added `npm run dashboard:run` to generate a standalone Docker Compose run directory for Dashboard connected to an EvoPilot API server.
+- Added tagged `install.sh` for `curl -fsSL ... | bash` Dashboard container bootstrap from GitHub Releases.
+- Added `npm run verify:distribution` and wired it into `npm run check`.
+- Added release artifact packaging for the Dashboard installer script.
+
+### Documented
+
+- Added README CTA-style Dashboard entry points for local browser run, self-hosted full-stack install, and static API-connected deployment.
+- Added the Dashboard distribution guide and linked it from docs index, getting started, self-hosting, readiness, and maturity documentation.
+- Clarified that Desktop app and hosted Cloud trial are not published Dashboard distribution surfaces in this version.
+
+### Validation
+
+- `npm run check`
+- `npm run verify:distribution`
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.5 - 2026-08-03
 
 ### Fixed

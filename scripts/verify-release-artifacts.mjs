@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -54,6 +55,12 @@ const sbom = readJson(path.join(outDir, `${projectName}-${version}-sbom.spdx.jso
 assert.equal(sbom.spdxVersion, "SPDX-2.3");
 assert.ok(Array.isArray(sbom.packages));
 assert.ok(sbom.packages.some((pkg) => pkg.name === packageJson.name && pkg.versionInfo === version));
+
+const sourceListing = execFileSync("tar", ["-tzf", path.join(outDir, `${projectName}-${version}-source.tar.gz`)], {
+  encoding: "utf8"
+});
+assert.match(sourceListing, /^install\.sh$/m, "source archive must include install.sh");
+assert.match(sourceListing, /^scripts\/run-dashboard-container\.mjs$/m, "source archive must include Dashboard runner");
 
 const provenance = readJson(path.join(outDir, `${projectName}-${version}-provenance.json`));
 assert.equal(provenance.schema, "evopilot-dashboard-release-provenance/v1");

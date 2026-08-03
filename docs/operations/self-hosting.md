@@ -14,6 +14,14 @@ Use this guide when deploying the Dashboard next to EvoPilot API for a real oper
 - A network route from Dashboard to EvoPilot API.
 - A reverse proxy if exposing a public host.
 
+For a generated full stack that includes EvoPilot API, loop worker, code-upgrader, Postgres, and Dashboard, prefer the EvoPilot installer:
+
+```bash
+npx create-evopilot@1.0.8 self-host --dir evopilot-stack --init-env
+```
+
+Use the manual path below when Dashboard is deployed separately from an existing EvoPilot API server.
+
 ## 15 Minute Path
 
 Start EvoPilot API first. From a sibling checkout:
@@ -28,10 +36,11 @@ Start Dashboard:
 
 ```bash
 cd /opt/evopilot-stack/evopilot-dashboard
-EVOPILOT_DOCKER_NETWORK=evopilot_default \
-EVOPILOT_API_BASE_URL=http://evopilot-server:19876 \
-EVOPILOT_DASHBOARD_PORT=8080 \
-docker compose -f compose.production.yaml up -d --build
+npm run dashboard:run -- \
+  --api-url http://evopilot-server:19876 \
+  --network evopilot_default \
+  --dir /opt/evopilot-stack/evopilot-dashboard-run \
+  --start
 ```
 
 Verify:
@@ -78,10 +87,12 @@ Use an absolute API URL only when CORS is explicitly configured on EvoPilot API.
 
 ```bash
 git pull --ff-only origin main
-EVOPILOT_DOCKER_NETWORK=evopilot_default \
-EVOPILOT_API_BASE_URL=http://evopilot-server:19876 \
-EVOPILOT_DASHBOARD_PORT=8080 \
-docker compose -f compose.production.yaml up -d --build
+npm run dashboard:run -- \
+  --api-url http://evopilot-server:19876 \
+  --network evopilot_default \
+  --dir /opt/evopilot-stack/evopilot-dashboard-run \
+  --force \
+  --start
 
 EVOPILOT_DASHBOARD_BASE_URL=http://127.0.0.1:8080 \
 EVOPILOT_API_BASE_URL=http://127.0.0.1:19876 \

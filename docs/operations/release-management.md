@@ -14,6 +14,7 @@ Dashboard release readiness requires:
 - Production build.
 - Smoke or live E2E evidence against a real or approved disposable EvoPilot API.
 - PR artifacts containing Playwright reports, release artifacts, and verification output.
+- Distribution verification for standalone Dashboard container runner and tagged installer output.
 - Updated docs for humans and AI Agents.
 - Immutable release artifacts: release archive with built `dist/`, SHA256SUMS, SPDX SBOM, provenance, and image digest metadata.
 
@@ -39,6 +40,7 @@ Rules:
 ```bash
 npm ci
 npm run check
+npm run verify:distribution
 npx playwright install chromium
 npm run test:browser
 npm run release:artifact
@@ -76,6 +78,7 @@ Expected assets:
 - `evopilot-dashboard-<version>-sbom.spdx.json`
 - `evopilot-dashboard-<version>-provenance.json`
 - `evopilot-dashboard-<version>-image-metadata.json`
+- `install.sh` inside `evopilot-dashboard-<version>-source.tar.gz`
 - `SHA256SUMS`
 
 The release archive includes built `dist/` assets for static inspection. Production deployment should prefer the immutable image reference recorded in `evopilot-dashboard-<version>-image-metadata.json`:

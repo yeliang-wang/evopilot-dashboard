@@ -13,6 +13,16 @@ Dashboard users, WorkBuddy setup agents, and developers validating the split das
 - Tenant and workspace identifiers.
 - Node.js 22 for local development.
 
+## Start Choices
+
+| Entry | Use when | Command |
+| --- | --- | --- |
+| Run Dashboard | You have an EvoPilot API server and want a containerized browser surface | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
+| Self-host with EvoPilot | You want Dashboard generated with the full EvoPilot stack | `npx create-evopilot@1.0.8 self-host --dir evopilot-stack --init-env` |
+| Connect to API | You deploy static assets behind a same-origin proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
+
+Desktop app and hosted Cloud trial are not published Dashboard surfaces yet. Use [Distribution](operations/distribution.md) for the supported entry points.
+
 ## Run Locally
 
 ```bash
@@ -67,9 +77,10 @@ curl -i http://127.0.0.1:5174/api/v1/summary
 
 ```bash
 npm run check
+npm run verify:distribution
 ```
 
-This type-checks the React app, builds the production bundle, and runs static contract tests that keep Dashboard aligned with EvoPilot API and CLI semantics.
+This type-checks the React app, builds the production bundle, runs static contract tests, checks governance files, and verifies the Dashboard distribution runner.
 
 For a complete self-hosted stack, use [Self-Hosting](operations/self-hosting.md). For public release validation, use [Release Management](operations/release-management.md).
 

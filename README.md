@@ -7,16 +7,26 @@
 [![CI](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://react.dev/)
-[![Release](https://img.shields.io/badge/Release-v1.0.5%20GA-2ea043)](./docs/releases/1.0.5.md)
+[![Release](https://img.shields.io/badge/Release-v1.0.6%20GA-2ea043)](./docs/releases/1.0.6.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 Admins provision scoped users. Users sign in, connect GitHub/GitLab projects, describe goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` drafts, and run governed loops from a browser.
 
-[Quickstart](./docs/getting-started.md) | [Self-Hosting](./docs/operations/self-hosting.md) | [Docs](./docs/README.md) | [User Guide](./docs/user-guide.md) | [AI Agents](./docs/ai-agents/README.md) | [Changelog](./CHANGELOG.md) | [Security](./SECURITY.md)
+[Quickstart](./docs/getting-started.md) | [Distribution](./docs/operations/distribution.md) | [Self-Hosting](./docs/operations/self-hosting.md) | [Docs](./docs/README.md) | [User Guide](./docs/user-guide.md) | [AI Agents](./docs/ai-agents/README.md) | [Changelog](./CHANGELOG.md) | [Security](./SECURITY.md)
 
 ![EvoPilot Dashboard Agent Console](./docs/assets/agent-console.png)
 
 </div>
+
+## Start Here
+
+| Entry | Use when | Command |
+| --- | --- | --- |
+| Run Dashboard | You have an EvoPilot API server and want the browser surface in one command | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
+| Self-host with EvoPilot | You want the API and Dashboard in one generated stack | `npx create-evopilot@1.0.8 self-host --dir evopilot-stack --init-env` |
+| Connect to API | You deploy Dashboard as static assets behind a proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
+
+Desktop app and hosted Cloud trial are not published Dashboard surfaces yet. The supported public entry points are local browser run, self-hosted stack, and static deployment connected to EvoPilot API.
 
 ## Overview
 
@@ -79,12 +89,13 @@ CLI and Dashboard are two adapters over the same EvoPilot server state. Dashboar
 
 ```bash
 npm run check
+npm run verify:distribution
 npm run smoke:console
 npm run release:artifact
 npm run verify:release-artifact
 ```
 
-`npm run check` runs typecheck, production build, and static contract tests. Use mutating smoke only against disposable or explicitly approved test data:
+`npm run check` runs typecheck, production build, static contract tests, governance checks, and distribution verification. Use mutating smoke only against disposable or explicitly approved test data:
 
 ```bash
 EVOPILOT_MUTATING_SMOKE=1 npm run smoke:console
