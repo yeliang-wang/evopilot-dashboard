@@ -15,7 +15,7 @@ Admin provisions user -> User logs in -> Project intake -> Template auto-match
 | WorkBuddy or browser AI Agent | [AI Agents](ai-agents/README.md) |
 | Platform administrator | [Admin Guide](admin-guide.md) |
 | Self-hosting operator | [Self-Hosting](operations/self-hosting.md) |
-| Maintainer | [Release Management](operations/release-management.md) |
+| Maintainer | [Test Matrix](operations/test-matrix.md) and [Release Management](operations/release-management.md) |
 
 ## Core Principle
 
@@ -34,13 +34,15 @@ Ordinary users do not choose public `HarnessTemplate` files manually. Template m
 - [API usage map](reference/api-usage.md) - Dashboard action to EvoPilot API mapping.
 - [Roles and permissions](reference/roles-and-permissions.md) - page access and scope rules.
 - [Smoke test](operations/smoke-test.md) - local, production, and mutating smoke.
+- [Test Matrix](operations/test-matrix.md) - browser E2E, visual regression, live E2E, and PR artifacts.
 - [Troubleshooting](operations/troubleshooting.md) - request ID and Evidence Drawer diagnosis.
 
 ## Release And Trust
 
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v1.0.3 Release Notes](releases/1.0.3.md) is the current immutable ECS deployment body for the public production baseline.
+- [EvoPilot Dashboard v1.0.4 Release Notes](releases/1.0.4.md) is the current browser test-matrix and release-readiness body for the public production baseline.
+- [EvoPilot Dashboard v1.0.3 Release Notes](releases/1.0.3.md) is the immutable ECS deployment body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.2 Release Notes](releases/1.0.2.md) is the immutable release artifact body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.1 Release Notes](releases/1.0.1.md) is the publication-hardening release body for the previous public production baseline.
 - [Open Source Readiness](reference/open-source-readiness.md) tracks repository trust assets.

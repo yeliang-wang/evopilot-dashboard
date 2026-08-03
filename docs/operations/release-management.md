@@ -9,8 +9,11 @@ Dashboard release readiness requires:
 - A compatible EvoPilot API version.
 - Current screenshots or UI docs.
 - Static contract tests.
+- Browser E2E against an EvoPilot-shaped mocked API.
+- Visual regression for review, blocker, and release decision states.
 - Production build.
-- Smoke evidence against a real or approved disposable EvoPilot API.
+- Smoke or live E2E evidence against a real or approved disposable EvoPilot API.
+- PR artifacts containing Playwright reports, release artifacts, and verification output.
 - Updated docs for humans and AI Agents.
 - Immutable release artifacts: release archive with built `dist/`, SHA256SUMS, SPDX SBOM, provenance, and image digest metadata.
 
@@ -36,6 +39,8 @@ Rules:
 ```bash
 npm ci
 npm run check
+npx playwright install chromium
+npm run test:browser
 npm run release:artifact
 npm run verify:release-artifact
 EVOPILOT_DASHBOARD_BASE_URL=http://127.0.0.1:5174 \

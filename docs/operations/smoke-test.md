@@ -35,6 +35,30 @@ npm run check
 
 This type-checks the Dashboard, builds it, and runs static contract tests.
 
+## Browser And Visual Matrix
+
+Run the Playwright browser matrix before release readiness review:
+
+```bash
+npx playwright install chromium
+npm run test:e2e:mock
+npm run test:visual
+```
+
+`npm run test:e2e:mock` verifies the Agent Console browser flow with an EvoPilot-shaped mocked API. It covers login, project intake, ProjectHarnessProfile generation, and a governed blocker carrying `requestId`, `nextAction`, and `blockers`.
+
+`npm run test:visual` verifies review, blocker, and release decision baselines across desktop and mobile-sized viewports.
+
+Use live E2E only against a real or approved disposable EvoPilot API:
+
+```bash
+EVOPILOT_LIVE_E2E=1 \
+EVOPILOT_API_BASE_URL=http://127.0.0.1:19876 \
+EVOPILOT_E2E_USERNAME=<user> \
+EVOPILOT_E2E_PASSWORD=<password> \
+npm run test:e2e:live
+```
+
 ## Dashboard Console Smoke
 
 Run the non-mutating Dashboard console smoke against a running Dashboard and EvoPilot API:

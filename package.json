@@ -1,6 +1,6 @@
 {
   "name": "evopilot-dashboard",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "description": "Chat-first Agent Console for EvoPilot project evolution loops through its HTTP API control plane.",
   "license": "Apache-2.0",
@@ -11,6 +11,10 @@
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run build && node tests/static-contract.test.mjs && npm run verify:oss-governance",
+    "test:browser": "npm run test:e2e:mock && npm run test:visual",
+    "test:e2e:mock": "playwright test tests/e2e --project=chromium --project=mobile-chromium",
+    "test:e2e:live": "EVOPILOT_LIVE_E2E=1 playwright test tests/e2e/live-api.spec.ts --project=chromium",
+    "test:visual": "playwright test tests/visual --project=chromium",
     "release:artifact": "node scripts/build-release-artifacts.mjs",
     "verify:release-artifact": "node scripts/verify-release-artifacts.mjs",
     "smoke:console": "node scripts/dashboard-console-smoke.mjs",
@@ -18,6 +22,7 @@
     "verify:oss-governance": "node scripts/verify-open-source-governance.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^5.2.0",

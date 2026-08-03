@@ -1,0 +1,47 @@
+name: PR Artifacts
+
+on:
+  pull_request:
+
+jobs:
+  pr-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Static and contract checks
+        run: npm run check
+
+      - name: Browser and visual matrix
+        run: npm run test:browser
+
+      - name: Build release artifacts for review
+        run: npm run release:artifact
+
+      - name: Verify review release artifacts
+        run: npm run verify:release-artifact
+
+      - name: Upload PR artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-pr-readiness-artifacts
+          path: |
+            dist/release/
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore

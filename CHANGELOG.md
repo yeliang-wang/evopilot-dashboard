@@ -4,6 +4,32 @@ All notable changes to EvoPilot Dashboard are documented here.
 
 Dashboard releases should focus on browser-operable EvoPilot workflows, API compatibility, AI Agent usability, and visible product evidence. Do not accept screenshot-only validation without API compatibility evidence.
 
+## 1.0.4 - 2026-08-03
+
+### Added
+
+- Added Playwright browser E2E coverage for Agent Console demo stages, mocked EvoPilot API login, project intake, `ProjectHarnessProfile` generation, and governed blocker evidence.
+- Added visual regression baselines for owner review, blocker repair, and release decision states.
+- Added opt-in live E2E login smoke against a real or approved disposable EvoPilot API.
+- Added CI workflows for browser E2E, visual regression, and PR review artifacts.
+
+### Fixed
+
+- Fixed mobile layout constraints so the Agent Console remains usable at 390px mobile viewport width.
+
+### Documented
+
+- Added the Dashboard test matrix guide and updated smoke-test, release-management, and docs index entries for browser E2E, visual regression, live E2E, and PR artifacts.
+
+### Validation
+
+- `npm run check`
+- `npm run test:browser`
+- `npm run test:e2e:live` skipped without live API URL and credentials
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.3 - 2026-08-02
 
 ### Fixed

@@ -9,6 +9,7 @@ const api = fs.readFileSync("src/api.ts", "utf8");
 const styles = fs.readFileSync("src/styles.css", "utf8");
 const config = fs.readFileSync("public/config.js", "utf8");
 const packageJson = fs.readFileSync("package.json", "utf8");
+const playwrightConfig = fs.readFileSync("playwright.config.ts", "utf8");
 const distIndex = fs.existsSync("dist/index.html") ? fs.readFileSync("dist/index.html", "utf8") : "";
 const dockerfile = fs.readFileSync("Dockerfile", "utf8");
 const dockerignore = fs.readFileSync(".dockerignore", "utf8");
@@ -19,6 +20,13 @@ const productionCompose = fs.readFileSync("compose.production.yaml", "utf8");
 const hostNginx = fs.readFileSync("deploy/nginx/evopilot-dashboard.conf.example", "utf8");
 const productionSmoke = fs.readFileSync("scripts/production-compat-smoke.mjs", "utf8");
 const consoleSmoke = fs.readFileSync("scripts/dashboard-console-smoke.mjs", "utf8");
+const browserWorkflow = fs.readFileSync(".github/workflows/browser-e2e.yml", "utf8");
+const visualWorkflow = fs.readFileSync(".github/workflows/visual-regression.yml", "utf8");
+const prArtifactsWorkflow = fs.readFileSync(".github/workflows/pr-artifacts.yml", "utf8");
+const browserE2E = fs.readFileSync("tests/e2e/agent-console.spec.ts", "utf8");
+const liveE2E = fs.readFileSync("tests/e2e/live-api.spec.ts", "utf8");
+const visualTest = fs.readFileSync("tests/visual/agent-console-visual.spec.ts", "utf8");
+const mockApi = fs.readFileSync("tests/fixtures/mock-evopilot-api.ts", "utf8");
 const readme = fs.readFileSync("README.md", "utf8");
 const docsIndex = fs.readFileSync("docs/README.md", "utf8");
 const docsUserGuide = fs.readFileSync("docs/user-guide.md", "utf8");
@@ -26,6 +34,7 @@ const docsAiAgents = fs.readFileSync("docs/ai-agents/README.md", "utf8");
 const docsDashboardMap = fs.readFileSync("docs/ai-agents/dashboard-page-map.md", "utf8");
 const docsExpectedStates = fs.readFileSync("docs/ai-agents/expected-ui-states.md", "utf8");
 const docsSmoke = fs.readFileSync("docs/operations/smoke-test.md", "utf8");
+const docsTestMatrix = fs.readFileSync("docs/operations/test-matrix.md", "utf8");
 const docsApiUsage = fs.readFileSync("docs/reference/api-usage.md", "utf8");
 const docsRoles = fs.readFileSync("docs/reference/roles-and-permissions.md", "utf8");
 const docsE2E = fs.readFileSync("docs/workflows/end-to-end-scenarios.md", "utf8");
@@ -41,6 +50,7 @@ const allDocs = [
   docsDashboardMap,
   docsExpectedStates,
   docsSmoke,
+  docsTestMatrix,
   docsApiUsage,
   docsRoles,
   docsE2E,
@@ -320,6 +330,7 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
     "docs/operations/deployment.md",
     "docs/operations/troubleshooting.md",
     "docs/operations/smoke-test.md",
+    "docs/operations/test-matrix.md",
     "docs/reference/api-usage.md",
     "docs/reference/roles-and-permissions.md"
   ]) {
@@ -361,6 +372,10 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
   assert.match(docsSmoke, /Dashboard Console Smoke/);
   assert.match(docsSmoke, /EVOPILOT_MUTATING_SMOKE=1/);
   assert.match(docsSmoke, /evopilot-dashboard-console-smoke\/v1/);
+  assert.match(docsTestMatrix, /Browser E2E Scope/);
+  assert.match(docsTestMatrix, /Visual Regression Scope/);
+  assert.match(docsTestMatrix, /Live E2E Boundary/);
+  assert.match(docsTestMatrix, /PR Artifacts/);
   assert.match(docsApiUsage, /Agent Console API Map/);
   assert.match(docsApiUsage, /Role-Based API Boundary/);
   assert.match(docsApiUsage, /Projection Context/);
@@ -433,6 +448,49 @@ test("production and console smoke validate API compatibility", () => {
   assert.match(consoleSmoke, /mutating\.harness\.activate/);
   assert.match(consoleSmoke, /mutating\.goal\.approve-plan/);
   assert.match(consoleSmoke, /requestId/);
+});
+
+test("dashboard test matrix covers browser e2e, visual regression, live e2e, and PR artifacts", () => {
+  assert.match(packageJson, /"test:browser": "npm run test:e2e:mock && npm run test:visual"/);
+  assert.match(packageJson, /"test:e2e:mock": "playwright test tests\/e2e --project=chromium --project=mobile-chromium"/);
+  assert.match(packageJson, /"test:e2e:live": "EVOPILOT_LIVE_E2E=1 playwright test tests\/e2e\/live-api\.spec\.ts --project=chromium"/);
+  assert.match(packageJson, /"test:visual": "playwright test tests\/visual --project=chromium"/);
+  assert.match(packageJson, /"@playwright\/test"/);
+
+  assert.match(playwrightConfig, /webServer/);
+  assert.match(playwrightConfig, /npm run dev -- --port/);
+  assert.match(playwrightConfig, /trace: "retain-on-failure"/);
+  assert.match(playwrightConfig, /video: "retain-on-failure"/);
+  assert.match(playwrightConfig, /snapshotPathTemplate/);
+  assert.match(playwrightConfig, /mobile-chromium/);
+
+  assert.match(browserE2E, /\?demo=1&step=\$\{stage\.step\}/);
+  assert.match(browserE2E, /mock API login reaches ProjectHarnessProfile review/);
+  assert.match(browserE2E, /mock API blocker stops intake and exposes nextAction evidence/);
+  assert.match(browserE2E, /collectBrowserErrors/);
+  assert.match(liveE2E, /EVOPILOT_LIVE_E2E/);
+  assert.match(liveE2E, /EVOPILOT_API_BASE_URL/);
+  assert.match(liveE2E, /EVOPILOT_E2E_USERNAME/);
+  assert.match(visualTest, /toHaveScreenshot/);
+  assert.match(visualTest, /agent-console-review-desktop\.png/);
+  assert.match(visualTest, /agent-console-blocker-mobile\.png/);
+  assert.match(mockApi, /req-project-preflight-blocked/);
+  assert.match(mockApi, /connect-github-account/);
+  assert.match(mockApi, /x-request-id/);
+
+  for (const workflow of [browserWorkflow, visualWorkflow, prArtifactsWorkflow]) {
+    assert.match(workflow, /actions\/setup-node@v4/);
+    assert.match(workflow, /node-version: "22"/);
+    assert.match(workflow, /npm ci/);
+    assert.match(workflow, /npx playwright install --with-deps chromium/);
+    assert.match(workflow, /actions\/upload-artifact@v4/);
+  }
+  assert.match(browserWorkflow, /npm run test:e2e:mock/);
+  assert.match(visualWorkflow, /npm run test:visual/);
+  assert.match(prArtifactsWorkflow, /npm run check/);
+  assert.match(prArtifactsWorkflow, /npm run test:browser/);
+  assert.match(prArtifactsWorkflow, /npm run release:artifact/);
+  assert.match(prArtifactsWorkflow, /npm run verify:release-artifact/);
 });
 
 function escapeRegExp(value) {
