@@ -15,6 +15,7 @@ Dashboard release readiness requires:
 - Smoke or live E2E evidence against a real or approved disposable EvoPilot API.
 - PR artifacts containing Playwright reports, release artifacts, and verification output.
 - Distribution verification for standalone Dashboard container runner and tagged installer output.
+- Cloud deployment runbook validation for container and static hosting entrypoints.
 - Updated docs for humans and AI Agents.
 - Immutable release artifacts: release archive with built `dist/`, SHA256SUMS, SPDX SBOM, provenance, and image digest metadata.
 
@@ -78,6 +79,7 @@ Expected assets:
 - `evopilot-dashboard-<version>-sbom.spdx.json`
 - `evopilot-dashboard-<version>-provenance.json`
 - `evopilot-dashboard-<version>-image-metadata.json`
+- `evopilot-dashboard-<version>-cloud-runbook.md`
 - `install.sh` inside `evopilot-dashboard-<version>-source.tar.gz`
 - `SHA256SUMS`
 

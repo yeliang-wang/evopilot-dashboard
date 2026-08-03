@@ -16,6 +16,7 @@ Admin provisions user -> User logs in -> Project intake -> Template auto-match
 | Platform administrator | [Admin Guide](admin-guide.md) |
 | New operator | [Distribution](operations/distribution.md) |
 | Self-hosting operator | [Self-Hosting](operations/self-hosting.md) |
+| Cloud operator | [Cloud Deployment](deployment/cloud.md) |
 | Maintainer | [Test Matrix](operations/test-matrix.md) and [Release Management](operations/release-management.md) |
 
 ## Core Principle
@@ -36,15 +37,18 @@ Ordinary users do not choose public `HarnessTemplate` files manually. Template m
 - [Roles and permissions](reference/roles-and-permissions.md) - page access and scope rules.
 - [Smoke test](operations/smoke-test.md) - local, production, and mutating smoke.
 - [Distribution](operations/distribution.md) - README CTA entry points for local run, self-hosted stack, and static deployment.
+- [Cloud Deployment](deployment/cloud.md) - operator-owned cloud container and static hosting runbook.
 - [Test Matrix](operations/test-matrix.md) - browser E2E, visual regression, live E2E, and PR artifacts.
 - [Troubleshooting](operations/troubleshooting.md) - request ID and Evidence Drawer diagnosis.
 
 ## Release And Trust
 
 - [Distribution](operations/distribution.md) explains the supported public entry points.
+- [Cloud Deployment](deployment/cloud.md) explains operator-owned cloud deployment paths.
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v1.0.6 Release Notes](releases/1.0.6.md) is the current distribution-expansion body for the public production baseline.
+- [EvoPilot Dashboard v1.0.7 Release Notes](releases/1.0.7.md) is the current cloud deployment entrypoint body for the public production baseline.
+- [EvoPilot Dashboard v1.0.6 Release Notes](releases/1.0.6.md) is the distribution-expansion body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.4 Release Notes](releases/1.0.4.md) was superseded after Visual Regression CI exposed cross-platform mobile screenshot height variance.
 - [EvoPilot Dashboard v1.0.3 Release Notes](releases/1.0.3.md) is the immutable ECS deployment body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.2 Release Notes](releases/1.0.2.md) is the immutable release artifact body for the previous public production baseline.

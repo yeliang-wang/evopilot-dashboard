@@ -164,6 +164,11 @@ run("tar", [
   "vite.config.js"
 ], { stdio: "inherit" });
 
+fs.copyFileSync(
+  path.join(root, "docs", "deployment", "cloud.md"),
+  path.join(outDir, `${projectName}-${version}-cloud-runbook.md`)
+);
+
 const sbomPath = path.join(outDir, `${projectName}-${version}-sbom.spdx.json`);
 fs.writeFileSync(sbomPath, `${JSON.stringify(generateSbom(), null, 2)}\n`);
 

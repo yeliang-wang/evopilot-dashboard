@@ -9,6 +9,7 @@ import path from "node:path";
 const root = process.cwd();
 const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 const version = packageJson.version;
+const cloudRunbook = fs.readFileSync(path.join(root, "docs", "deployment", "cloud.md"), "utf8");
 
 function run(command, args, options = {}) {
   const output = execFileSync(command, args, {
@@ -23,6 +24,11 @@ function run(command, args, options = {}) {
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "evopilot-dashboard-distribution-"));
 const runDir = path.join(tempRoot, "runner");
 const installDir = path.join(tempRoot, "install-script");
+
+assert.ok(cloudRunbook.includes(`evopilot-dashboard:${version}`), "cloud deployment runbook should pin the Dashboard image version");
+assert.ok(cloudRunbook.includes("EVOPILOT_API_BASE_URL"), "cloud deployment runbook should document API base URL configuration");
+assert.ok(cloudRunbook.includes("Cloud Run"), "cloud deployment runbook should include Cloud Run guidance");
+assert.ok(cloudRunbook.includes("Static hosting"), "cloud deployment runbook should include static hosting guidance");
 
 const help = run("node", ["scripts/run-dashboard-container.mjs", "--help"]);
 assert.match(help, /EvoPilot Dashboard runner/);

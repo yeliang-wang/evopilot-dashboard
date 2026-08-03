@@ -28,6 +28,7 @@ const required = [
   `${projectName}-${version}-source.tar.gz`,
   `${projectName}-${version}-sbom.spdx.json`,
   `${projectName}-${version}-provenance.json`,
+  `${projectName}-${version}-cloud-runbook.md`,
   "SHA256SUMS"
 ];
 
@@ -61,6 +62,11 @@ const sourceListing = execFileSync("tar", ["-tzf", path.join(outDir, `${projectN
 });
 assert.match(sourceListing, /^install\.sh$/m, "source archive must include install.sh");
 assert.match(sourceListing, /^scripts\/run-dashboard-container\.mjs$/m, "source archive must include Dashboard runner");
+assert.match(sourceListing, /^docs\/deployment\/cloud\.md$/m, "source archive must include cloud deployment runbook");
+
+const cloudRunbook = fs.readFileSync(path.join(outDir, `${projectName}-${version}-cloud-runbook.md`), "utf8");
+assert.ok(cloudRunbook.includes(`evopilot-dashboard:${version}`), "cloud runbook asset should pin the release image tag");
+assert.ok(cloudRunbook.includes("EVOPILOT_API_BASE_URL"), "cloud runbook asset should document API base URL configuration");
 
 const provenance = readJson(path.join(outDir, `${projectName}-${version}-provenance.json`));
 assert.equal(provenance.schema, "evopilot-dashboard-release-provenance/v1");

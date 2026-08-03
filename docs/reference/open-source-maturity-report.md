@@ -18,7 +18,7 @@ It should not claim community parity with the most established public AI-agent c
 | User flows | Project intake, EvoPilot template auto-match, `ProjectHarnessProfile.yaml` DRAFT review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
 | AI Agent readiness | WorkBuddy-readable page map, expected UI states, stop rules, AGENTS entrypoint. | `AGENTS.md`, `docs/ai-agents/` |
 | Distribution | README CTA entries, local browser run, standalone container runner, tagged installer, self-hosted full-stack installer path, static deployment config, Dockerfile, production compose, Nginx template, immutable release archive, SBOM, provenance, checksum, and image digest metadata. | `README.md`, `install.sh`, `scripts/run-dashboard-container.mjs`, `docs/operations/distribution.md`, `Dockerfile`, `compose.production.yaml`, `deploy/`, `.github/workflows/release-artifacts.yml` |
-| Release readiness | Versioned release notes, changelog, release checklist, smoke validation, browser test matrix, visual regression, PR artifacts, and immutable artifact workflow. | `CHANGELOG.md`, `docs/releases/1.0.6.md`, `docs/operations/release-management.md`, `docs/operations/test-matrix.md` |
+| Release readiness | Versioned release notes, changelog, release checklist, smoke validation, browser test matrix, visual regression, PR artifacts, cloud runbook artifact, and immutable artifact workflow. | `CHANGELOG.md`, `docs/releases/1.0.7.md`, `docs/operations/release-management.md`, `docs/operations/test-matrix.md` |
 | Community shell | License, notice, contribution guide, security policy, code of conduct, issue forms, PR template. | Root governance files and `.github/` |
 
 ## Top-Tier Gap Assessment

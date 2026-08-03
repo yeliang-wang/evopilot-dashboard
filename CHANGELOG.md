@@ -8,6 +8,27 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.7 - 2026-08-03
+
+### Added
+
+- Added a cloud deployment runbook for container and static hosting entrypoints.
+- Added release artifact packaging and verification for `evopilot-dashboard-<version>-cloud-runbook.md`.
+- Updated distribution validation to assert cloud deployment docs, image tag pinning, and API base URL configuration.
+
+### Documented
+
+- Updated README, distribution, self-hosting, getting started, release management, readiness, and maturity docs for the P2 cloud deployment entrypoint.
+- Added v1.0.7 release notes for Dashboard cloud deployment documentation and artifact validation.
+
+### Validation
+
+- `npm run check`
+- `npm run verify:distribution`
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.6 - 2026-08-03
 
 ### Added
