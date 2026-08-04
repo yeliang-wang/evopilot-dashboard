@@ -5,6 +5,18 @@ import test from "node:test";
 
 const index = fs.readFileSync("index.html", "utf8");
 const app = fs.readFileSync("src/App.tsx", "utf8");
+const dashboardModel = fs.readFileSync("src/dashboard/model.ts", "utf8");
+const dashboardController = fs.readFileSync("src/dashboard/hooks/useAgentConsoleController.ts", "utf8");
+const dashboardComponentFiles = [
+  "src/dashboard/components.tsx",
+  "src/dashboard/components/auth.tsx",
+  "src/dashboard/components/console.tsx",
+  "src/dashboard/components/evidence.tsx",
+  "src/dashboard/components/management.tsx",
+  "src/dashboard/components/stage.tsx"
+];
+const dashboardComponents = dashboardComponentFiles.map((file) => fs.readFileSync(file, "utf8")).join("\n");
+const dashboardSource = [app, dashboardController, dashboardModel, dashboardComponents].join("\n");
 const api = fs.readFileSync("src/api.ts", "utf8");
 const styles = fs.readFileSync("src/styles.css", "utf8");
 const config = fs.readFileSync("public/config.js", "utf8");
@@ -85,15 +97,25 @@ test("dashboard is a standalone React API client", () => {
   assert.match(api, /X-EvoPilot-Workspace/);
   assert.match(api, /X-EvoPilot-Actor/);
   assert.match(api, /Authorization/);
-  assert.match(app, /sessionStorage\.getItem\("evopilot\.apiToken"\)/);
-  assert.match(app, /sessionStorage\.setItem\("evopilot\.apiToken", nextScope\.token\)/);
-  assert.match(app, /storage\.removeItem\("evopilot\.apiToken"\)/);
-  assert.doesNotMatch(app, /storage\.setItem\("evopilot\.apiToken"/);
+  assert.match(dashboardModel, /sessionStorage\.getItem\("evopilot\.apiToken"\)/);
+  assert.match(dashboardSource, /sessionStorage\.setItem\("evopilot\.apiToken", nextScope\.token\)/);
+  assert.match(dashboardModel, /storage\.removeItem\("evopilot\.apiToken"\)/);
+  assert.doesNotMatch(dashboardSource, /storage\.setItem\("evopilot\.apiToken"/);
   assert.doesNotMatch(app, /fetch\(/);
-  assert.doesNotMatch(`${app}\n${api}`, /apps\/dashboard/);
-  assert.doesNotMatch(`${app}\n${api}`, /\.codex-evidence/);
-  assert.doesNotMatch(`${app}\n${api}`, /evopilot\s+(target|goal|loop|harness)/);
+  assert.doesNotMatch(`${dashboardSource}\n${api}`, /apps\/dashboard/);
+  assert.doesNotMatch(`${dashboardSource}\n${api}`, /\.codex-evidence/);
+  assert.doesNotMatch(`${dashboardSource}\n${api}`, /evopilot\s+(target|goal|loop|harness)/);
   assert.equal(fs.existsSync("src/domain.ts"), false, "stale static domain fixture should not exist");
+});
+
+test("dashboard shell and feature modules stay bounded", () => {
+  assert.ok(lineCount(app) <= 350, `src/App.tsx has ${lineCount(app)} lines`);
+  assert.ok(lineCount(dashboardController) <= 750, `controller has ${lineCount(dashboardController)} lines`);
+  assert.ok(lineCount(dashboardModel) <= 650, `model has ${lineCount(dashboardModel)} lines`);
+  for (const file of dashboardComponentFiles) {
+    const content = fs.readFileSync(file, "utf8");
+    assert.ok(lineCount(content) <= 700, `${file} has ${lineCount(content)} lines`);
+  }
 });
 
 test("dashboard implements the Agent Console v2 information architecture", () => {
@@ -121,26 +143,26 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Harness Templates",
     "HarnessTemplateEvolution"
   ]) {
-    assert.match(app, new RegExp(escapeRegExp(text)));
+    assert.match(dashboardSource, new RegExp(escapeRegExp(text)));
   }
 
-  assert.match(app, /type ConsoleStep =/);
-  assert.match(app, /type DrawerKind =/);
-  assert.match(app, /type PageId = "console" \| "tenants" \| "workspaces" \| "users" \| "templates" \| "audit"/);
-  assert.match(app, /function AuthScreen/);
-  assert.match(app, /function PasswordChangeScreen/);
-  assert.match(app, /function ManagementPage/);
-  assert.doesNotMatch(app, /function ProjectsPage/);
-  assert.match(app, /function TenantsPage/);
-  assert.match(app, /function WorkspacesPage/);
-  assert.match(app, /function UsersPage/);
-  assert.match(app, /function TemplatesPage/);
-  assert.match(app, /function AuditPage/);
-  assert.match(app, /function StageBar/);
-  assert.match(app, /function EvidenceDrawer/);
-  assert.match(app, /function ProfileReviewCard/);
-  assert.match(app, /function DiffCard/);
-  assert.match(app, /function BlockerCard/);
+  assert.match(dashboardModel, /export type ConsoleStep =/);
+  assert.match(dashboardModel, /export type DrawerKind =/);
+  assert.match(dashboardModel, /export type PageId = "console" \| "tenants" \| "workspaces" \| "users" \| "templates" \| "audit"/);
+  assert.match(dashboardComponents, /function AuthScreen/);
+  assert.match(dashboardComponents, /function PasswordChangeScreen/);
+  assert.match(dashboardComponents, /function ManagementPage/);
+  assert.doesNotMatch(dashboardComponents, /function ProjectsPage/);
+  assert.match(dashboardComponents, /function TenantsPage/);
+  assert.match(dashboardComponents, /function WorkspacesPage/);
+  assert.match(dashboardComponents, /function UsersPage/);
+  assert.match(dashboardComponents, /function TemplatesPage/);
+  assert.match(dashboardComponents, /function AuditPage/);
+  assert.match(dashboardComponents, /function StageBar/);
+  assert.match(dashboardComponents, /function EvidenceDrawer/);
+  assert.match(dashboardComponents, /function ProfileReviewCard/);
+  assert.match(dashboardComponents, /function DiffCard/);
+  assert.match(dashboardComponents, /function BlockerCard/);
   assert.match(styles, /\.app-shell/);
   assert.match(styles, /\.stagebar/);
   assert.match(styles, /\.conversation/);
@@ -153,15 +175,15 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
   assert.match(styles, /\.management-workspace/);
   assert.match(styles, /\.form-panel/);
 
-  assert.doesNotMatch(app, /type PageId = "projects" \| "runs" \| "ops";/);
-  assert.doesNotMatch(app, /\(\["projects", "runs", "ops"\] as PageId\[\]\)/);
-  assert.doesNotMatch(app, /"projects", "Projects"/);
-  assert.doesNotMatch(app, /page === "projects"/);
-  assert.doesNotMatch(app, /Workspace \/ Project/);
-  assert.doesNotMatch(app, /Active sessions/);
-  assert.doesNotMatch(app, /Recent decisions/);
-  assert.doesNotMatch(app, /Projects \/ Runs \/ Ops/);
-  assert.doesNotMatch(app, /five top-level pages/);
+  assert.doesNotMatch(dashboardSource, /type PageId = "projects" \| "runs" \| "ops";/);
+  assert.doesNotMatch(dashboardSource, /\(\["projects", "runs", "ops"\] as PageId\[\]\)/);
+  assert.doesNotMatch(dashboardSource, /"projects", "Projects"/);
+  assert.doesNotMatch(dashboardSource, /page === "projects"/);
+  assert.doesNotMatch(dashboardSource, /Workspace \/ Project/);
+  assert.doesNotMatch(dashboardSource, /Active sessions/);
+  assert.doesNotMatch(dashboardSource, /Recent decisions/);
+  assert.doesNotMatch(dashboardSource, /Projects \/ Runs \/ Ops/);
+  assert.doesNotMatch(dashboardSource, /five top-level pages/);
 });
 
 test("dashboard preserves governed review gates and stop rules", () => {
@@ -174,7 +196,7 @@ test("dashboard preserves governed review gates and stop rules", () => {
     "approve-goal-plan",
     "advance-goal"
   ]) {
-    assert.match(app, new RegExp(escapeRegExp(actionId)));
+    assert.match(dashboardSource, new RegExp(escapeRegExp(actionId)));
   }
 
   for (const text of [
@@ -188,7 +210,7 @@ test("dashboard preserves governed review gates and stop rules", () => {
     "Dashboard will not invent either value",
     "Release truth comes from EvoPilot evidence packages and release decisions"
   ]) {
-    assert.match(app, new RegExp(escapeRegExp(text)));
+    assert.match(dashboardSource, new RegExp(escapeRegExp(text)));
   }
 });
 
@@ -495,4 +517,8 @@ test("dashboard test matrix covers browser e2e, visual regression, live e2e, and
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function lineCount(value) {
+  return value.split(/\r?\n/).length;
 }

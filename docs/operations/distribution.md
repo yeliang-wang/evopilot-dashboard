@@ -7,7 +7,7 @@ EvoPilot Dashboard has three supported public entry points. These labels match t
 | README CTA | Audience | Command |
 | --- | --- | --- |
 | Run Dashboard | Developers and operators with an EvoPilot API server | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
-| Self-host with EvoPilot | Operators bringing up the full EvoPilot stack | `npx create-evopilot@1.0.9 self-host --dir evopilot-stack --init-env` |
+| Self-host with EvoPilot | Operators bringing up the full EvoPilot stack | `npx create-evopilot@1.0.10 self-host --dir evopilot-stack --init-env` |
 | Connect to API | Platform teams deploying Dashboard static assets behind a proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
 
 The Dashboard is a standalone React HTTP client. It does not publish a separate npm CLI, does not call the EvoPilot CLI, and does not own server state. EvoPilot API remains the system of record for users, tenant/workspace scope, projects, harness profiles, loops, evidence, audit, release decisions, and credentials.
@@ -48,7 +48,7 @@ npm run dashboard:run -- \
 From a release tag, bootstrap without cloning:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yeliang-wang/evopilot-dashboard/v1.0.7/install.sh | bash -s -- --api-url http://127.0.0.1:19876 --dir evopilot-dashboard-run
+curl -fsSL https://raw.githubusercontent.com/yeliang-wang/evopilot-dashboard/v1.0.8/install.sh | bash -s -- --api-url http://127.0.0.1:19876 --dir evopilot-dashboard-run
 ```
 
 ## Self-Hosted Stack
@@ -56,7 +56,7 @@ curl -fsSL https://raw.githubusercontent.com/yeliang-wang/evopilot-dashboard/v1.
 Use the EvoPilot installer when you want Dashboard, API, loop worker, code-upgrader, and Postgres generated together:
 
 ```bash
-npx create-evopilot@1.0.9 self-host --dir evopilot-stack --init-env
+npx create-evopilot@1.0.10 self-host --dir evopilot-stack --init-env
 cd evopilot-stack
 docker compose up -d
 ./verify.sh

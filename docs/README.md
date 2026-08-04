@@ -47,7 +47,8 @@ Ordinary users do not choose public `HarnessTemplate` files manually. Template m
 - [Cloud Deployment](deployment/cloud.md) explains operator-owned cloud deployment paths.
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v1.0.7 Release Notes](releases/1.0.7.md) is the current cloud deployment entrypoint body for the public production baseline.
+- [EvoPilot Dashboard v1.0.8 Release Notes](releases/1.0.8.md) is the current module-boundary cleanup body for the public production baseline.
+- [EvoPilot Dashboard v1.0.7 Release Notes](releases/1.0.7.md) is the cloud deployment entrypoint body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.6 Release Notes](releases/1.0.6.md) is the distribution-expansion body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.4 Release Notes](releases/1.0.4.md) was superseded after Visual Regression CI exposed cross-platform mobile screenshot height variance.
 - [EvoPilot Dashboard v1.0.3 Release Notes](releases/1.0.3.md) is the immutable ECS deployment body for the previous public production baseline.

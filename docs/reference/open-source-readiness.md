@@ -29,7 +29,7 @@ EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned u
 | Installable Dashboard runner | Present | `install.sh`, `scripts/run-dashboard-container.mjs`, `npm run verify:distribution` |
 | Self-hosting guide | Present | `docs/operations/self-hosting.md` |
 | Release playbook | Present | `docs/operations/release-management.md` |
-| Release notes | Present | `docs/releases/1.0.7.md` |
+| Release notes | Present | `docs/releases/1.0.8.md` |
 | Immutable release artifacts | Present | `scripts/build-release-artifacts.mjs`, `scripts/verify-release-artifacts.mjs`, `deploy/ecs/compose.immutable.yaml` |
 | Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
 
@@ -45,7 +45,8 @@ The public documentation model is:
 
 | Capability | Evidence |
 | --- | --- |
-| Agent Console v2 | `src/App.tsx`, `src/styles.css` |
+| Agent Console v2 | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `src/styles.css` |
+| Code structure boundaries | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `tests/static-contract.test.mjs` |
 | ProjectHarnessProfile review | `docs/user-guide.md`, `docs/ai-agents/expected-ui-states.md` |
 | Evidence Drawer | `docs/reference/api-usage.md`, `docs/operations/troubleshooting.md` |
 | WorkBuddy operation | `docs/ai-agents/README.md`, `docs/workflows/end-to-end-scenarios.md` |

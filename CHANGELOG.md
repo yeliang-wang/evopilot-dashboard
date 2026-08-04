@@ -8,6 +8,27 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.8 - 2026-08-04
+
+### Changed
+
+- Split the Dashboard shell from the Agent Console controller, domain model, and component modules.
+- Reduced `src/App.tsx` to a thin render shell while keeping login, scoped operation, project intake, harness review, evidence drawer, blocker, and release flows intact.
+- Added static contract checks for Dashboard module boundaries and line budgets.
+
+### Documented
+
+- Updated open-source readiness and maturity evidence to reference `src/dashboard/` modules instead of treating `src/App.tsx` as the full UI implementation.
+- Added v1.0.8 release notes for the Dashboard module-boundary cleanup release.
+
+### Validation
+
+- `npm run check`
+- `npm run test:browser`
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.7 - 2026-08-03
 
 ### Added

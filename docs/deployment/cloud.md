@@ -2,17 +2,17 @@
 
 > Deploy EvoPilot Dashboard on operator-owned cloud infrastructure while keeping EvoPilot API as the system of record.
 
-This guide covers cloud container and static hosting entrypoints for Dashboard `v1.0.7`. It does not announce a hosted EvoPilot Cloud trial or a managed SaaS product. Operators own the cloud project, DNS, TLS, secrets, and EvoPilot API endpoint.
+This guide covers cloud container and static hosting entrypoints for Dashboard `v1.0.8`. It does not announce a hosted EvoPilot Cloud trial or a managed SaaS product. Operators own the cloud project, DNS, TLS, secrets, and EvoPilot API endpoint.
 
 ## Required Contract
 
 | Requirement | Value |
 | --- | --- |
-| Dashboard image | `ghcr.io/yeliang-wang/evopilot-dashboard:1.0.7` |
+| Dashboard image | `ghcr.io/yeliang-wang/evopilot-dashboard:1.0.8` |
 | Runtime port | `8080` |
 | Health path | `/health` |
 | Browser config | `EVOPILOT_API_BASE_URL` for container injection or `public/config.js` for static assets |
-| API system of record | EvoPilot API `v1.0.9` or later |
+| API system of record | EvoPilot API `v1.0.10` or later |
 
 Do not put bearer tokens, GitHub PATs, GitLab tokens, LLM keys, deploy credentials, or passwords in browser config. Dashboard only needs the EvoPilot API base URL.
 
@@ -22,7 +22,7 @@ Use a container service when the platform should serve the built Dashboard image
 
 ```bash
 gcloud run deploy evopilot-dashboard \
-  --image ghcr.io/yeliang-wang/evopilot-dashboard:1.0.7 \
+  --image ghcr.io/yeliang-wang/evopilot-dashboard:1.0.8 \
   --port 8080 \
   --set-env-vars EVOPILOT_API_BASE_URL=https://evopilot.example.com \
   --allow-unauthenticated
@@ -42,7 +42,7 @@ curl -i https://dashboard.example.com/api/v1/summary
 Use the same container contract on Fly.io, ECS, Azure Container Apps, or any managed container service:
 
 ```text
-image: ghcr.io/yeliang-wang/evopilot-dashboard:1.0.7
+image: ghcr.io/yeliang-wang/evopilot-dashboard:1.0.8
 port: 8080
 env:
   EVOPILOT_API_BASE_URL: https://evopilot.example.com
