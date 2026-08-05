@@ -8,6 +8,23 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.10 - 2026-08-05
+
+### Fixed
+
+- Fixed production Workspaces usage rendering so slow non-critical projections such as audit do not block already-returned workspace token usage data.
+- Added per-request Dashboard API timeouts with a longer window for usage projections.
+- Updated the Workspaces usage table layout for real production project and loop identifiers, keeping the first five token rows readable while retaining workspace totals.
+
+### Validation
+
+- `npm run check`
+- `npm run typecheck`
+- `npm run build`
+- `node tests/static-contract.test.mjs`
+- `git diff --check`
+- Chrome local verification against production EvoPilot API
+
 ## 1.0.9 - 2026-08-05
 
 ### Added

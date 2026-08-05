@@ -700,7 +700,7 @@ pre {
 .management-workspace {
   min-height: 0;
   padding: 24px 28px;
-  overflow: hidden;
+  overflow: auto;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 18px;
@@ -765,7 +765,7 @@ pre {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 18px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .data-panel {
@@ -859,7 +859,7 @@ pre {
 
 .usage-panel {
   min-height: 440px;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto auto;
 }
 
 .usage-metric-grid {
@@ -982,10 +982,9 @@ pre {
   display: block;
   font-size: 11px;
   line-height: 1.25;
-  overflow: visible;
-  overflow-wrap: anywhere;
-  text-overflow: clip;
-  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .form-two {

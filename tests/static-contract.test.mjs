@@ -93,7 +93,16 @@ test("dashboard is a standalone React API client", () => {
   assert.match(api, /function login/);
   assert.match(api, /function changePassword/);
   assert.match(api, /interface DashboardProjectionContext/);
+  assert.match(api, /interface DashboardSnapshotOptions/);
   assert.match(api, /loadDashboardApiSnapshot\(\s*scope: DashboardScope,\s*context: DashboardProjectionContext/s);
+  assert.match(api, /DASHBOARD_API_TIMEOUT_MS/);
+  assert.match(api, /DASHBOARD_USAGE_API_TIMEOUT_MS/);
+  assert.match(api, /AbortController/);
+  assert.match(api, /Promise\.allSettled/);
+  assert.match(api, /Request timed out after/);
+  assert.match(api, /options\.onResult/);
+  assert.match(dashboardController, /useRef/);
+  assert.match(dashboardController, /onResult: \(key, result\)/);
   assert.match(api, /X-EvoPilot-Tenant/);
   assert.match(api, /X-EvoPilot-Workspace/);
   assert.match(api, /X-EvoPilot-Actor/);

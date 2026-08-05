@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   apiSurface,
   changePassword,
@@ -56,6 +56,7 @@ export function useAgentConsoleController() {
   const [apiSnapshot, setApiSnapshot] = useState<Record<string, ApiResult>>({});
   const [apiNotice, setApiNotice] = useState(defaultScope.token ? "Loading EvoPilot projections" : "Sign in to load live EvoPilot projections");
   const [apiLoading, setApiLoading] = useState(false);
+  const apiRefreshId = useRef(0);
   const [consoleStep, setConsoleStep] = useState<ConsoleStep>(initialStep);
   const [drawer, setDrawer] = useState<DrawerKind | undefined>(
     ["review", "changes", "blocker", "release"].includes(initialStep)
@@ -171,6 +172,8 @@ export function useAgentConsoleController() {
   }
 
   async function refreshApiSnapshot(scopeOverride = scope, contextOverride = context) {
+    const refreshId = apiRefreshId.current + 1;
+    apiRefreshId.current = refreshId;
     setApiLoading(true);
     if (!scopeOverride.token) {
       setApiSnapshot({});
@@ -178,7 +181,13 @@ export function useAgentConsoleController() {
       setApiLoading(false);
       return;
     }
-    const snapshot = await loadDashboardApiSnapshot(scopeOverride, contextOverride);
+    const snapshot = await loadDashboardApiSnapshot(scopeOverride, contextOverride, {
+      onResult: (key, result) => {
+        if (apiRefreshId.current !== refreshId) return;
+        setApiSnapshot((current) => ({ ...current, [key]: result }));
+      }
+    });
+    if (apiRefreshId.current !== refreshId) return;
     setApiSnapshot(snapshot);
     const failures = Object.entries(snapshot).filter(([, result]) => !result.ok);
     const successes = Object.entries(snapshot).filter(([, result]) => result.ok);

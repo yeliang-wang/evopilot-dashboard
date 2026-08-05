@@ -63,6 +63,13 @@ export interface DashboardActionResult<T = unknown> extends ApiResult<T> {
   blockers?: string[];
 }
 
+export interface DashboardSnapshotOptions {
+  onResult?: (key: string, result: ApiResult) => void;
+}
+
+const DASHBOARD_API_TIMEOUT_MS = 15_000;
+const DASHBOARD_USAGE_API_TIMEOUT_MS = 45_000;
+
 export const configuredApiBaseUrl = String(window.EVOPILOT_DASHBOARD_CONFIG?.apiBaseUrl ?? "").replace(/\/+$/, "");
 export const controlPlaneBaseUrl = configuredApiBaseUrl || window.location.origin;
 
@@ -73,18 +80,20 @@ export function apiUrl(path: string): string {
 
 export async function publicApiFetch<T = unknown>(
   path: string,
-  init: RequestInit = {}
+  init: RequestInit = {},
+  timeoutMs = DASHBOARD_API_TIMEOUT_MS
 ): Promise<ApiResult<T>> {
   const headers = new Headers(init.headers);
   headers.set("Accept", "application/json");
   if (init.body) headers.set("Content-Type", "application/json");
-  return fetchJson<T>(path, { ...init, headers });
+  return fetchJson<T>(path, { ...init, headers }, timeoutMs);
 }
 
 export async function apiFetch<T = unknown>(
   path: string,
   scope: DashboardScope,
-  init: RequestInit = {}
+  init: RequestInit = {},
+  timeoutMs = DASHBOARD_API_TIMEOUT_MS
 ): Promise<ApiResult<T>> {
   const headers = new Headers(init.headers);
   headers.set("Accept", "application/json");
@@ -94,15 +103,18 @@ export async function apiFetch<T = unknown>(
   headers.set("X-EvoPilot-Actor", scope.actorId);
   if (scope.token) headers.set("Authorization", `Bearer ${scope.token}`);
 
-  return fetchJson<T>(path, { ...init, headers });
+  return fetchJson<T>(path, { ...init, headers }, timeoutMs);
 }
 
 async function fetchJson<T = unknown>(
   path: string,
-  init: RequestInit = {}
+  init: RequestInit = {},
+  timeoutMs = DASHBOARD_API_TIMEOUT_MS
 ): Promise<ApiResult<T>> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(apiUrl(path), init);
+    const response = await fetch(apiUrl(path), { ...init, signal: controller.signal });
     const requestId = response.headers.get("x-request-id") ?? response.headers.get("x-evopilot-request-id") ?? undefined;
     const text = await response.text();
     const data = text ? safeJson(text) : undefined;
@@ -122,8 +134,12 @@ async function fetchJson<T = unknown>(
     return {
       ok: false,
       status: 0,
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof DOMException && error.name === "AbortError"
+        ? `Request timed out after ${timeoutMs}ms`
+        : error instanceof Error ? error.message : String(error)
     };
+  } finally {
+    window.clearTimeout(timeout);
   }
 }
 
@@ -319,7 +335,8 @@ export const apiSurface = {
 
 export async function loadDashboardApiSnapshot(
   scope: DashboardScope,
-  context: DashboardProjectionContext
+  context: DashboardProjectionContext,
+  options: DashboardSnapshotOptions = {}
 ): Promise<Record<string, ApiResult>> {
   const projectId = context.projectId.trim();
   const goalId = context.goalId.trim();
@@ -359,6 +376,22 @@ export async function loadDashboardApiSnapshot(
   }
   if (loopId) calls.push(["loopExecutorGraph", apiSurface.loopExecutorGraph(loopId)]);
 
-  const results = await Promise.all(calls.map(async ([key, path]) => [key, await apiFetch(path, scope)] as const));
-  return Object.fromEntries(results);
+  const results = await Promise.allSettled(calls.map(async ([key, path]) => {
+    const result = await apiFetch(path, scope, {}, snapshotTimeoutMs(key));
+    options.onResult?.(key, result);
+    return [key, result] as const;
+  }));
+  return Object.fromEntries(results.map((result, index) => {
+    if (result.status === "fulfilled") return result.value;
+    const [key] = calls[index];
+    return [key, {
+      ok: false,
+      status: 0,
+      error: result.reason instanceof Error ? result.reason.message : String(result.reason)
+    } satisfies ApiResult];
+  }));
+}
+
+function snapshotTimeoutMs(key: string): number {
+  return key.endsWith("Usage") ? DASHBOARD_USAGE_API_TIMEOUT_MS : DASHBOARD_API_TIMEOUT_MS;
 }

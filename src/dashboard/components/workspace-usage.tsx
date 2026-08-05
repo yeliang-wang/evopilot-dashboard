@@ -10,7 +10,7 @@ export function WorkspaceUsagePanel({ scope, snapshot }: { scope: DashboardScope
   const usage = asRecord(dataEnvelope(result?.data));
   const llmUsage = asRecord(usage?.llmUsage);
   const projectRows = resultItems(result, ["projectUsage"]).slice(0, 10);
-  const providerRows = projectLlmRows(projectRows).slice(0, 12);
+  const providerRows = projectLlmRows(projectRows).slice(0, 5);
   const topProject = asRecord(usage?.topProject);
   const statusText = result
     ? result.ok ? `status=${result.status}` : `status=${result.status} ${result.error ?? ""}`.trim()
