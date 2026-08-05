@@ -760,6 +760,14 @@ pre {
   gap: 18px;
 }
 
+.management-stack {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 18px;
+  overflow: hidden;
+}
+
 .data-panel {
   min-height: 0;
   padding: 18px;
@@ -847,6 +855,137 @@ pre {
   place-items: center;
   color: var(--muted);
   font-size: 13px;
+}
+
+.usage-panel {
+  min-height: 440px;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.usage-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.usage-metric-card {
+  min-width: 0;
+  min-height: 126px;
+  padding: 14px;
+  border: 1px solid #e5ebf3;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  display: grid;
+  gap: 9px;
+  align-content: start;
+}
+
+.usage-metric-title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #52647d;
+}
+
+.usage-metric-title span {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d8e3f0;
+  border-radius: 7px;
+  background: #eef6ff;
+  color: #2563eb;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.usage-metric-title strong {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 880;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-metric-value {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 880;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.usage-metric-card small {
+  min-width: 0;
+  color: #53657e;
+  display: block;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.usage-table {
+  min-height: 238px;
+}
+
+.usage-table .table-row {
+  min-height: 58px;
+}
+
+.usage-table .table-row span,
+.usage-table .table-head strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.usage-project-cell,
+.usage-llm-cell,
+.usage-loop-cell {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.usage-project-cell strong,
+.usage-llm-cell strong,
+.usage-loop-cell strong,
+.usage-token-value {
+  min-width: 0;
+  color: #172033;
+  font-size: 12px;
+  font-weight: 860;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-project-cell small,
+.usage-llm-cell small,
+.usage-table .table-row span small {
+  min-width: 0;
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-table .table-row .usage-loop-cell small {
+  min-width: 0;
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  line-height: 1.25;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .form-two {

@@ -252,6 +252,7 @@ export const apiSurface = {
   sourceCredentialPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/source-credentials/preflight`,
   projectDevops: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/devops`,
   projectDevopsPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/devops/preflight`,
+  projectUsage: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/usage`,
   llmProfiles: "/api/v1/llm-profiles",
   projectLlm: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm`,
   projectLlmPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight`,
@@ -312,6 +313,7 @@ export const apiSurface = {
   users: "/api/v1/users",
   tenants: "/api/v1/tenants",
   workspaces: "/api/v1/workspaces",
+  workspaceUsage: (workspaceId: string) => `/api/v1/workspaces/${encodeURIComponent(workspaceId)}/usage`,
   githubAppInstallations: "/api/v1/github-app/installations"
 };
 
@@ -336,9 +338,13 @@ export async function loadDashboardApiSnapshot(
     ["llmProfiles", apiSurface.llmProfiles],
     ["tenants", apiSurface.tenants],
     ["workspaces", apiSurface.workspaces],
+    ["workspaceUsage", apiSurface.workspaceUsage(scope.workspaceId)],
     ["users", apiSurface.users]
   ];
-  if (projectId) calls.push(["profiles", apiSurface.projectHarnessProfiles(projectId)]);
+  if (projectId) {
+    calls.push(["profiles", apiSurface.projectHarnessProfiles(projectId)]);
+    calls.push(["projectUsage", apiSurface.projectUsage(projectId)]);
+  }
   if (goalId) {
     calls.push(["goal", apiSurface.goal(goalId)]);
     calls.push(["goalRunStatus", apiSurface.goalRunStatus(goalId)]);

@@ -8,6 +8,30 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.9 - 2026-08-05
+
+### Added
+
+- Added a Workspaces-page `接入项目 LLM 用量追踪` panel backed by EvoPilot workspace usage projections.
+- Added workspace metric cards for total tokens, connected projects with LLM usage, LLM provider/model/profile combinations, and top token project.
+- Added a project/LLM table that shows project id/name, actual provider/model/profile, calls, input/output/total tokens, workspace share, latest loop token total, latest loop id/status, and request id.
+
+### Changed
+
+- Extended the Dashboard API adapter to call `GET /api/v1/workspaces/{workspaceId}/usage` and `GET /api/v1/projects/{projectId}/usage`.
+- Updated static contracts and AI-agent docs so Dashboard treats EvoPilot as the system of record for token totals and does not calculate project usage locally.
+
+### Validation
+
+- `npm run typecheck`
+- `npm run build`
+- `node tests/static-contract.test.mjs`
+- `npm run check`
+- `npm run test:browser`
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.8 - 2026-08-04
 
 ### Changed

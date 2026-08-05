@@ -1,4 +1,3 @@
-import { type CSSProperties } from "react";
 import {
   CheckCircle2,
   Eye,
@@ -38,6 +37,7 @@ import {
   type WorkspaceForm
 } from "../model";
 import { EvidenceRow, LogLine } from "./evidence";
+import { WorkspaceUsagePanel } from "./workspace-usage";
 
 export function ManagementPage({
   page,
@@ -75,7 +75,7 @@ export function ManagementPage({
   onRefresh: () => void;
 }) {
   if (page === "tenants") return <TenantsPage form={tenantForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onTenantForm} onRunAction={onRunAction} />;
-  if (page === "workspaces") return <WorkspacesPage form={workspaceForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onWorkspaceForm} onRunAction={onRunAction} />;
+  if (page === "workspaces") return <WorkspacesPage form={workspaceForm} scope={scope} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onWorkspaceForm} onRunAction={onRunAction} />;
   if (page === "users") return <UsersPage form={userForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onUserForm} onRunAction={onRunAction} />;
   if (page === "templates") return <TemplatesPage form={templateForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onTemplateForm} onRunAction={onRunAction} />;
   return <AuditPage snapshot={snapshot} session={session} lastAction={lastAction} onRefresh={onRefresh} />;
@@ -156,6 +156,7 @@ function TenantsPage({
 
 function WorkspacesPage({
   form,
+  scope,
   snapshot,
   busyAction,
   lastAction,
@@ -163,6 +164,7 @@ function WorkspacesPage({
   onRunAction
 }: {
   form: WorkspaceForm;
+  scope: DashboardScope;
   snapshot: Record<string, ApiResult>;
   busyAction?: string;
   lastAction?: DashboardActionResult;
@@ -173,19 +175,22 @@ function WorkspacesPage({
   return (
     <main className="management-workspace">
       <section className="management-layout">
-        <DataPanel
-          title="工作区管理"
-          subtitle="Workspace 是用户、项目、凭据引用、loop 和审计的隔离边界。"
-          rows={rows}
-          columns={[
-            ["Workspace", ["id", "workspaceId", "name"]],
-            ["Tenant", ["tenantId", "tenant"]],
-            ["Projects", ["projectCount", "projects"]],
-            ["Loops", ["loopCount", "loops"]],
-            ["Status", ["status", "state"]]
-          ]}
-          empty="No workspaces returned by EvoPilot."
-        />
+        <div className="management-stack">
+          <WorkspaceUsagePanel scope={scope} snapshot={snapshot} />
+          <DataPanel
+            title="工作区管理"
+            subtitle="Workspace 是用户、项目、凭据引用、loop 和审计的隔离边界。"
+            rows={rows}
+            columns={[
+              ["Workspace", ["id", "workspaceId", "name"]],
+              ["Tenant", ["tenantId", "tenant"]],
+              ["Projects", ["projectCount", "projects"]],
+              ["Loops", ["loopCount", "loops"]],
+              ["Status", ["status", "state"]]
+            ]}
+            empty="No workspaces returned by EvoPilot."
+          />
+        </div>
         <aside className="form-panel">
           <PanelTitle eyebrow="Workspace boundary" title="创建工作区" />
           <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} /></label>
@@ -493,4 +498,3 @@ function ActionEvidence({ lastAction }: { lastAction?: DashboardActionResult }) 
     </div>
   );
 }
-

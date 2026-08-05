@@ -68,7 +68,7 @@ Expected fields:
 | Page | Expected elements |
 |---|---|
 | Tenants | tenant table, `初始化新租户`, create action, audit evidence |
-| Workspaces | workspace table, owner and quota fields, create action |
+| Workspaces | workspace table, owner and quota fields, project LLM/token usage projection, create action |
 | Users | user table, role/status fields, `mustChangePassword=true` behavior in docs |
 | Harness Templates | template table, evolution intent, source type, create evolution draft |
 | Audit | audit rows, requestId, last action, nextAction, blockers, failure trace |

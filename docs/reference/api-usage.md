@@ -11,6 +11,7 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Password change | `POST /api/v1/auth/change-password` |
 | Locked scope projections | headers `X-EvoPilot-Tenant`, `X-EvoPilot-Workspace`, `X-EvoPilot-Actor` |
 | Project intake | `POST /api/v1/onboarding/project/checklist` |
+| Project LLM usage | `GET /api/v1/projects/{projectId}/usage` |
 | Harness draft | `POST /api/v1/projects/{projectId}/harness-profiles/generate` |
 | Harness profile list/read | `GET /api/v1/projects/{projectId}/harness-profiles`, `GET /api/v1/projects/{projectId}/harness-profiles/{profileId}` |
 | Harness activation | `POST /api/v1/projects/{projectId}/harness-profiles/{profileId}/activate` |
@@ -22,7 +23,7 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Loop projections | `GET /api/v1/loops/{loopId}/executor-graph`, `trace-tree`, `events`, `source-closure/preflight` |
 | Release | `GET /api/v1/release/decisions`, `GET /api/v1/release/evidence` |
 | Tenants | `GET /api/v1/tenants`, `POST /api/v1/tenants` |
-| Workspaces | `GET /api/v1/workspaces`, `POST /api/v1/workspaces` |
+| Workspaces | `GET /api/v1/workspaces`, `POST /api/v1/workspaces`, `GET /api/v1/workspaces/{workspaceId}/usage` |
 | Users | `GET /api/v1/users`, `POST /api/v1/users` |
 | Harness template evolution | `GET /api/v1/harness/template-evolutions`, `POST /api/v1/harness/template-evolutions` |
 | Harness templates and policies | `GET /api/v1/harness/templates`, `GET /api/v1/harness/policies` |
@@ -65,6 +66,8 @@ Every mutating action should surface:
 - profile digests or release evidence digests when returned
 
 The **Evidence Drawer** is the UI place for these fields.
+
+Workspace usage and project LLM usage are server projections. Dashboard displays `llmUsage.provider`, `llmUsage.model`, `inputTokens`, `outputTokens`, `totalTokens`, `creditsConsumed`, calls, and request evidence when EvoPilot returns them. Browser code must not calculate project token totals locally.
 
 ## Role-Based API Boundary
 

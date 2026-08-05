@@ -13,7 +13,8 @@ const dashboardComponentFiles = [
   "src/dashboard/components/console.tsx",
   "src/dashboard/components/evidence.tsx",
   "src/dashboard/components/management.tsx",
-  "src/dashboard/components/stage.tsx"
+  "src/dashboard/components/stage.tsx",
+  "src/dashboard/components/workspace-usage.tsx"
 ];
 const dashboardComponents = dashboardComponentFiles.map((file) => fs.readFileSync(file, "utf8")).join("\n");
 const dashboardSource = [app, dashboardController, dashboardModel, dashboardComponents].join("\n");
@@ -141,7 +142,13 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Workspaces",
     "Users",
     "Harness Templates",
-    "HarnessTemplateEvolution"
+    "HarnessTemplateEvolution",
+    "接入项目 LLM 用量追踪",
+    "Project LLM Usage",
+    "WorkspaceUsagePanel",
+    "providerModelUsage",
+    "latestLoopTotalTokens",
+    "shareOfWorkspace"
   ]) {
     assert.match(dashboardSource, new RegExp(escapeRegExp(text)));
   }
@@ -223,6 +230,7 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/projects",
     "/api/v1/onboarding/project/checklist",
     "/api/v1/projects/${encodeURIComponent(projectId)}/onboarding-checklist",
+    "/api/v1/projects/${encodeURIComponent(projectId)}/usage",
     "/api/v1/projects/${encodeURIComponent(projectId)}/source-credentials/preflight",
     "/api/v1/projects/${encodeURIComponent(projectId)}/devops/preflight",
     "/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight",
@@ -265,6 +273,7 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/secrets",
     "/api/v1/tenants",
     "/api/v1/workspaces",
+    "/api/v1/workspaces/${encodeURIComponent(workspaceId)}/usage",
     "/api/v1/users",
     "/api/v1/loop-workers/queue"
   ]) {
@@ -272,6 +281,9 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
   }
 
   assert.doesNotMatch(api, /\/api\/v1\/deploy-connectors/);
+  assert.match(dashboardSource, /snapshot\.workspaceUsage/);
+  assert.match(docsApiUsage, /Browser code must not calculate project token totals locally/);
+  assert.doesNotMatch(dashboardSource, /reduce\(\(.*totalTokens/s);
 });
 
 test("optional sibling EvoPilot OpenAPI contains the dashboard contract paths", () => {
@@ -291,6 +303,7 @@ test("optional sibling EvoPilot OpenAPI contains the dashboard contract paths", 
     "/api/v1/summary",
     "/api/v1/projects",
     "/api/v1/onboarding/project/checklist",
+    "/api/v1/projects/{projectId}/usage",
     "/api/v1/harness/templates",
     "/api/v1/harness/template-evolutions",
     "/api/v1/harness/policies",
@@ -316,7 +329,8 @@ test("optional sibling EvoPilot OpenAPI contains the dashboard contract paths", 
     "/api/v1/release/decisions",
     "/api/v1/release/evidence",
     "/api/v1/audit",
-    "/api/v1/llm-profiles"
+    "/api/v1/llm-profiles",
+    "/api/v1/workspaces/{workspaceId}/usage"
   ]) {
     assert.equal(paths.includes(required), true, `${required} should exist in sibling EvoPilot OpenAPI`);
   }
