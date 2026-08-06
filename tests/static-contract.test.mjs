@@ -10,6 +10,7 @@ const dashboardController = fs.readFileSync("src/dashboard/hooks/useAgentConsole
 const dashboardComponentFiles = [
   "src/dashboard/components.tsx",
   "src/dashboard/components/auth.tsx",
+  "src/dashboard/components/composer.tsx",
   "src/dashboard/components/console.tsx",
   "src/dashboard/components/evidence.tsx",
   "src/dashboard/components/management.tsx",
@@ -352,6 +353,11 @@ test("dashboard project onboarding follows current EvoPilot DevOps contract", ()
   assert.match(`${app}\n${docsDevopsBoundary}`, /GitLab/);
   assert.match(`${app}\n${docsDevopsBoundary}`, /executionMode/);
   assert.match(`${app}\n${docsDevopsBoundary}`, /fork-validated-pr/);
+  assert.match(dashboardSource, /sourceMode/);
+  assert.match(dashboardSource, /external-source/);
+  assert.match(dashboardSource, /workflowProvider/);
+  assert.match(dashboardSource, /gitlabRef/);
+  assert.match(dashboardSource, /GitHub source \+ GitLab CI/);
   assert.match(docsDevopsBoundary, /claimBoundary/);
   assert.match(`${app}\n${docsDevopsBoundary}`, /tokenRef/);
   assert.match(docsDevopsBoundary, /Server-side credentialRef\/tokenRef/);

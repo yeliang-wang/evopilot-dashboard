@@ -1,14 +1,7 @@
 import { type CSSProperties } from "react";
 import {
-  CheckCircle2,
-  Eye,
-  LogIn,
-  LogOut,
-  Play,
   RefreshCw,
-  Send,
-  ShieldCheck,
-  Wrench
+  ShieldCheck
 } from "lucide-react";
 import {
   apiSurface,
@@ -38,6 +31,11 @@ import {
   type WorkspaceForm
 } from "../model";
 import { fallbackProfileYaml } from "./evidence";
+import {
+  deliveryChainLabel,
+  normalizeDeliveryChain,
+  repositoryProviderForChain
+} from "../model";
 
 export function Sidebar({
   activePage,
@@ -252,18 +250,22 @@ function MessageCard({
 }
 
 function IntakeCard({ context }: { context: ProjectLoopContext }) {
+  const chain = normalizeDeliveryChain(context.deliveryChain) ?? "github-native";
+  const workflowRepository = chain === "github-source-gitlab-ci"
+    ? context.workflowProjectId || context.workflowRepository || "GitLab project pending"
+    : context.workflowRepository || context.repositoryUrl || "repository workflow";
   return (
     <div className="card">
       <div className="card-head">
         <div>
           <strong>Intake summary</strong>
-          <span>EvoPilot 会自动解析项目和目标，不要求普通用户理解 CLI 参数。</span>
+          <span>EvoPilot 会按项目源码系统和 CI/Loop 执行系统生成接入检查。</span>
         </div>
         <span className="tag blue">DRAFT</span>
       </div>
       <div className="card-body metrics three">
-        <Metric label="Repo" value={context.repositoryProvider || "GitHub"} note={context.repositoryUrl || "Enter repository URL"} />
-        <Metric label="Goal target" value="GA-ready" note={context.goalLoopTarget || "Describe enterprise readiness"} />
+        <Metric label="Source" value={repositoryProviderForChain(chain)} note={context.repositoryUrl || "Enter repository URL"} />
+        <Metric label="CI/Loop" value={chain === "github-native" ? "GitHub Actions" : "GitLab CI"} note={workflowRepository} />
         <Metric label="Owner gate" value="Required" note="profile activation needs confirmation" />
       </div>
     </div>
@@ -516,142 +518,5 @@ function TimelineRow({ status, name, detail, tone }: { status: string; name: str
       <strong>{name}</strong>
       <span>{detail}</span>
     </div>
-  );
-}
-
-export function Composer({
-  consoleStep,
-  context,
-  goal,
-  ownerChange,
-  busyAction,
-  onPatchContext,
-  onGoalChange,
-  onOwnerChange,
-  onStart,
-  onRequestChanges,
-  onConfirm,
-  onApproveAndAdvance,
-  onViewEvidence,
-  onViewRelease
-}: {
-  consoleStep: ConsoleStep;
-  context: ProjectLoopContext;
-  goal: string;
-  ownerChange: string;
-  busyAction?: string;
-  onPatchContext: (patch: Partial<ProjectLoopContext>) => void;
-  onGoalChange: (goal: string) => void;
-  onOwnerChange: (value: string) => void;
-  onStart: () => void;
-  onRequestChanges: () => void;
-  onConfirm: () => void;
-  onApproveAndAdvance: () => void;
-  onViewEvidence: () => void;
-  onViewRelease: () => void;
-}) {
-  const disabled = Boolean(busyAction);
-  if (consoleStep === "intake" || consoleStep === "template-match" || consoleStep === "drafting") {
-    return (
-      <section className="composer" aria-label="Project goal composer">
-        <div className="composer-grid">
-          <label>
-            <span>Repository</span>
-            <input
-              value={context.repositoryUrl}
-              placeholder="https://github.com/org/project.git"
-              onChange={(event) => onPatchContext({ repositoryUrl: event.currentTarget.value })}
-            />
-          </label>
-          <label>
-            <span>Goal Loop Target</span>
-            <textarea value={goal} placeholder="Describe the project goal..." onChange={(event) => onGoalChange(event.currentTarget.value)} />
-          </label>
-        </div>
-        <div className="composer-footer">
-          <span>Enter repository and goal target. EvoPilot will auto-match template harness and return a DRAFT ProjectHarnessProfile.</span>
-          <button className="btn primary" type="button" onClick={onStart} disabled={disabled || !goal.trim()}>
-            <Send size={15} aria-hidden="true" /> {disabled ? "Working..." : "Start intake"}
-          </button>
-        </div>
-      </section>
-    );
-  }
-
-  if (consoleStep === "review" || consoleStep === "changes") {
-    return (
-      <section className="composer" aria-label="Owner review composer">
-        <textarea
-          value={ownerChange}
-          placeholder="Request a harness change, or confirm the displayed ProjectHarnessProfile.yaml."
-          onChange={(event) => onOwnerChange(event.currentTarget.value)}
-        />
-        <div className="composer-footer">
-          <span>修改会生成新的 DRAFT 差异，不会直接激活。</span>
-          <div className="actions">
-            <button className="btn primary" type="button" onClick={onRequestChanges} disabled={disabled || !ownerChange.trim()}>
-              <Send size={15} aria-hidden="true" /> Request changes
-            </button>
-            <button className="btn green" type="button" onClick={onConfirm} disabled={disabled}>
-              <CheckCircle2 size={15} aria-hidden="true" /> Confirm
-            </button>
-            <button className="btn" type="button" onClick={onViewEvidence}>
-              <Eye size={15} aria-hidden="true" /> View evidence
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (consoleStep === "activated") {
-    return (
-      <section className="composer" aria-label="Phase plan approval composer">
-        <div className="composer-grid approval">
-          <label>
-            <span>Confirmed By</span>
-            <input value={context.confirmedBy} placeholder="real project owner" onChange={(event) => onPatchContext({ confirmedBy: event.currentTarget.value })} />
-          </label>
-          <label>
-            <span>Confirmation</span>
-            <textarea value={context.confirmation} placeholder="Project owner reviewed the active harness binding and Alpha/Beta/RC/GA phase plan." onChange={(event) => onPatchContext({ confirmation: event.currentTarget.value })} />
-          </label>
-        </div>
-        <div className="composer-footer">
-          <span>Phase plan approval needs real confirmation. Dashboard will not invent it.</span>
-          <button className="btn primary" type="button" onClick={onApproveAndAdvance} disabled={disabled || !context.confirmedBy.trim() || !context.confirmation.trim()}>
-            <Play size={15} aria-hidden="true" /> Approve plan & start loop
-          </button>
-        </div>
-      </section>
-    );
-  }
-
-  if (consoleStep === "blocker") {
-    return (
-      <section className="composer" aria-label="Blocker composer">
-        <textarea readOnly value="批准修复 blocker 前，请先查看 requestId、日志、失败能力和建议修复范围。" />
-        <div className="composer-footer">
-          <span>Stop on blocker unless the project owner or administrator approves repair.</span>
-          <div className="actions">
-            <button className="btn warn" type="button" onClick={onViewEvidence}><Wrench size={15} aria-hidden="true" /> View repair evidence</button>
-            <button className="btn" type="button" onClick={onViewRelease}>Refresh release evidence</button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="composer" aria-label="Release decision composer">
-      <textarea readOnly value="确认发布前，请读取 release decision、TargetEvidencePackage、PhasePackage 和 residual risk。" />
-      <div className="composer-footer">
-        <span>Release truth comes from EvoPilot evidence packages and release decisions.</span>
-        <div className="actions">
-          <button className="btn green" type="button" onClick={onViewRelease}><CheckCircle2 size={15} aria-hidden="true" /> Confirm release</button>
-          <button className="btn" type="button" onClick={onViewEvidence}><Eye size={15} aria-hidden="true" /> View evidence</button>
-        </div>
-      </div>
-    </section>
   );
 }

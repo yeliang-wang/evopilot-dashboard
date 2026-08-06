@@ -21,8 +21,11 @@ import {
   type DashboardSession
 } from "../../api";
 import {
+  deliveryChainLabel,
   defaultScope,
   fieldText,
+  normalizeDeliveryChain,
+  repositoryProviderForChain,
   resultItems,
   roleLabel,
   type ChatMessage,
@@ -142,12 +145,22 @@ export function EvidenceDrawer({
     api: ["API action evidence", apiNotice]
   };
   const [title, subtitle] = titleMap[kind];
+  const chain = normalizeDeliveryChain(context.deliveryChain) ?? "github-native";
+  const sourceProvider = repositoryProviderForChain(chain);
+  const workflowRepository = chain === "github-source-gitlab-ci"
+    ? context.workflowProjectId || context.workflowRepository || "missing"
+    : context.workflowRepository || context.repositoryUrl || "missing";
+  const workflowProvider = chain === "github-native" ? "github-actions" : "gitlab-ci";
 
   return (
     <aside className="drawer">
       <DrawerHead title={title} subtitle={subtitle} />
       <div className="drawer-body">
         <EvidenceRow label="requestId" value={lastAction?.requestId ?? "not returned"} />
+        <EvidenceRow label="project" value={context.projectId || "not set"} />
+        <EvidenceRow label="source" value={`${sourceProvider} · ${context.repositoryUrl || "repository missing"} · branch=${context.defaultBranch || "main"}`} />
+        <EvidenceRow label="CI/Loop" value={`${workflowProvider} · ${deliveryChainLabel(chain)} · ${workflowRepository}`} />
+        <EvidenceRow label="LLM profile" value={context.llmProfileId || "not selected"} />
         <EvidenceRow label="profileDraft" value={`${profileDraft.profileId}${profileDraft.version ? ` v${profileDraft.version}` : ""} · ${profileDraft.sourceDigest ?? "sourceDigest missing"}`} />
         <EvidenceRow label="compiledDigest" value={profileDraft.compiledDigest ?? "not returned"} />
         <EvidenceRow label="policyRefs" value={profileDraft.policyRefs.join(", ") || "none"} />
@@ -161,6 +174,7 @@ export function EvidenceDrawer({
           </div>
           <LogLine level={lastAction?.ok ? "INFO" : lastAction ? "ERROR" : "INFO"} text={lastAction?.error ?? lastAction?.actionLabel ?? "No API action yet"} />
           <LogLine level="INFO" text={`project=${context.projectId || "not-set"} goal=${context.goalId || "not-set"} loop=${context.loopId || "not-set"}`} />
+          <LogLine level="INFO" text={`source=${sourceProvider} workflow=${workflowProvider} deliveryChain=${chain}`} />
           <LogLine level={lastAction?.nextAction ? "WARN" : "INFO"} text={`nextAction=${lastAction?.nextAction ?? "none"} blockers=${lastAction?.blockers?.join(", ") || "none"}`} />
         </div>
         <details className="drawer-card">
@@ -169,6 +183,9 @@ export function EvidenceDrawer({
           <label><span>Goal ID</span><input value={context.goalId} onChange={(event) => onPatchContext({ goalId: event.currentTarget.value })} /></label>
           <label><span>Loop ID</span><input value={context.loopId} onChange={(event) => onPatchContext({ loopId: event.currentTarget.value })} /></label>
           <label><span>Token Ref</span><input value={context.tokenRef} onChange={(event) => onPatchContext({ tokenRef: event.currentTarget.value })} /></label>
+          <label><span>DevOps Token Ref</span><input value={context.devopsTokenRef} onChange={(event) => onPatchContext({ devopsTokenRef: event.currentTarget.value })} /></label>
+          <label><span>Workflow Repository</span><input value={context.workflowProjectId || context.workflowRepository} onChange={(event) => onPatchContext({ workflowProjectId: event.currentTarget.value, workflowRepository: event.currentTarget.value })} /></label>
+          <label><span>GitLab Ref</span><input value={context.gitlabRef} onChange={(event) => onPatchContext({ gitlabRef: event.currentTarget.value })} /></label>
           <label><span>LLM Profile</span><input value={context.llmProfileId} onChange={(event) => onPatchContext({ llmProfileId: event.currentTarget.value })} /></label>
           <label><span>Template override</span><input value={context.templateId} onChange={(event) => onPatchContext({ templateId: event.currentTarget.value })} /></label>
         </details>

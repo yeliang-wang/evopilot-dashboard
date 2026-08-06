@@ -7,17 +7,19 @@
 - Repository URL or local path.
 - Goal Loop Target as a business objective.
 - Optional projectId and project name.
-- Source provider, default branch, tokenRef, execution mode, DevOps owner, CI workflow, required check, and LLM profile when needed.
+- Source provider, default branch, tokenRef, delivery chain, execution mode, DevOps owner, CI workflow/check or GitLab stage/job, bridge workflow project, DevOps tokenRef, and LLM profile when needed.
 
 ## Steps
 
 1. Open **# Agent Console**.
 2. Fill **Repository**.
 3. Fill **Goal Loop Target**.
-4. Open **Advanced Control Details** only when real project, DevOps, credential, LLM, or profile IDs are known.
-5. Click **Start intake**.
-6. Read **Project Onboarding Checklist** status, blockers, requestId, and nextAction.
-7. Continue only when the checklist allows harness profile generation and phase planning.
+4. Select the delivery chain.
+5. Fill source tokenRef and CI/Loop fields that are known.
+6. Open **Advanced Control Details** only when real project, DevOps, credential, LLM, or profile IDs are known.
+7. Click **Start intake**.
+8. Read **Project Onboarding Checklist** status, blockers, requestId, and nextAction.
+9. Continue only when the checklist allows harness profile generation and phase planning.
 
 ## Expected Result
 
@@ -34,7 +36,7 @@
 | `connect-github-account` | GitHub writeback or GitHub Actions needs a user/org/service principal. | Connect or create the GitHub account/org, fork or authorize the repo, store tokenRef, and re-run checklist. |
 | `connect-gitlab-account` | GitLab writeback or GitLab CI needs a user/group/deploy principal. | Connect or create the GitLab account/group, fork or authorize the project, store tokenRef, and re-run checklist. |
 | `BLOCKED` | Required provider, branch, tokenRef, or repository condition is missing. | Fix blockers and re-run Review Pack. |
-| Provider mismatch | GitHub project configured with GitLab CI or inverse. | Correct provider and DevOps config. |
+| Provider mismatch | GitHub/GitLab native mode was mixed without explicit bridge configuration. | Correct provider or select GitHub source + GitLab CI bridge. |
 
 ## Do Not Do
 

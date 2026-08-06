@@ -36,8 +36,8 @@ Do not expect workspace/project cards, active sessions, recent decisions, user f
 | Stage bar | `Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Loop Execution -> Release Decision`. | This is workflow orientation, not server truth by itself. |
 | Conversation | Main ordinary-user interaction. | Read inline cards in order. |
 | ProjectHarnessProfile.yaml card | Human-readable harness DRAFT. | Stop for owner review before activation. |
-| Composer | Repository/goal input, change request, confirmation, loop/release actions. | Buttons map to EvoPilot APIs. |
-| Evidence Drawer | Request IDs, digests, policy refs, generatedBy, API actions, logs, projections. | Use this for WorkBuddy reports and troubleshooting. |
+| Composer | Repository, delivery chain, goal input, change request, confirmation, loop/release actions. | Buttons map to EvoPilot APIs. |
+| Evidence Drawer | Request IDs, source system, CI/Loop executor, workflow repository, LLM profile, digests, policy refs, generatedBy, API actions, logs, projections. | Use this for WorkBuddy reports and troubleshooting. |
 
 ## Administration Pages
 

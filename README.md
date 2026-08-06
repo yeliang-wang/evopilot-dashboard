@@ -7,7 +7,7 @@
 [![CI](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://react.dev/)
-[![Release](https://img.shields.io/badge/Release-v1.0.11%20GA-2ea043)](./docs/releases/1.0.11.md)
+[![Release](https://img.shields.io/badge/Release-v1.0.12%20GA-2ea043)](./docs/releases/1.0.12.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 Admins provision scoped users. Users sign in, connect GitHub/GitLab projects, describe goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` drafts, and run governed loops from a browser.
@@ -47,9 +47,9 @@ Login is the first screen. The left navigation follows the fixed product baselin
 
 | Area | What the Dashboard does |
 | --- | --- |
-| Agent Console | Project intake, goal loop target submission, harness draft review, and loop operation in one chat-first workspace. |
+| Agent Console | Project intake, delivery-chain selection, goal loop target submission, harness draft review, and loop operation in one chat-first workspace. |
 | Harness governance | EvoPilot auto-matches templates; users review `ProjectHarnessProfile.yaml` before activation. |
-| Evidence | Request IDs, digests, policy refs, logs, blockers, `nextAction`, release decisions, and token usage in the Evidence Drawer. |
+| Evidence | Request IDs, source/CI boundary, LLM profile, digests, policy refs, logs, blockers, `nextAction`, release decisions, and token usage in the Evidence Drawer. |
 | Project LLM usage | Workspaces shows EvoPilot-projected project/provider/model/profile usage, token totals, latest loop tokens, and request IDs. |
 | Auth and scope | Login-first operation with tenant/workspace/actor scope locked by EvoPilot. |
 | Admin pages | Tenants, workspaces, users, harness template evolution, and audit for permitted roles. |

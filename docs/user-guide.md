@@ -14,15 +14,16 @@ Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Re
 2. Complete password change when EvoPilot requires it.
 3. Confirm the header shows `scope locked`, tenant, workspace, role, and API status.
 4. Enter a GitHub, GitLab, or local repository URL.
-5. Describe the goal loop target in normal language.
-6. Click **Start intake**.
-7. Wait for EvoPilot to automatically match a `HarnessTemplate` and generate `ProjectHarnessProfile.yaml` DRAFT.
-8. Review the generated `ProjectHarnessProfile.yaml` DRAFT.
-9. Click **Request changes** when the harness definition is wrong or incomplete.
-10. Click **Confirm** only after the DRAFT harness is acceptable.
-11. Provide real `Confirmed By` and `Confirmation` text for phase-plan approval.
-12. Start or advance the loop.
-13. Open the **Evidence Drawer** for request IDs, digests, policy refs, blockers, next actions, and logs.
+5. Select the delivery chain: GitHub source + GitHub Actions, GitLab source + GitLab CI, or GitHub source + GitLab CI Bridge.
+6. Describe the goal loop target in normal language.
+7. Click **Start intake**.
+8. Wait for EvoPilot to automatically match a `HarnessTemplate` and generate `ProjectHarnessProfile.yaml` DRAFT.
+9. Review the generated `ProjectHarnessProfile.yaml` DRAFT.
+10. Click **Request changes** when the harness definition is wrong or incomplete.
+11. Click **Confirm** only after the DRAFT harness is acceptable.
+12. Provide real `Confirmed By` and `Confirmation` text for phase-plan approval.
+13. Start or advance the loop.
+14. Open the **Evidence Drawer** for request IDs, source/CI boundary, LLM profile, digests, policy refs, blockers, next actions, and logs.
 
 Ordinary users do not choose the public `HarnessTemplate` manually. Template selection belongs to EvoPilot and is based on repository context, runtime signals, tenant/workspace policy, history when present, and the goal loop target.
 
@@ -38,6 +39,16 @@ Ordinary users do not choose the public `HarnessTemplate` manually. Template sel
 | `Audit` |
 
 Project context, active sessions, recent decisions, and user details are not sidebar content. They appear in the main Agent Console, the relevant admin page, or the Evidence Drawer. `Tenants`, `Workspaces`, `Users`, and `Harness Templates` call EvoPilot APIs and still obey RBAC, audit, and `nextAction` stop rules.
+
+## Delivery Chain
+
+Agent Console intake supports three EvoPilot project chains:
+
+- GitHub source + GitHub Actions
+- GitLab source + GitLab CI
+- GitHub source + GitLab CI Bridge
+
+For the bridge chain, Dashboard submits EvoPilot's explicit `sourceMode=external-source` contract and keeps GitHub source credentials separate from the GitLab CI DevOps tokenRef.
 
 ## ProjectHarnessProfile.yaml
 
@@ -58,6 +69,9 @@ Confirming the DRAFT activates a project-level harness contract. It is not just 
 Use **View evidence** when you need audit or AI-agent details:
 
 - `requestId`
+- source system
+- CI/Loop executor and workflow repository
+- LLM profile
 - `sourceDigest`
 - `compiledDigest`
 - `policyRefs`

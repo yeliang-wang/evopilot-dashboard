@@ -21,6 +21,7 @@ export type ConsoleStep =
 
 export type DrawerKind = "session" | "review" | "diff" | "blocker" | "release" | "api";
 export type PageId = "console" | "tenants" | "workspaces" | "users" | "templates" | "audit";
+export type ProjectDeliveryChain = "github-native" | "gitlab-native" | "github-source-gitlab-ci";
 
 export type MessageRole = "user" | "agent";
 
@@ -30,10 +31,23 @@ export interface ProjectLoopContext extends DashboardProjectionContext {
   repositoryUrl: string;
   defaultBranch: string;
   tokenRef: string;
+  deliveryChain: ProjectDeliveryChain;
   executionMode: string;
   devopsOwner: string;
   ciWorkflow: string;
   ciRequiredCheck: string;
+  ciRequiredStage: string;
+  ciRequiredJob: string;
+  workflowProvider: string;
+  workflowBaseUrl: string;
+  workflowRepository: string;
+  workflowProjectId: string;
+  workflowBranch: string;
+  gitlabRef: string;
+  devopsTokenRef: string;
+  cdRequiredStage: string;
+  cdRequiredJob: string;
+  readyUrl: string;
   llmProfileId: string;
   profileId: string;
   profileVersion: string;
@@ -134,10 +148,23 @@ export const defaultContext: ProjectLoopContext = {
   repositoryUrl: storage.getItem("evopilot.repositoryUrl") ?? (demoMode ? "https://github.com/acme/inventory-service.git" : ""),
   defaultBranch: storage.getItem("evopilot.defaultBranch") ?? "main",
   tokenRef: storage.getItem("evopilot.tokenRef") ?? "",
+  deliveryChain: normalizeDeliveryChain(storage.getItem("evopilot.deliveryChain")) ?? "github-native",
   executionMode: storage.getItem("evopilot.executionMode") ?? "owned-repository",
   devopsOwner: storage.getItem("evopilot.devopsOwner") ?? (demoMode ? "acme" : ""),
   ciWorkflow: storage.getItem("evopilot.ciWorkflow") ?? "ci.yml",
   ciRequiredCheck: storage.getItem("evopilot.ciRequiredCheck") ?? "build",
+  ciRequiredStage: storage.getItem("evopilot.ciRequiredStage") ?? "test",
+  ciRequiredJob: storage.getItem("evopilot.ciRequiredJob") ?? "build",
+  workflowProvider: storage.getItem("evopilot.workflowProvider") ?? "gitlab",
+  workflowBaseUrl: storage.getItem("evopilot.workflowBaseUrl") ?? "",
+  workflowRepository: storage.getItem("evopilot.workflowRepository") ?? "",
+  workflowProjectId: storage.getItem("evopilot.workflowProjectId") ?? "",
+  workflowBranch: storage.getItem("evopilot.workflowBranch") ?? "main",
+  gitlabRef: storage.getItem("evopilot.gitlabRef") ?? "main",
+  devopsTokenRef: storage.getItem("evopilot.devopsTokenRef") ?? "",
+  cdRequiredStage: storage.getItem("evopilot.cdRequiredStage") ?? "",
+  cdRequiredJob: storage.getItem("evopilot.cdRequiredJob") ?? "",
+  readyUrl: storage.getItem("evopilot.readyUrl") ?? "",
   llmProfileId: storage.getItem("evopilot.llmProfileId") ?? "",
   profileId: storage.getItem("evopilot.profileId") ?? "default",
   profileVersion: storage.getItem("evopilot.profileVersion") ?? "",
@@ -199,6 +226,28 @@ export function normalizeDemoStep(value: string | null): ConsoleStep | undefined
 export function normalizePage(value: string | null): PageId | undefined {
   const allowed: PageId[] = ["console", "tenants", "workspaces", "users", "templates", "audit"];
   return allowed.find((page) => page === value);
+}
+
+export function normalizeDeliveryChain(value: string | null | undefined): ProjectDeliveryChain | undefined {
+  const text = String(value ?? "").trim();
+  if (text === "github-native" || text === "github-actions") return "github-native";
+  if (text === "gitlab-native" || text === "gitlab-ci") return "gitlab-native";
+  if (text === "github-source-gitlab-ci" || text === "github-gitlab-bridge" || text === "external-source") return "github-source-gitlab-ci";
+  return undefined;
+}
+
+export function deliveryChainLabel(chain: ProjectDeliveryChain): string {
+  if (chain === "github-native") return "GitHub source + GitHub Actions";
+  if (chain === "gitlab-native") return "GitLab source + GitLab CI";
+  return "GitHub source + GitLab CI Bridge";
+}
+
+export function repositoryProviderForChain(chain: ProjectDeliveryChain): string {
+  return chain === "gitlab-native" ? "gitlab" : "github";
+}
+
+export function devopsProviderForChain(chain: ProjectDeliveryChain): "github-actions" | "gitlab-ci" {
+  return chain === "github-native" ? "github-actions" : "gitlab-ci";
 }
 
 export function nowTime() {
@@ -312,6 +361,29 @@ export function extractGoalId(value: unknown): string | undefined {
 
 export function buildOnboardingAction(context: ProjectLoopContext): DashboardActionRequest {
   const projectId = context.projectId || projectIdFromRepository(context.repositoryUrl);
+  const chain = normalizeDeliveryChain(context.deliveryChain) ?? "github-native";
+  const repositoryProvider = repositoryProviderForChain(chain);
+  const devopsProvider = devopsProviderForChain(chain);
+  const bridgeMode = chain === "github-source-gitlab-ci";
+  const gitlabWorkflowRepository = context.workflowProjectId || context.workflowRepository;
+  const devopsTokenRef = context.devopsTokenRef || undefined;
+  const ci = devopsProvider === "github-actions"
+    ? {
+        workflow: context.ciWorkflow || undefined,
+        requiredChecks: context.ciRequiredCheck ? [context.ciRequiredCheck] : undefined
+      }
+    : {
+        ref: bridgeMode
+          ? context.gitlabRef || context.workflowBranch || undefined
+          : context.gitlabRef || context.defaultBranch || undefined,
+        requiredStages: context.ciRequiredStage ? [context.ciRequiredStage] : undefined,
+        requiredJobs: context.ciRequiredJob ? [context.ciRequiredJob] : undefined
+      };
+  const cd = context.cdRequiredStage || context.cdRequiredJob || context.readyUrl ? {
+    requiredStages: context.cdRequiredStage ? [context.cdRequiredStage] : undefined,
+    requiredJobs: context.cdRequiredJob ? [context.cdRequiredJob] : undefined,
+    readyUrl: context.readyUrl || undefined
+  } : undefined;
   return {
     id: "project-preflight",
     label: "Project Onboarding Checklist",
@@ -321,17 +393,36 @@ export function buildOnboardingAction(context: ProjectLoopContext): DashboardAct
       id: projectId,
       name: context.projectName || projectId,
       repository: {
-        provider: context.repositoryProvider,
+        provider: repositoryProvider,
         gitUrl: context.repositoryUrl,
         defaultBranch: context.defaultBranch
       },
       tokenRef: context.tokenRef || undefined,
       devops: {
+        provider: devopsProvider,
+        sourceMode: bridgeMode ? "external-source" : "repository-native",
         executionMode: context.executionMode,
         devopsOwner: context.devopsOwner || undefined,
-        workflowRepository: context.repositoryUrl || undefined,
-        ciWorkflow: context.ciWorkflow || undefined,
-        requiredChecks: context.ciRequiredCheck ? [context.ciRequiredCheck] : undefined
+        workflowRepository: bridgeMode ? undefined : context.workflowRepository || context.repositoryUrl || undefined,
+        workflowProvider: bridgeMode ? context.workflowProvider || "gitlab" : undefined,
+        workflowBaseUrl: bridgeMode ? context.workflowBaseUrl || undefined : undefined,
+        workflowRepo: bridgeMode ? context.workflowRepository || undefined : undefined,
+        workflowProjectId: bridgeMode ? gitlabWorkflowRepository || undefined : undefined,
+        workflowBranch: bridgeMode ? context.workflowBranch || undefined : undefined,
+        gitlabRef: bridgeMode ? context.gitlabRef || context.workflowBranch || undefined : undefined,
+        tokenRef: devopsTokenRef,
+        bridge: bridgeMode ? {
+          workflowProvider: context.workflowProvider || "gitlab",
+          workflowRepository: {
+            provider: "gitlab",
+            baseUrl: context.workflowBaseUrl || undefined,
+            projectId: gitlabWorkflowRepository || undefined,
+            defaultBranch: context.workflowBranch || undefined
+          },
+          gitlabRef: context.gitlabRef || context.workflowBranch || undefined
+        } : undefined,
+        ci,
+        cd
       },
       llmProfileId: context.llmProfileId || undefined,
       objective: context.goalLoopTarget

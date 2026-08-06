@@ -8,6 +8,24 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.12 - 2026-08-06
+
+### Added
+
+- Added Agent Console delivery chain selection for GitHub source + GitHub Actions, GitLab source + GitLab CI, and GitHub source + GitLab CI Bridge.
+- Added bridge intake fields for GitLab base URL, GitLab CI project, GitLab ref, source tokenRef, DevOps tokenRef, required stage, and required job.
+- Added Evidence Drawer rows for project, source system, CI/Loop executor, workflow repository, and LLM profile so AI agents can report the actual connected-project boundary.
+- Added static contract coverage for the bridge payload fields that Dashboard sends to EvoPilot onboarding.
+
+### Changed
+
+- Kept Dashboard as a browser HTTP client and mapped the new UI controls to EvoPilot's server-governed onboarding checklist instead of calculating readiness locally.
+- Split the Composer into its own component module to preserve Agent Console file-size boundaries after adding the new intake controls.
+
+### Validation
+
+- `npm run check`
+
 ## 1.0.11 - 2026-08-06
 
 ### Changed

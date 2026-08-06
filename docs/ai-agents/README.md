@@ -23,15 +23,16 @@ Assume the user account has already been created by an EvoPilot administrator. D
 5. Confirm the fixed left navigation from the table below.
 6. Enter the GitHub/GitLab repository URL.
 7. Enter the user's goal loop target.
-8. Click **Start intake**.
-9. Wait while EvoPilot automatically matches a `HarnessTemplate` and returns the inline `ProjectHarnessProfile.yaml` DRAFT.
-10. Stop and show the DRAFT to the user or project owner.
-11. If the user requests changes, enter the change request and click **Request changes**.
-12. Repeat review until the user confirms.
-13. Click **Confirm** to activate only the reviewed profile.
-14. Review phase plan binding, fill real `Confirmed By` and `Confirmation`, then approve.
-15. Start or advance the loop.
-16. Use the **Evidence Drawer** to report request IDs, profile digests, policy refs, blockers, next actions, and release decisions.
+8. Select the delivery chain; when source and CI/Loop differ, use the explicit GitHub source + GitLab CI bridge chain.
+9. Click **Start intake**.
+10. Wait while EvoPilot automatically matches a `HarnessTemplate` and returns the inline `ProjectHarnessProfile.yaml` DRAFT.
+11. Stop and show the DRAFT to the user or project owner.
+12. If the user requests changes, enter the change request and click **Request changes**.
+13. Repeat review until the user confirms.
+14. Click **Confirm** to activate only the reviewed profile.
+15. Review phase plan binding, fill real `Confirmed By` and `Confirmation`, then approve.
+16. Start or advance the loop.
+17. Use the **Evidence Drawer** to report request IDs, source system, CI/Loop executor, workflow repository, LLM profile, profile digests, policy refs, blockers, next actions, and release decisions.
 
 | Expected left navigation |
 |---|
