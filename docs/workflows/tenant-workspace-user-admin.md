@@ -12,9 +12,9 @@
 
 1. Log in as a platform administrator or authorized tenant administrator.
 2. Confirm `scope locked`, role, tenant, and workspace in the header.
-3. Open **Tenants** to create a tenant, initial workspace, and tenant admin when platform admin privileges are present.
-4. Open **Workspaces** to create or inspect workspace boundaries and quotas.
-5. Open **Users** to create scoped users with `mustChangePassword=true`.
+3. Open **Tenants** to create or update tenant registry metadata when platform admin privileges are present.
+4. Open **Workspaces** to create or inspect workspace boundaries and quotas for that tenant.
+5. Open **Users** to create or update scoped users with `mustChangePassword=true` on first sign-in.
 6. Open **Audit** and verify requestId, action, actor, scope, status, and nextAction when available.
 
 ## Expected Result

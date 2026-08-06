@@ -8,6 +8,22 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.11 - 2026-08-06
+
+### Changed
+
+- Converted Tenants, Workspaces, Users, and Harness Templates management forms from persistent right-side panels into scoped modal dialogs opened from page and row actions.
+- Converted Audit evidence review into a row/detail modal that shows selected audit event fields plus last action evidence.
+- Kept the left sidebar and Agent Console flow unchanged while giving management pages full-width list/projection surfaces.
+- Aligned Tenants management copy and submit body with the real EvoPilot tenant upsert API, leaving workspace and user setup to their own pages.
+
+### Validation
+
+- `npm run check`
+- `npm run test:e2e:mock`
+- `npm run typecheck`
+- Chrome local screenshots for Tenants, Workspaces, Users, Harness Templates, Audit, and mobile Workspaces
+
 ## 1.0.10 - 2026-08-05
 
 ### Fixed

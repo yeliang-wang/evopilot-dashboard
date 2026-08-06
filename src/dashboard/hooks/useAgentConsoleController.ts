@@ -79,11 +79,9 @@ export function useAgentConsoleController() {
   const [activePage, setActivePage] = useState<PageId>(demoPage ?? "console");
   const [tenantForm, setTenantForm] = useState<TenantForm>({
     tenantId: "tenant-payments",
-    workspaceId: "workspace-payment-agents",
-    adminUser: "payments-admin",
-    role: "admin",
-    platformAdmin: "false",
-    password: ""
+    name: "Payments",
+    plan: "SaaS",
+    status: "ACTIVE"
   });
   const [workspaceForm, setWorkspaceForm] = useState<WorkspaceForm>({
     tenantId: defaultScope.tenantId,

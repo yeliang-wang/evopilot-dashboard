@@ -1,18 +1,13 @@
+import { useState, type ReactNode } from "react";
 import {
-  CheckCircle2,
   Eye,
-  LogIn,
-  LogOut,
-  Play,
+  Pencil,
+  Plus,
   RefreshCw,
-  Send,
-  ShieldCheck,
-  Wrench
+  X
 } from "lucide-react";
 import {
   apiSurface,
-  configuredApiBaseUrl,
-  controlPlaneBaseUrl,
   type ApiResult,
   type DashboardActionRequest,
   type DashboardActionResult,
@@ -24,13 +19,7 @@ import {
   fieldText,
   resultItems,
   roleLabel,
-  type ChatMessage,
-  type ConsoleStep,
-  type DrawerKind,
-  type HarnessProfileDraft,
   type PageId,
-  type ProjectLoopContext,
-  type ReviewStep,
   type TemplateEvolutionForm,
   type TenantForm,
   type UserForm,
@@ -38,6 +27,9 @@ import {
 } from "../model";
 import { EvidenceRow, LogLine } from "./evidence";
 import { WorkspaceUsagePanel } from "./workspace-usage";
+
+type RowRecord = Record<string, unknown>;
+type DialogMode = "create" | "edit";
 
 export function ManagementPage({
   page,
@@ -97,59 +89,80 @@ function TenantsPage({
   onRunAction: (action: DashboardActionRequest) => void;
 }) {
   const rows = resultItems(snapshot.tenants, ["tenants"]).slice(0, 8);
+  const [dialog, setDialog] = useState<DialogMode | undefined>();
+
+  function openCreate() {
+    onForm({
+      tenantId: "",
+      name: "",
+      plan: "SaaS",
+      status: "ACTIVE"
+    });
+    setDialog("create");
+  }
+
+  function openEdit(row: RowRecord) {
+    const tenantId = fieldText(row, ["id", "tenantId"], form.tenantId);
+    onForm({
+      tenantId,
+      name: fieldText(row, ["name"], tenantId),
+      plan: fieldText(row, ["plan", "tier"], form.plan),
+      status: fieldText(row, ["status", "state"], form.status)
+    });
+    setDialog("edit");
+  }
+
+  const submitAction: DashboardActionRequest = {
+    id: dialog === "edit" ? "admin-update-tenant" : "admin-create-tenant",
+    label: dialog === "edit" ? "Update tenant" : "Create tenant/workspace/admin",
+    method: "POST",
+    path: apiSurface.tenants,
+    body: {
+      id: form.tenantId,
+      name: form.name || form.tenantId,
+      plan: form.plan || undefined,
+      status: form.status || undefined
+    }
+  };
+
   return (
     <main className="management-workspace">
-      <section className="management-layout">
-        <DataPanel
-          title="创建租户、工作区和租户管理员"
-          subtitle="只有 platform admin 能跨 tenant 管理边界。"
-          rows={rows}
-          columns={[
-            ["Tenant", ["id", "tenantId", "name"]],
-            ["Plan", ["plan", "tier"]],
-            ["Workspaces", ["workspaceCount", "workspaces"]],
-            ["Users", ["userCount", "users"]],
-            ["Status", ["status", "state"]]
-          ]}
-          empty="No tenants returned by EvoPilot."
-        />
-        <aside className="form-panel">
-          <PanelTitle eyebrow="Tenant registry" title="初始化新租户" />
-          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} /></label>
-          <label><span>Workspace ID</span><input value={form.workspaceId} onChange={(event) => onForm({ ...form, workspaceId: event.currentTarget.value })} /></label>
-          <label><span>租户管理员</span><input value={form.adminUser} onChange={(event) => onForm({ ...form, adminUser: event.currentTarget.value })} /></label>
+      <DataPanel
+        title="租户管理"
+        subtitle="Platform admin 管理 tenant registry；workspace 和用户在各自页面处理。"
+        rows={rows}
+        columns={[
+          ["Tenant", ["id", "tenantId", "name"]],
+          ["Plan", ["plan", "tier"]],
+          ["Workspaces", ["workspaceCount", "workspaces"]],
+          ["Users", ["userCount", "users"]],
+          ["Status", ["status", "state"]]
+        ]}
+        empty="No tenants returned by EvoPilot."
+        toolbar={<button className="btn primary" type="button" onClick={openCreate}><Plus size={15} aria-hidden="true" /> 初始化租户</button>}
+        actionLabel="修改"
+        onRowAction={openEdit}
+      />
+      {dialog && (
+        <AdminDialog
+          eyebrow="Tenant registry"
+          title={dialog === "edit" ? "修改租户" : "初始化新租户"}
+          subtitle={`${form.tenantId || "new tenant"} · ${form.plan || "plan"}`}
+          primaryLabel={dialog === "edit" ? "保存租户" : "创建租户"}
+          busy={busyAction === submitAction.id}
+          disabled={!form.tenantId}
+          lastAction={lastAction}
+          onClose={() => setDialog(undefined)}
+          onSubmit={() => onRunAction(submitAction)}
+        >
+          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} disabled={dialog === "edit"} /></label>
           <div className="form-two">
-            <label><span>角色</span><select value={form.role} onChange={(event) => onForm({ ...form, role: event.currentTarget.value })}><option value="admin">admin</option><option value="operator">operator</option></select></label>
-            <label><span>Platform Admin</span><select value={form.platformAdmin} onChange={(event) => onForm({ ...form, platformAdmin: event.currentTarget.value })}><option value="false">false</option><option value="true">true</option></select></label>
+            <label><span>Name</span><input value={form.name} onChange={(event) => onForm({ ...form, name: event.currentTarget.value })} /></label>
+            <label><span>Plan</span><input value={form.plan} onChange={(event) => onForm({ ...form, plan: event.currentTarget.value })} /></label>
           </div>
-          <label><span>初始密码</span><input type="password" value={form.password} onChange={(event) => onForm({ ...form, password: event.currentTarget.value })} /></label>
-          <button
-            className="btn green wide"
-            type="button"
-            disabled={busyAction === "admin-create-tenant" || !form.tenantId || !form.workspaceId || !form.adminUser}
-            onClick={() => onRunAction({
-              id: "admin-create-tenant",
-              label: "Create tenant/workspace/admin",
-              method: "POST",
-              path: apiSurface.tenants,
-              body: {
-                id: form.tenantId,
-                workspace: { id: form.workspaceId },
-                owner: {
-                  username: form.adminUser,
-                  role: form.role,
-                  platformAdmin: form.platformAdmin === "true",
-                  password: form.password || undefined,
-                  mustChangePassword: true
-                }
-              }
-            })}
-          >
-            创建并发放
-          </button>
-          <ActionEvidence lastAction={lastAction} />
-        </aside>
-      </section>
+          <label><span>Status</span><select value={form.status} onChange={(event) => onForm({ ...form, status: event.currentTarget.value })}><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option></select></label>
+        </AdminDialog>
+      )}
     </main>
   );
 }
@@ -172,59 +185,81 @@ function WorkspacesPage({
   onRunAction: (action: DashboardActionRequest) => void;
 }) {
   const rows = resultItems(snapshot.workspaces, ["workspaces"]).slice(0, 8);
+  const [dialog, setDialog] = useState<DialogMode | undefined>();
+
+  function openCreate() {
+    setDialog("create");
+  }
+
+  function openEdit(row: RowRecord) {
+    onForm({
+      ...form,
+      tenantId: fieldText(row, ["tenantId", "tenant"], form.tenantId),
+      workspaceId: fieldText(row, ["id", "workspaceId", "name"], form.workspaceId)
+    });
+    setDialog("edit");
+  }
+
+  const createAction: DashboardActionRequest = {
+    id: "admin-create-workspace",
+    label: "Create workspace",
+    method: "POST",
+    path: apiSurface.workspaces,
+    body: {
+      tenantId: form.tenantId,
+      id: form.workspaceId,
+      owner: form.owner,
+      quotas: {
+        projects: Number(form.projectLimit) || undefined,
+        loops: Number(form.loopLimit) || undefined
+      }
+    }
+  };
+  const editUnsupported = dialog === "edit";
+
   return (
     <main className="management-workspace">
-      <section className="management-layout">
-        <div className="management-stack">
-          <WorkspaceUsagePanel scope={scope} snapshot={snapshot} />
-          <DataPanel
-            title="工作区管理"
-            subtitle="Workspace 是用户、项目、凭据引用、loop 和审计的隔离边界。"
-            rows={rows}
-            columns={[
-              ["Workspace", ["id", "workspaceId", "name"]],
-              ["Tenant", ["tenantId", "tenant"]],
-              ["Projects", ["projectCount", "projects"]],
-              ["Loops", ["loopCount", "loops"]],
-              ["Status", ["status", "state"]]
-            ]}
-            empty="No workspaces returned by EvoPilot."
-          />
-        </div>
-        <aside className="form-panel">
-          <PanelTitle eyebrow="Workspace boundary" title="创建工作区" />
-          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} /></label>
-          <label><span>Workspace ID</span><input value={form.workspaceId} onChange={(event) => onForm({ ...form, workspaceId: event.currentTarget.value })} /></label>
+      <section className="management-stack">
+        <WorkspaceUsagePanel scope={scope} snapshot={snapshot} />
+        <DataPanel
+          title="工作区管理"
+          subtitle="Workspace 是用户、项目、凭据引用、loop 和审计的隔离边界。"
+          rows={rows}
+          columns={[
+            ["Workspace", ["id", "workspaceId", "name"]],
+            ["Tenant", ["tenantId", "tenant"]],
+            ["Projects", ["projectCount", "projects"]],
+            ["Loops", ["loopCount", "loops"]],
+            ["Status", ["status", "state"]]
+          ]}
+          empty="No workspaces returned by EvoPilot."
+          toolbar={<button className="btn primary" type="button" onClick={openCreate}><Plus size={15} aria-hidden="true" /> 新增工作区</button>}
+          actionLabel="修改"
+          onRowAction={openEdit}
+        />
+      </section>
+      {dialog && (
+        <AdminDialog
+          eyebrow="Workspace boundary"
+          title={dialog === "edit" ? "编辑工作区" : "创建工作区"}
+          subtitle={`${form.workspaceId || "workspace"} · ${form.tenantId || "tenant"}`}
+          primaryLabel={editUnsupported ? "服务端暂未开放保存" : "创建工作区"}
+          busy={busyAction === createAction.id}
+          disabled={editUnsupported || !form.tenantId || !form.workspaceId}
+          lastAction={lastAction}
+          footerNote={editUnsupported ? "当前 EvoPilot API 未开放 workspace PATCH；Dashboard 只展示预填编辑弹框，不伪造本地保存结果。" : undefined}
+          onClose={() => setDialog(undefined)}
+          onSubmit={() => onRunAction(createAction)}
+        >
+          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} disabled={dialog === "edit"} /></label>
+          <label><span>Workspace ID</span><input value={form.workspaceId} onChange={(event) => onForm({ ...form, workspaceId: event.currentTarget.value })} disabled={dialog === "edit"} /></label>
           <label><span>Owner</span><input value={form.owner} onChange={(event) => onForm({ ...form, owner: event.currentTarget.value })} /></label>
           <div className="form-two">
             <label><span>Project limit</span><input value={form.projectLimit} onChange={(event) => onForm({ ...form, projectLimit: event.currentTarget.value })} /></label>
             <label><span>Loop limit</span><input value={form.loopLimit} onChange={(event) => onForm({ ...form, loopLimit: event.currentTarget.value })} /></label>
           </div>
-          <button
-            className="btn green wide"
-            type="button"
-            disabled={busyAction === "admin-create-workspace" || !form.tenantId || !form.workspaceId}
-            onClick={() => onRunAction({
-              id: "admin-create-workspace",
-              label: "Create workspace",
-              method: "POST",
-              path: apiSurface.workspaces,
-              body: {
-                tenantId: form.tenantId,
-                id: form.workspaceId,
-                owner: form.owner,
-                quota: {
-                  projects: Number(form.projectLimit) || undefined,
-                  loops: Number(form.loopLimit) || undefined
-                }
-              }
-            })}
-          >
-            创建工作区
-          </button>
-          <ActionEvidence lastAction={lastAction} />
-        </aside>
-      </section>
+        </AdminDialog>
+      )}
     </main>
   );
 }
@@ -245,57 +280,92 @@ function UsersPage({
   onRunAction: (action: DashboardActionRequest) => void;
 }) {
   const rows = resultItems(snapshot.users, ["users"]).slice(0, 8);
+  const [dialog, setDialog] = useState<DialogMode | undefined>();
+
+  function openCreate() {
+    setDialog("create");
+  }
+
+  function openEdit(row: RowRecord) {
+    onForm({
+      ...form,
+      username: fieldText(row, ["username", "id"], form.username),
+      tenantId: fieldText(row, ["tenantId"], form.tenantId),
+      workspaceId: fieldText(row, ["workspaceId"], form.workspaceId),
+      role: fieldText(row, ["role"], form.role),
+      status: fieldText(row, ["status", "state"], form.status),
+      password: ""
+    });
+    setDialog("edit");
+  }
+
+  const action: DashboardActionRequest = dialog === "edit" ? {
+    id: "admin-update-user",
+    label: "Update scoped user",
+    method: "PATCH",
+    path: `/api/v1/users/${encodeURIComponent(form.username)}`,
+    body: {
+      tenantId: form.tenantId,
+      workspaceId: form.workspaceId,
+      role: form.role,
+      status: form.status
+    }
+  } : {
+    id: "admin-create-user",
+    label: "Create scoped user",
+    method: "POST",
+    path: apiSurface.users,
+    body: {
+      username: form.username,
+      tenantId: form.tenantId,
+      workspaceId: form.workspaceId,
+      role: form.role,
+      status: form.status,
+      password: form.password || undefined,
+      mustChangePassword: true
+    }
+  };
+
   return (
     <main className="management-workspace">
-      <section className="management-layout">
-        <DataPanel
-          title="创建 tenant/workspace scoped 用户"
-          subtitle="用户登录后 scope 锁定，普通用户不能跨租户切换。"
-          rows={rows}
-          columns={[
-            ["User", ["username", "id"]],
-            ["Role", ["role"]],
-            ["Tenant", ["tenantId"]],
-            ["Workspace", ["workspaceId"]],
-            ["Status", ["status", "state"]]
-          ]}
-          empty="No users returned by EvoPilot."
-        />
-        <aside className="form-panel">
-          <PanelTitle eyebrow="User registry" title="创建新用户" />
-          <label><span>Username</span><input value={form.username} onChange={(event) => onForm({ ...form, username: event.currentTarget.value })} /></label>
+      <DataPanel
+        title="创建 tenant/workspace scoped 用户"
+        subtitle="用户登录后 scope 锁定，普通用户不能跨租户切换。"
+        rows={rows}
+        columns={[
+          ["User", ["username", "id"]],
+          ["Role", ["role"]],
+          ["Tenant", ["tenantId"]],
+          ["Workspace", ["workspaceId"]],
+          ["Status", ["status", "state"]]
+        ]}
+        empty="No users returned by EvoPilot."
+        toolbar={<button className="btn primary" type="button" onClick={openCreate}><Plus size={15} aria-hidden="true" /> 新增用户</button>}
+        actionLabel="修改"
+        onRowAction={openEdit}
+      />
+      {dialog && (
+        <AdminDialog
+          eyebrow="User registry"
+          title={dialog === "edit" ? "编辑用户" : "创建新用户"}
+          subtitle={`${form.username || "new user"} · ${form.tenantId || "tenant"} / ${form.workspaceId || "workspace"}`}
+          primaryLabel={dialog === "edit" ? "保存修改" : "创建用户"}
+          busy={busyAction === action.id}
+          disabled={!form.username || !form.tenantId || !form.workspaceId}
+          lastAction={lastAction}
+          onClose={() => setDialog(undefined)}
+          onSubmit={() => onRunAction(action)}
+        >
+          <label><span>Username</span><input value={form.username} onChange={(event) => onForm({ ...form, username: event.currentTarget.value })} disabled={dialog === "edit"} /></label>
           <div className="form-two">
-            <label><span>Role</span><select value={form.role} onChange={(event) => onForm({ ...form, role: event.currentTarget.value })}><option value="operator">operator</option><option value="admin">admin</option><option value="auditor">auditor</option></select></label>
+            <label><span>Role</span><select value={form.role} onChange={(event) => onForm({ ...form, role: event.currentTarget.value })}><option value="operator">operator</option><option value="admin">admin</option><option value="auditor">auditor</option><option value="viewer">viewer</option></select></label>
             <label><span>Status</span><select value={form.status} onChange={(event) => onForm({ ...form, status: event.currentTarget.value })}><option value="ACTIVE">ACTIVE</option><option value="DISABLED">DISABLED</option></select></label>
           </div>
-          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} /></label>
+          <label><span>Tenant ID</span><input value={form.tenantId} onChange={(event) => onForm({ ...form, tenantId: event.currentTarget.value })} disabled={dialog === "edit"} /></label>
           <label><span>Workspace ID</span><input value={form.workspaceId} onChange={(event) => onForm({ ...form, workspaceId: event.currentTarget.value })} /></label>
-          <label><span>Initial password</span><input type="password" value={form.password} onChange={(event) => onForm({ ...form, password: event.currentTarget.value })} /></label>
-          <button
-            className="btn green wide"
-            type="button"
-            disabled={busyAction === "admin-create-user" || !form.username || !form.tenantId || !form.workspaceId}
-            onClick={() => onRunAction({
-              id: "admin-create-user",
-              label: "Create scoped user",
-              method: "POST",
-              path: apiSurface.users,
-              body: {
-                username: form.username,
-                tenantId: form.tenantId,
-                workspaceId: form.workspaceId,
-                role: form.role,
-                status: form.status,
-                password: form.password || undefined,
-                mustChangePassword: true
-              }
-            })}
-          >
-            创建用户
-          </button>
-          <ActionEvidence lastAction={lastAction} />
-        </aside>
-      </section>
+          <label><span>{dialog === "edit" ? "Password reset" : "Initial password"}</span><input type="password" value={form.password} placeholder={dialog === "edit" ? "保持不变" : ""} onChange={(event) => onForm({ ...form, password: event.currentTarget.value })} disabled={dialog === "edit"} /></label>
+        </AdminDialog>
+      )}
     </main>
   );
 }
@@ -316,24 +386,61 @@ function TemplatesPage({
   onRunAction: (action: DashboardActionRequest) => void;
 }) {
   const templates = resultItems(snapshot.templates, ["templates"]).slice(0, 8);
-  const evolutions = resultItems(snapshot.templateEvolutions, ["evolutions"]).slice(0, 5);
+  const [dialog, setDialog] = useState(false);
+
+  function openEvolution(row?: RowRecord) {
+    if (row) onForm({ ...form, baseTemplateId: fieldText(row, ["id", "templateId", "name"], form.baseTemplateId) });
+    setDialog(true);
+  }
+
+  const action: DashboardActionRequest = {
+    id: "admin-create-template-evolution",
+    label: "Create HarnessTemplateEvolution",
+    method: "POST",
+    path: apiSurface.harnessTemplateEvolutions,
+    body: {
+      baseTemplateId: form.baseTemplateId,
+      targetVersion: form.targetVersion || undefined,
+      intent: form.intent,
+      sources: [{
+        type: form.sourceType,
+        name: form.sourceUri || form.sourceType,
+        uri: form.sourceType === "admin-note" ? undefined : form.sourceUri,
+        contentText: form.sourceType === "admin-note" ? form.sourceUri : undefined
+      }]
+    }
+  };
+
   return (
     <main className="management-workspace">
-      <section className="management-layout">
-        <DataPanel
-          title="企业级 HarnessTemplate 知识包"
-          subtitle="新项目自动匹配模板；管理员通过版本、changelog 和 evolution run 管理生命周期。"
-          rows={templates}
-          columns={[
-            ["Template", ["id", "templateId", "name"]],
-            ["Version", ["version"]],
-            ["Type", ["softwareType", "language", "category"]],
-            ["Status", ["status", "state"]]
-          ]}
-          empty="No templates returned by EvoPilot."
-        />
-        <aside className="form-panel">
-          <PanelTitle eyebrow="Template evolution" title="创建进化 run" />
+      <DataPanel
+        title="企业级 HarnessTemplate 知识包"
+        subtitle="新项目自动匹配模板；管理员通过版本、changelog 和 evolution run 管理生命周期。"
+        rows={templates}
+        columns={[
+          ["Template", ["id", "templateId", "name"]],
+          ["Version", ["version"]],
+          ["Type", ["softwareType", "language", "category"]],
+          ["Status", ["status", "state"]]
+        ]}
+        empty="No templates returned by EvoPilot."
+        toolbar={<button className="btn primary" type="button" onClick={() => openEvolution()}><Plus size={15} aria-hidden="true" /> 创建 evolution draft</button>}
+        actionLabel="进化"
+        actionIcon="plus"
+        onRowAction={openEvolution}
+      />
+      {dialog && (
+        <AdminDialog
+          eyebrow="Template evolution"
+          title="创建进化 run"
+          subtitle={`${form.baseTemplateId || "base template"} · target ${form.targetVersion || "next version"}`}
+          primaryLabel="创建 evolution draft"
+          busy={busyAction === action.id}
+          disabled={!form.baseTemplateId || !form.intent}
+          lastAction={lastAction}
+          onClose={() => setDialog(false)}
+          onSubmit={() => onRunAction(action)}
+        >
           <label><span>Base Template</span><input value={form.baseTemplateId} onChange={(event) => onForm({ ...form, baseTemplateId: event.currentTarget.value })} /></label>
           <label><span>Target Version</span><input value={form.targetVersion} onChange={(event) => onForm({ ...form, targetVersion: event.currentTarget.value })} /></label>
           <label><span>Intent</span><textarea value={form.intent} onChange={(event) => onForm({ ...form, intent: event.currentTarget.value })} /></label>
@@ -341,36 +448,8 @@ function TemplatesPage({
             <label><span>Source Type</span><select value={form.sourceType} onChange={(event) => onForm({ ...form, sourceType: event.currentTarget.value })}><option value="admin-note">admin-note</option><option value="github-repo">github-repo</option><option value="web-url">web-url</option><option value="attachment">attachment</option><option value="local-pack">local-pack</option></select></label>
             <label><span>Source</span><input value={form.sourceUri} onChange={(event) => onForm({ ...form, sourceUri: event.currentTarget.value })} /></label>
           </div>
-          <button
-            className="btn green wide"
-            type="button"
-            disabled={busyAction === "admin-create-template-evolution" || !form.baseTemplateId || !form.intent}
-            onClick={() => onRunAction({
-              id: "admin-create-template-evolution",
-              label: "Create HarnessTemplateEvolution",
-              method: "POST",
-              path: apiSurface.harnessTemplateEvolutions,
-              body: {
-                baseTemplateId: form.baseTemplateId,
-                targetVersion: form.targetVersion || undefined,
-                intent: form.intent,
-                sources: [{
-                  type: form.sourceType,
-                  name: form.sourceUri || form.sourceType,
-                  uri: form.sourceType === "admin-note" ? undefined : form.sourceUri,
-                  contentText: form.sourceType === "admin-note" ? form.sourceUri : undefined
-                }]
-              }
-            })}
-          >
-            创建 evolution draft
-          </button>
-          <div className="sub-list">
-            {evolutions.map((item, index) => <small key={index}>{fieldText(item, ["id", "evolutionId"])} · {fieldText(item, ["status", "state"])}</small>)}
-          </div>
-          <ActionEvidence lastAction={lastAction} />
-        </aside>
-      </section>
+        </AdminDialog>
+      )}
     </main>
   );
 }
@@ -387,6 +466,15 @@ function AuditPage({
   onRefresh: () => void;
 }) {
   const rows = resultItems(snapshot.audit, ["audit", "records"]).slice(0, 10);
+  const fallbackRows = rows.length > 0 ? rows : [{
+    time: "-",
+    actorId: session?.user?.username ?? defaultScope.actorId,
+    action: "No failing API action selected",
+    target: "requestId not returned",
+    status: "INFO"
+  }];
+  const [selectedAuditRow, setSelectedAuditRow] = useState<RowRecord | undefined>();
+
   return (
     <main className="management-workspace">
       <section className="summary-grid">
@@ -394,30 +482,46 @@ function AuditPage({
         <SummaryCard label="Actor" value={session?.user?.username ?? defaultScope.actorId} detail={roleLabel(session)} />
         <SummaryCard label="Last request" value={lastAction?.requestId ?? "none"} detail={lastAction?.nextAction ?? "no nextAction"} />
       </section>
-      <section className="management-layout">
-        <DataPanel
-          title="审计与日志溯源"
-          subtitle="AI Agent 根据 requestId -> action -> scope -> nextAction/blockers 定位问题。"
-          rows={rows}
-          columns={[
-            ["Time", ["time", "timestamp", "createdAt"]],
-            ["Actor", ["actorId", "actor", "username"]],
-            ["Action", ["action", "operation", "event"]],
-            ["Target", ["target", "resource", "path"]],
-            ["Result", ["status", "result"]]
-          ]}
-          empty="No audit records returned by EvoPilot."
-        />
-        <aside className="form-panel">
-          <PanelTitle eyebrow="Failure trace" title="AI 可读证据" />
+      <DataPanel
+        title="审计与日志溯源"
+        subtitle="AI Agent 根据 requestId -> action -> scope -> nextAction/blockers 定位问题。"
+        rows={fallbackRows}
+        columns={[
+          ["Time", ["time", "timestamp", "createdAt"]],
+          ["Actor", ["actorId", "actor", "username"]],
+          ["Action", ["action", "operation", "event"]],
+          ["Target", ["target", "resource", "path"]],
+          ["Result", ["status", "result"]]
+        ]}
+        empty="No audit records returned by EvoPilot."
+        toolbar={<button className="btn primary" type="button" onClick={onRefresh}><RefreshCw size={15} aria-hidden="true" /> Refresh audit</button>}
+        actionLabel="查看证据"
+        actionIcon="eye"
+        onRowAction={setSelectedAuditRow}
+      />
+      {selectedAuditRow && (
+        <AdminDialog
+          eyebrow="Failure trace"
+          title="AI 可读证据"
+          subtitle={`${fieldText(selectedAuditRow, ["action", "operation", "event"])} · ${fieldText(selectedAuditRow, ["status", "result"])}`}
+          primaryLabel="Refresh audit"
+          lastAction={lastAction}
+          onClose={() => setSelectedAuditRow(undefined)}
+          onSubmit={onRefresh}
+        >
+          <EvidenceRow label="audit.time" value={fieldText(selectedAuditRow, ["time", "timestamp", "createdAt"])} />
+          <EvidenceRow label="audit.actor" value={fieldText(selectedAuditRow, ["actorId", "actor", "username"])} />
+          <EvidenceRow label="audit.action" value={fieldText(selectedAuditRow, ["action", "operation", "event"])} />
+          <EvidenceRow label="audit.target" value={fieldText(selectedAuditRow, ["target", "resource", "path"])} />
+          <EvidenceRow label="audit.status" value={fieldText(selectedAuditRow, ["status", "result"])} />
+          <EvidenceRow label="audit.requestId" value={fieldText(selectedAuditRow, ["requestId", "correlationId"], "not returned")} />
           <EvidenceRow label="requestId" value={lastAction?.requestId ?? "not returned"} />
           <EvidenceRow label="lastAction" value={lastAction ? `${lastAction.method} ${lastAction.path}` : "none"} />
           <EvidenceRow label="nextAction" value={lastAction?.nextAction ?? "none"} />
           <EvidenceRow label="blockers" value={lastAction?.blockers?.join(", ") || "none"} />
           <LogLine level={lastAction?.ok ? "INFO" : lastAction ? "ERROR" : "INFO"} text={lastAction?.error ?? "No failing API action selected."} />
-          <button className="btn primary wide" type="button" onClick={onRefresh}><RefreshCw size={15} aria-hidden="true" /> Refresh audit</button>
-        </aside>
-      </section>
+        </AdminDialog>
+      )}
     </main>
   );
 }
@@ -437,26 +541,47 @@ function DataPanel({
   subtitle,
   rows,
   columns,
-  empty
+  empty,
+  toolbar,
+  actionLabel,
+  actionIcon = "edit",
+  onRowAction
 }: {
   title: string;
   subtitle: string;
-  rows: Record<string, unknown>[];
+  rows: RowRecord[];
   columns: Array<[string, string[]]>;
   empty: string;
+  toolbar?: ReactNode;
+  actionLabel?: string;
+  actionIcon?: "edit" | "eye" | "plus";
+  onRowAction?: (row: RowRecord) => void;
 }) {
+  const gridTemplateColumns = `repeat(${columns.length + (onRowAction ? 1 : 0)}, minmax(0, 1fr))`;
   return (
     <section className="data-panel">
-      <PanelTitle eyebrow="Live projection" title={title} subtitle={subtitle} />
+      <div className="panel-headline">
+        <PanelTitle eyebrow="Live projection" title={title} subtitle={subtitle} />
+        {toolbar && <div className="panel-actions">{toolbar}</div>}
+      </div>
       <div className="table">
-        <div className="table-head" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
+        <div className="table-head" style={{ gridTemplateColumns }}>
           {columns.map(([label]) => <strong key={label}>{label}</strong>)}
+          {onRowAction && <strong>操作</strong>}
         </div>
         {rows.length === 0 ? (
           <div className="empty-row">{empty}</div>
         ) : rows.map((row, index) => (
-          <div key={index} className="table-row" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
-            {columns.map(([label, keys]) => <span key={label}>{fieldText(row, keys)}</span>)}
+          <div key={index} className="table-row" style={{ gridTemplateColumns }}>
+            {columns.map(([label, keys]) => <TableCell key={label} label={label} value={fieldText(row, keys)} />)}
+            {onRowAction && (
+              <span className="row-actions">
+                <button className="mini-btn" type="button" onClick={() => onRowAction(row)}>
+                  {actionIcon === "eye" ? <Eye size={14} aria-hidden="true" /> : actionIcon === "plus" ? <Plus size={14} aria-hidden="true" /> : <Pencil size={14} aria-hidden="true" />}
+                  {actionLabel}
+                </button>
+              </span>
+            )}
           </div>
         ))}
       </div>
@@ -466,6 +591,20 @@ function DataPanel({
       </div>
     </section>
   );
+}
+
+function TableCell({ label, value }: { label: string; value: string }) {
+  if (["Status", "Result"].includes(label) && value !== "-") {
+    return <span><span className={`status-pill ${statusClassName(value)}`}>{value}</span></span>;
+  }
+  return <span>{value}</span>;
+}
+
+function statusClassName(value: string) {
+  const normalized = value.toUpperCase();
+  if (normalized.includes("DRAFT") || normalized.includes("WAITING")) return "draft";
+  if (normalized.includes("FAIL") || normalized.includes("BLOCK") || normalized.includes("DISABLED")) return "red";
+  return "";
 }
 
 function PanelTitle({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
@@ -478,12 +617,54 @@ function PanelTitle({ eyebrow, title, subtitle }: { eyebrow: string; title: stri
   );
 }
 
-function LockedScope({ scope }: { scope: DashboardScope }) {
+function AdminDialog({
+  eyebrow,
+  title,
+  subtitle,
+  primaryLabel,
+  children,
+  busy,
+  disabled,
+  footerNote,
+  lastAction,
+  onClose,
+  onSubmit
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  primaryLabel: string;
+  children: ReactNode;
+  busy?: boolean;
+  disabled?: boolean;
+  footerNote?: string;
+  lastAction?: DashboardActionResult;
+  onClose: () => void;
+  onSubmit: () => void;
+}) {
   return (
-    <div className="locked-scope">
-      <EvidenceRow label="Tenant" value={scope.tenantId} />
-      <EvidenceRow label="Workspace" value={scope.workspaceId} />
-      <EvidenceRow label="Actor" value={scope.actorId} />
+    <div className="modal-backdrop" role="presentation">
+      <section className="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-dialog-title">
+        <header className="modal-header">
+          <div>
+            <span>{eyebrow}</span>
+            <h3 id="admin-dialog-title">{title}</h3>
+            {subtitle && <p>{subtitle}</p>}
+          </div>
+          <button className="icon-close" type="button" aria-label="关闭" onClick={onClose}><X size={15} aria-hidden="true" /></button>
+        </header>
+        <div className="modal-body">
+          {children}
+          <ActionEvidence lastAction={lastAction} />
+        </div>
+        <footer className="modal-footer">
+          <small>{footerNote ?? "保存后仍以 EvoPilot API 返回的 requestId、status、nextAction 为准。"}</small>
+          <div className="modal-footer-actions">
+            <button className="btn ghost" type="button" onClick={onClose}>取消</button>
+            <button className="btn green" type="button" disabled={busy || disabled} onClick={onSubmit}>{busy ? "submitting" : primaryLabel}</button>
+          </div>
+        </footer>
+      </section>
     </div>
   );
 }

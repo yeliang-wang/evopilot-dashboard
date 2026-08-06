@@ -79,11 +79,9 @@ export interface ReviewStep {
 
 export interface TenantForm {
   tenantId: string;
-  workspaceId: string;
-  adminUser: string;
-  role: string;
-  platformAdmin: string;
-  password: string;
+  name: string;
+  plan: string;
+  status: string;
 }
 
 export interface WorkspaceForm {
