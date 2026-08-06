@@ -20,7 +20,7 @@ const requiredFiles = [
   "docs/reference/github-metadata.md",
   "docs/operations/self-hosting.md",
   "docs/operations/release-management.md",
-  "docs/releases/1.0.13.md",
+  "docs/releases/1.0.14.md",
   "docs/deployment/cloud.md",
   "deploy/ecs/compose.immutable.yaml",
   "scripts/build-release-artifacts.mjs",

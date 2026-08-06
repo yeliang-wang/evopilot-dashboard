@@ -8,6 +8,21 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.14 - 2026-08-06
+
+### Fixed
+
+- Updated the mobile Agent Console blocker visual baseline after the `LLM Profiles` navigation item became part of the production UI.
+
+### Validation
+
+- `npm run check`
+- `npm run smoke:console`
+- `npm run test:visual`
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.13 - 2026-08-06
 
 ### Added
