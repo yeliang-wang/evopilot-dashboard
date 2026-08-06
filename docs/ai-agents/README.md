@@ -36,7 +36,7 @@ Assume the user account has already been created by an EvoPilot administrator. D
 
 | Expected left navigation |
 |---|
-| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `Audit` |
+| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit` |
 
 The left navigation must not contain workspace/project cards, active sessions, recent decisions, a user footer, or a `Projects` menu.
 

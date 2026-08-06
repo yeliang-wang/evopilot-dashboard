@@ -36,6 +36,7 @@ import {
   type ConsoleStep,
   type DrawerKind,
   type HarnessProfileDraft,
+  type LlmProfileForm,
   type PageId,
   type ProjectLoopContext,
   type ReviewStep,
@@ -104,6 +105,14 @@ export function useAgentConsoleController() {
     intent: "Upgrade observability, exception triage, release evidence, and AI-agent runbook coverage.",
     sourceType: "admin-note",
     sourceUri: "Administrator lifecycle note"
+  });
+  const [llmProfileForm, setLlmProfileForm] = useState<LlmProfileForm>({
+    profileId: "workspace-glm-52",
+    scope: "workspace",
+    providerPreset: "glm",
+    modelName: "glm-5.2",
+    apiKeyRef: "LLM_ZHIPU_PROD",
+    baseUrl: ""
   });
 
   const liveProjectionSummary = useMemo(() => {
@@ -614,6 +623,7 @@ export function useAgentConsoleController() {
     focusedMessages,
     lastAction,
     liveProjectionSummary,
+    llmProfileForm,
     loginForm,
     ownerChange,
     passwordForm,
@@ -637,6 +647,7 @@ export function useAgentConsoleController() {
     setActivePage,
     setDrawer,
     setLoginForm,
+    setLlmProfileForm,
     setOwnerChange,
     setPasswordForm,
     setTemplateForm,

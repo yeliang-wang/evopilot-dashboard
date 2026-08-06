@@ -29,7 +29,7 @@ EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned u
 | Installable Dashboard runner | Present | `install.sh`, `scripts/run-dashboard-container.mjs`, `npm run verify:distribution` |
 | Self-hosting guide | Present | `docs/operations/self-hosting.md` |
 | Release playbook | Present | `docs/operations/release-management.md` |
-| Release notes | Present | `docs/releases/1.0.12.md` |
+| Release notes | Present | `docs/releases/1.0.13.md` |
 | Immutable release artifacts | Present | `scripts/build-release-artifacts.mjs`, `scripts/verify-release-artifacts.mjs`, `deploy/ecs/compose.immutable.yaml` |
 | Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
 

@@ -122,7 +122,7 @@ Use when a platform administrator prepares a tenant/workspace and user for a rea
 ### Browser Flow
 
 1. Log in as a platform administrator.
-2. Confirm the left navigation includes **Tenants**, **Workspaces**, **Users**, **Harness Templates**, and **Audit**.
+2. Confirm the left navigation includes **Tenants**, **Workspaces**, **Users**, **Harness Templates**, **LLM Profiles**, and **Audit**.
 3. Open **Tenants** and create the tenant, initial workspace, and tenant admin.
 4. Open **Users** and create project owner or operator users with `mustChangePassword=true`.
 5. Open **Audit** and verify the request IDs and actions are visible.

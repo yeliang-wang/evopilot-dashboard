@@ -7,7 +7,7 @@
 1. Open Dashboard URL.
 2. Log in with assigned EvoPilot username and password.
 3. Confirm current tenant, workspace, actor, role, and `scope locked`.
-4. Confirm the left navigation shows only **# Agent Console**, **Tenants**, **Workspaces**, **Users**, **Harness Templates**, and **Audit**.
+4. Confirm the left navigation shows only **# Agent Console**, **Tenants**, **Workspaces**, **Users**, **Harness Templates**, **LLM Profiles**, and **Audit**.
 5. Start from the requested workflow document.
 
 ## Standard Step Format

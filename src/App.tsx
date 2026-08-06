@@ -31,6 +31,7 @@ export default function App() {
     focusedMessages,
     lastAction,
     liveProjectionSummary,
+    llmProfileForm,
     loginForm,
     ownerChange,
     passwordForm,
@@ -54,6 +55,7 @@ export default function App() {
     setActivePage,
     setDrawer,
     setLoginForm,
+    setLlmProfileForm,
     setOwnerChange,
     setPasswordForm,
     setTemplateForm,
@@ -143,6 +145,16 @@ export default function App() {
                   onApproveAndAdvance={() => void approvePlanAndAdvance()}
                   onViewEvidence={toggleReviewDrawer}
                   onViewRelease={() => void refreshReleaseEvidence()}
+                  llmProfilesResult={apiSnapshot.llmProfiles}
+                  projectLlmResult={apiSnapshot.projectLlm}
+                  onBindProjectLlm={(profileId) => void runManagementAction({
+                    id: "project-bind-llm-profile",
+                    label: "Bind project LLM profile",
+                    method: "POST",
+                    path: `/api/v1/projects/${encodeURIComponent(context.projectId)}/llm`,
+                    body: { profileId, required: true }
+                  })}
+                  onManageLlmProfiles={() => setActivePage("llm-profiles")}
                 />
               </section>
               {drawer && (
@@ -186,10 +198,12 @@ export default function App() {
             workspaceForm={workspaceForm}
             userForm={userForm}
             templateForm={templateForm}
+            llmProfileForm={llmProfileForm}
             onTenantForm={setTenantForm}
             onWorkspaceForm={setWorkspaceForm}
             onUserForm={setUserForm}
             onTemplateForm={setTemplateForm}
+            onLlmProfileForm={setLlmProfileForm}
             onRunAction={(action) => void runManagementAction(action)}
             onRefresh={() => void refreshApiSnapshot()}
           />

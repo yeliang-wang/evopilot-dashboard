@@ -8,6 +8,27 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 1.0.13 - 2026-08-06
+
+### Added
+
+- Added an `LLM Profiles` left-navigation page with Workspace, Project, and My Profiles tabs.
+- Added a compact profile registration modal for profile name, scope, provider preset, model, secret ref, and optional custom base URL.
+- Added selected-profile preflight from the LLM Profiles page so operators can test the profile registered in EvoPilot.
+- Added Agent Console project LLM binding controls for workspace defaults and user-owned per-run overrides.
+- Added Dashboard API calls for `GET /api/v1/llm-profiles`, `POST /api/v1/llm-profiles`, profile preflight, project LLM binding, and project LLM preflight.
+
+### Changed
+
+- Kept Dashboard as a browser HTTP client and rendered EvoPilot's LLM profile, provider/model, request ID, and token projections instead of calculating usage locally.
+- Updated AI-agent, user-guide, workflow, troubleshooting, and static contract documentation for the project default plus user override model.
+
+### Validation
+
+- `npm run check`
+- Chrome desktop screenshots for LLM Profiles registration and Agent Console LLM binding
+- `git diff --check`
+
 ## 1.0.12 - 2026-08-06
 
 ### Added

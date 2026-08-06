@@ -17,7 +17,7 @@ Use this guide when deploying the Dashboard next to EvoPilot API for a real oper
 For a generated full stack that includes EvoPilot API, loop worker, code-upgrader, Postgres, and Dashboard, prefer the EvoPilot installer:
 
 ```bash
-npx create-evopilot@1.1.6 self-host --dir evopilot-stack --init-env
+npx create-evopilot@1.1.8 self-host --dir evopilot-stack --init-env
 ```
 
 Use the manual path below when Dashboard is deployed separately from an existing EvoPilot API server.

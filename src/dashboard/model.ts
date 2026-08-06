@@ -20,7 +20,7 @@ export type ConsoleStep =
   | "release";
 
 export type DrawerKind = "session" | "review" | "diff" | "blocker" | "release" | "api";
-export type PageId = "console" | "tenants" | "workspaces" | "users" | "templates" | "audit";
+export type PageId = "console" | "tenants" | "workspaces" | "users" | "templates" | "llm-profiles" | "audit";
 export type ProjectDeliveryChain = "github-native" | "gitlab-native" | "github-source-gitlab-ci";
 
 export type MessageRole = "user" | "agent";
@@ -121,6 +121,15 @@ export interface TemplateEvolutionForm {
   intent: string;
   sourceType: string;
   sourceUri: string;
+}
+
+export interface LlmProfileForm {
+  profileId: string;
+  scope: "workspace" | "user";
+  providerPreset: "glm" | "kimi" | "gemma" | "custom";
+  modelName: string;
+  apiKeyRef: string;
+  baseUrl: string;
 }
 
 export const storage = window.localStorage;
@@ -224,7 +233,7 @@ export function normalizeDemoStep(value: string | null): ConsoleStep | undefined
 }
 
 export function normalizePage(value: string | null): PageId | undefined {
-  const allowed: PageId[] = ["console", "tenants", "workspaces", "users", "templates", "audit"];
+  const allowed: PageId[] = ["console", "tenants", "workspaces", "users", "templates", "llm-profiles", "audit"];
   return allowed.find((page) => page === value);
 }
 

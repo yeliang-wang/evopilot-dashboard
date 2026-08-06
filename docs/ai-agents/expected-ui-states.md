@@ -14,7 +14,7 @@ Ordinary users must not edit tenant/workspace/actor scope. Platform administrato
 
 | Expected navigation |
 |---|
-| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `Audit` |
+| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit` |
 
 The sidebar must not show workspace/project cards, active sessions, recent decisions, user footers, or a `Projects` menu.
 

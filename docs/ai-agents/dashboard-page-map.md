@@ -14,7 +14,7 @@ EvoPilot Dashboard exposes a login-first **Agent Console v2** plus a small role-
 
 The sidebar is intentionally fixed and compact:
 
-`# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `Audit`
+`# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit`
 
 ```text
 # Agent Console
@@ -22,6 +22,7 @@ Tenants
 Workspaces
 Users
 Harness Templates
+LLM Profiles
 Audit
 ```
 
@@ -47,6 +48,7 @@ Do not expect workspace/project cards, active sessions, recent decisions, user f
 | Workspaces | Create tenant-scoped workspace with owner and quota. | Stop on tenant mismatch or quota policy failure. |
 | Users | Create scoped user with `mustChangePassword=true`. | Stop if the requested role exceeds the signed-in user's authority. |
 | Harness Templates | Create a `HarnessTemplateEvolution` draft. | Do not approve or publish until source coverage, validation, diff, and impact are shown. |
+| LLM Profiles | Register workspace profiles for project defaults or user profiles for run overrides. | Do not paste raw keys into screenshots; stop on profile readiness or secret-ref blockers. |
 | Audit | Read request, action, scope, blockers, and failure trace. | Do not claim root cause without requestId or server trace evidence. |
 
 ## Button Recognition

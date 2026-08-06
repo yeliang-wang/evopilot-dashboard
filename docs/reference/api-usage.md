@@ -27,6 +27,8 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Users | `GET /api/v1/users`, `POST /api/v1/users` |
 | Harness template evolution | `GET /api/v1/harness/template-evolutions`, `POST /api/v1/harness/template-evolutions` |
 | Harness templates and policies | `GET /api/v1/harness/templates`, `GET /api/v1/harness/policies` |
+| LLM profiles | `GET /api/v1/llm-profiles`, `POST /api/v1/llm-profiles`, `POST /api/v1/llm-profiles/{profileId}/preflight` |
+| Project LLM default | `GET /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm/preflight` |
 | Audit | `GET /api/v1/audit` |
 
 ## Projection Context
@@ -76,6 +78,7 @@ Workspace usage and project LLM usage are server projections. Dashboard displays
 | `# Agent Console` | ordinary project owner/operator flow |
 | `Tenants`, `Workspaces`, `Users` | platform or tenant administration through EvoPilot RBAC |
 | `Harness Templates` | administrator template evolution lifecycle, not direct project harness activation |
+| `LLM Profiles` | workspace profile registration for project defaults and user profile registration for run overrides |
 | `Audit` | current authorized audit scope |
 
 Dashboard never mutates local EvoPilot files and never calls CLI commands. CLI and Dashboard remain separate adapters over the same EvoPilot server state.

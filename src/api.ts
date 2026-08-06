@@ -270,6 +270,7 @@ export const apiSurface = {
   projectDevopsPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/devops/preflight`,
   projectUsage: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/usage`,
   llmProfiles: "/api/v1/llm-profiles",
+  llmProfilePreflight: (profileId: string) => `/api/v1/llm-profiles/${encodeURIComponent(profileId)}/preflight`,
   projectLlm: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm`,
   projectLlmPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight`,
   harnessTemplates: "/api/v1/harness/templates",
@@ -361,6 +362,8 @@ export async function loadDashboardApiSnapshot(
   if (projectId) {
     calls.push(["profiles", apiSurface.projectHarnessProfiles(projectId)]);
     calls.push(["projectUsage", apiSurface.projectUsage(projectId)]);
+    calls.push(["projectLlm", apiSurface.projectLlm(projectId)]);
+    calls.push(["projectLlmPreflight", apiSurface.projectLlmPreflight(projectId)]);
   }
   if (goalId) {
     calls.push(["goal", apiSurface.goal(goalId)]);

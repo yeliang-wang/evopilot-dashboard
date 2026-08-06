@@ -13,6 +13,7 @@ const dashboardComponentFiles = [
   "src/dashboard/components/composer.tsx",
   "src/dashboard/components/console.tsx",
   "src/dashboard/components/evidence.tsx",
+  "src/dashboard/components/llm-profiles.tsx",
   "src/dashboard/components/management.tsx",
   "src/dashboard/components/stage.tsx",
   "src/dashboard/components/workspace-usage.tsx"
@@ -152,6 +153,11 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Workspaces",
     "Users",
     "Harness Templates",
+    "LLM Profiles",
+    "Register LLM Profile",
+    "Project LLM Profile",
+    "Use my profile for this run",
+    "workspace scope",
     "HarnessTemplateEvolution",
     "接入项目 LLM 用量追踪",
     "Project LLM Usage",
@@ -165,7 +171,7 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
 
   assert.match(dashboardModel, /export type ConsoleStep =/);
   assert.match(dashboardModel, /export type DrawerKind =/);
-  assert.match(dashboardModel, /export type PageId = "console" \| "tenants" \| "workspaces" \| "users" \| "templates" \| "audit"/);
+  assert.match(dashboardModel, /export type PageId = "console" \| "tenants" \| "workspaces" \| "users" \| "templates" \| "llm-profiles" \| "audit"/);
   assert.match(dashboardComponents, /function AuthScreen/);
   assert.match(dashboardComponents, /function PasswordChangeScreen/);
   assert.match(dashboardComponents, /function ManagementPage/);
@@ -174,6 +180,7 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
   assert.match(dashboardComponents, /function WorkspacesPage/);
   assert.match(dashboardComponents, /function UsersPage/);
   assert.match(dashboardComponents, /function TemplatesPage/);
+  assert.match(dashboardComponents, /function LlmProfilesPage/);
   assert.match(dashboardComponents, /function AuditPage/);
   assert.match(dashboardComponents, /function StageBar/);
   assert.match(dashboardComponents, /function EvidenceDrawer/);
@@ -280,6 +287,9 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/audit",
     "/api/v1/history",
     "/api/v1/llm-profiles",
+    "/api/v1/llm-profiles/${encodeURIComponent(profileId)}/preflight",
+    "/api/v1/projects/${encodeURIComponent(projectId)}/llm",
+    "/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight",
     "/api/v1/secrets",
     "/api/v1/tenants",
     "/api/v1/workspaces",
@@ -412,7 +422,7 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
   assert.match(docsAiAgents, /Admin Browser Operations/);
   assert.match(docsDashboardMap, /Dashboard Page Map/);
   assert.match(docsDashboardMap, /Left Navigation/);
-  assert.match(docsDashboardMap, /`# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `Audit`/);
+  assert.match(docsDashboardMap, /`# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit`/);
   assert.match(docsExpectedStates, /ProjectHarnessProfile YAML Review/);
   assert.match(docsExpectedStates, /Authentication States/);
   assert.match(docsExpectedStates, /Admin Page States/);

@@ -36,9 +36,10 @@ Ordinary users do not choose the public `HarnessTemplate` manually. Template sel
 | `Workspaces` |
 | `Users` |
 | `Harness Templates` |
+| `LLM Profiles` |
 | `Audit` |
 
-Project context, active sessions, recent decisions, and user details are not sidebar content. They appear in the main Agent Console, the relevant admin page, or the Evidence Drawer. `Tenants`, `Workspaces`, `Users`, and `Harness Templates` call EvoPilot APIs and still obey RBAC, audit, and `nextAction` stop rules.
+Project context, active sessions, recent decisions, and user details are not sidebar content. They appear in the main Agent Console, the relevant admin page, or the Evidence Drawer. `Tenants`, `Workspaces`, `Users`, `Harness Templates`, and `LLM Profiles` call EvoPilot APIs and still obey RBAC, audit, and `nextAction` stop rules.
 
 ## Delivery Chain
 
