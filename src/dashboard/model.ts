@@ -67,6 +67,12 @@ export interface HarnessProfileDraft {
   compiledDigest?: string;
   policyRefs: string[];
   templateRef?: string;
+  harnessLayer?: string;
+  domain?: string;
+  compatibilityProfiles: string[];
+  architectureProfiles: string[];
+  runtimeProfiles: string[];
+  referenceBoundary?: string;
   generatedByEvidence: string[];
   validationSummary?: string;
   diffSummary?: string;
@@ -340,6 +346,10 @@ export function extractHarnessDraft(value: unknown): HarnessProfileDraft | undef
   const validation = profile.validation ?? data.validation;
   const diffFromActive = profile.diffFromActive ?? data.diffFromActive;
   const templateRef = profile.templateRef ?? data.templateRef;
+  const sourceContentValue = profile.sourceContent ?? data.sourceContent;
+  const sourceRecord = asRecord(sourceContentValue);
+  const runtimeRecord = asRecord(sourceRecord?.runtime);
+  const metadataRecord = asRecord(sourceRecord?.metadata);
 
   const evidenceValues = [
     ...stringList(generatedBy?.evidence),
@@ -350,17 +360,34 @@ export function extractHarnessDraft(value: unknown): HarnessProfileDraft | undef
     profileId: stringField(profile.profileId) ?? stringField(profile.id) ?? stringField(summary?.profileId) ?? "default",
     version: numberField(profile.version) ?? numberField(summary?.latestVersion),
     status: stringField(profile.status) ?? stringField(data.status) ?? "DRAFT",
-    sourceContent: stringField(profile.sourceContent) ?? stringField(data.sourceContent),
+    sourceContent: stringField(sourceContentValue) ?? (sourceContentValue === undefined ? undefined : readableJson(sourceContentValue)),
     compiledContent: stringField(profile.compiledContent) ?? stringField(data.compiledContent),
     sourceDigest: stringField(profile.sourceDigest) ?? stringField(data.sourceDigest),
     compiledDigest: stringField(profile.compiledDigest) ?? stringField(data.compiledDigest),
     policyRefs: stringList(profile.policyRefs ?? data.policyRefs),
     templateRef: typeof templateRef === "string" ? templateRef : readableJson(templateRef || undefined),
+    harnessLayer: stringField(runtimeRecord?.harnessLayer) ?? stringField(metadataRecord?.templateHarnessLayer),
+    domain: stringField(runtimeRecord?.domain) ?? stringField(metadataRecord?.templateDomain),
+    compatibilityProfiles: profileLabels(runtimeRecord?.compatibilityProfiles ?? metadataRecord?.compatibilityProfiles),
+    architectureProfiles: profileLabels(runtimeRecord?.architectureProfiles ?? metadataRecord?.architectureProfiles),
+    runtimeProfiles: profileLabels(runtimeRecord?.runtimeProfiles ?? metadataRecord?.runtimeProfiles),
+    referenceBoundary: readableJson((runtimeRecord?.referenceBoundary ?? metadataRecord?.referenceBoundary) || undefined),
     generatedByEvidence: evidenceValues,
     validationSummary: readableJson(validation || undefined),
     diffSummary: readableJson(diffFromActive || undefined),
     raw: value
   };
+}
+
+export function profileLabels(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (typeof item === "string") return item;
+      const record = asRecord(item);
+      return stringField(record?.id) ?? stringField(record?.name) ?? stringField(record?.referenceProduct);
+    })
+    .filter((item): item is string => Boolean(item));
 }
 
 export function extractGoalId(value: unknown): string | undefined {
@@ -450,31 +477,42 @@ export function defaultDraft(context: ProjectLoopContext): HarnessProfileDraft {
       "  id: profile_draft_41c8",
       "  status: DRAFT",
       "  inherits:",
-      "    - enterprise-common-harness@1.1.0",
-      "    - python-web-service-harness@1.2.0",
+      "    - database-product-harness@2.0.0",
       "  scope:",
-      "    include: [inventory domain, FastAPI HTTP API, persistence]",
-      "    exclude: [billing ownership, external ERP source of truth]",
+      "    include: [self-developed database product, SQL engine, storage engine, recovery]",
+      "    exclude: [evolving PostgreSQL or MySQL upstreams as the product]",
+      "  harnessLayers:",
+      "    domain: database-product",
+      "    compatibilityProfiles: [postgres-compatible, mysql-compatible, ansi-sql]",
+      "    architectureProfiles: [distributed, htap, mpp]",
+      "    runtimeProfiles: [java, go, rust, generic]",
       "  controls:",
-      "    domainRules: [idempotency, audit trail, transaction boundaries]",
+      "    domainRules: [SQL compatibility, transaction isolation, crash recovery]",
+      "    referenceBoundary: PostgreSQL/MySQL are compatibility oracles only",
       "    exceptionHandling:",
-      "      required: [FastAPI handlers, ASGI middleware, domain exception mapper]",
-      "      validation: release-blocking HTTP error contract tests",
+      "      required: [sqlState, queryId, transactionId, traceId]",
+      "      validation: release-blocking SQL and protocol error contract tests",
       "    logging:",
-      "      requiredFields: [requestId, correlationId, phaseId, module, action, cause]",
+      "      requiredFields: [requestId, traceId, queryId, transactionId, sqlState]",
       "      triage: ERROR logs must link to evidence.requestId",
       "    observability:",
-      "      required: [RED metrics, trace spans, APM map, alert policy]",
+      "      required: [query latency, transaction aborts, replication lag, recovery status]",
       "    releaseGates:",
-      "      required: [preflight, canary evidence, rollback evidence, human approval]"
+      "      required: [SQL compatibility report, recovery proof, benchmark summary, human approval]"
     ].join("\n"),
     compiledContent: "",
     sourceDigest: "sha256:7aa1c8...e912",
     compiledDigest: "sha256:41c8...compiled",
     policyRefs: [],
-    templateRef: "python-web-service-harness@1.2.0",
-    generatedByEvidence: ["templateSelection=auto-match", `project=${projectId}`],
-    validationSummary: "32 checks; release-blocking validation required for logs, exception mapping, observability, and release gates.",
+    templateRef: "database-product-harness@2.0.0",
+    harnessLayer: "domain",
+    domain: "database-product",
+    compatibilityProfiles: ["postgres-compatible", "mysql-compatible", "ansi-sql"],
+    architectureProfiles: ["distributed", "htap", "mpp"],
+    runtimeProfiles: ["java", "go", "rust", "generic"],
+    referenceBoundary: "PostgreSQL and MySQL are compatibility references and differential oracles, not the evolved product.",
+    generatedByEvidence: ["templateSelection=auto-match", "domain=database-product", "domainSignal=database product", `project=${projectId}`],
+    validationSummary: "32 checks; SQL compatibility, recovery, benchmark, observability, and release gates are release-blocking.",
     diffSummary: "No active profile in demo baseline.",
     raw: undefined
   };

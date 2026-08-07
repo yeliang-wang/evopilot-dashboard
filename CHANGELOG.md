@@ -8,6 +8,28 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 2.0.0 - 2026-08-07
+
+### Added
+
+- Added Agent Console display for EvoPilot v2 domain HarnessTemplate metadata: harness layer, domain, compatibility profiles, architecture profiles, runtime profiles, and reference boundary.
+- Updated demo and browser test fixtures to use `database-product-harness@2.0.0` with structured `ProjectHarnessProfile` source content.
+- Added static contract coverage for v2 domain Harness fields and Dashboard rendering.
+
+### Changed
+
+- Updated package version, installer default image tag, Cloud/Distribution docs, release notes, and open-source governance pointers to `2.0.0`.
+- Kept Dashboard as an EvoPilot HTTP client; template matching still comes from EvoPilot API evidence, not local browser logic.
+
+### Validation
+
+- `npm run check`
+- `npm run smoke:console`
+- `npm run test:visual`
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 1.0.14 - 2026-08-06
 
 ### Fixed

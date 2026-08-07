@@ -159,6 +159,13 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Use my profile for this run",
     "workspace scope",
     "HarnessTemplateEvolution",
+    "database-product-harness@2.0.0",
+    "domain=database-product",
+    "Compatibility",
+    "Harness layer",
+    "compatibilityProfiles",
+    "architectureProfiles",
+    "runtimeProfiles",
     "接入项目 LLM 用量追踪",
     "Project LLM Usage",
     "WorkspaceUsagePanel",
@@ -538,6 +545,9 @@ test("dashboard test matrix covers browser e2e, visual regression, live e2e, and
   assert.match(mockApi, /req-project-preflight-blocked/);
   assert.match(mockApi, /connect-github-account/);
   assert.match(mockApi, /x-request-id/);
+  assert.match(mockApi, /database-product-harness@2\.0\.0/);
+  assert.match(mockApi, /domain: "database-product"/);
+  assert.match(mockApi, /postgres-compatible/);
 
   for (const workflow of [browserWorkflow, visualWorkflow, prArtifactsWorkflow]) {
     assert.match(workflow, /actions\/setup-node@v4/);
