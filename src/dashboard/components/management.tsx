@@ -1,10 +1,7 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import {
-  Eye,
-  Pencil,
   Plus,
-  RefreshCw,
-  X
+  RefreshCw
 } from "lucide-react";
 import {
   apiSurface,
@@ -28,6 +25,8 @@ import {
 } from "../model";
 import { EvidenceRow, LogLine } from "./evidence";
 import { LlmProfilesPage } from "./llm-profiles";
+import { AdminDialog, DataPanel } from "./management-widgets";
+import { TemplatesPage } from "./templates";
 import { WorkspaceUsagePanel } from "./workspace-usage";
 
 type RowRecord = Record<string, unknown>;
@@ -377,90 +376,6 @@ function UsersPage({
   );
 }
 
-function TemplatesPage({
-  form,
-  snapshot,
-  busyAction,
-  lastAction,
-  onForm,
-  onRunAction
-}: {
-  form: TemplateEvolutionForm;
-  snapshot: Record<string, ApiResult>;
-  busyAction?: string;
-  lastAction?: DashboardActionResult;
-  onForm: (form: TemplateEvolutionForm) => void;
-  onRunAction: (action: DashboardActionRequest) => void;
-}) {
-  const templates = resultItems(snapshot.templates, ["templates"]).slice(0, 8);
-  const [dialog, setDialog] = useState(false);
-
-  function openEvolution(row?: RowRecord) {
-    if (row) onForm({ ...form, baseTemplateId: fieldText(row, ["id", "templateId", "name"], form.baseTemplateId) });
-    setDialog(true);
-  }
-
-  const action: DashboardActionRequest = {
-    id: "admin-create-template-evolution",
-    label: "Create HarnessTemplateEvolution",
-    method: "POST",
-    path: apiSurface.harnessTemplateEvolutions,
-    body: {
-      baseTemplateId: form.baseTemplateId,
-      targetVersion: form.targetVersion || undefined,
-      intent: form.intent,
-      sources: [{
-        type: form.sourceType,
-        name: form.sourceUri || form.sourceType,
-        uri: form.sourceType === "admin-note" ? undefined : form.sourceUri,
-        contentText: form.sourceType === "admin-note" ? form.sourceUri : undefined
-      }]
-    }
-  };
-
-  return (
-    <main className="management-workspace">
-      <DataPanel
-        title="企业级 HarnessTemplate 知识包"
-        subtitle="新项目自动匹配模板；管理员通过版本、changelog 和 evolution run 管理生命周期。"
-        rows={templates}
-        columns={[
-          ["Template", ["id", "templateId", "name"]],
-          ["Version", ["version"]],
-          ["Type", ["softwareType", "language", "category"]],
-          ["Status", ["status", "state"]]
-        ]}
-        empty="No templates returned by EvoPilot."
-        toolbar={<button className="btn primary" type="button" onClick={() => openEvolution()}><Plus size={15} aria-hidden="true" /> 创建 evolution draft</button>}
-        actionLabel="进化"
-        actionIcon="plus"
-        onRowAction={openEvolution}
-      />
-      {dialog && (
-        <AdminDialog
-          eyebrow="Template evolution"
-          title="创建进化 run"
-          subtitle={`${form.baseTemplateId || "base template"} · target ${form.targetVersion || "next version"}`}
-          primaryLabel="创建 evolution draft"
-          busy={busyAction === action.id}
-          disabled={!form.baseTemplateId || !form.intent}
-          lastAction={lastAction}
-          onClose={() => setDialog(false)}
-          onSubmit={() => onRunAction(action)}
-        >
-          <label><span>Base Template</span><input value={form.baseTemplateId} onChange={(event) => onForm({ ...form, baseTemplateId: event.currentTarget.value })} /></label>
-          <label><span>Target Version</span><input value={form.targetVersion} onChange={(event) => onForm({ ...form, targetVersion: event.currentTarget.value })} /></label>
-          <label><span>Intent</span><textarea value={form.intent} onChange={(event) => onForm({ ...form, intent: event.currentTarget.value })} /></label>
-          <div className="form-two">
-            <label><span>Source Type</span><select value={form.sourceType} onChange={(event) => onForm({ ...form, sourceType: event.currentTarget.value })}><option value="admin-note">admin-note</option><option value="github-repo">github-repo</option><option value="web-url">web-url</option><option value="attachment">attachment</option><option value="local-pack">local-pack</option></select></label>
-            <label><span>Source</span><input value={form.sourceUri} onChange={(event) => onForm({ ...form, sourceUri: event.currentTarget.value })} /></label>
-          </div>
-        </AdminDialog>
-      )}
-    </main>
-  );
-}
-
 function AuditPage({
   snapshot,
   session,
@@ -539,150 +454,6 @@ function SummaryCard({ label, value, detail }: { label: string; value: string; d
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{detail}</small>
-    </div>
-  );
-}
-
-function DataPanel({
-  title,
-  subtitle,
-  rows,
-  columns,
-  empty,
-  toolbar,
-  actionLabel,
-  actionIcon = "edit",
-  onRowAction
-}: {
-  title: string;
-  subtitle: string;
-  rows: RowRecord[];
-  columns: Array<[string, string[]]>;
-  empty: string;
-  toolbar?: ReactNode;
-  actionLabel?: string;
-  actionIcon?: "edit" | "eye" | "plus";
-  onRowAction?: (row: RowRecord) => void;
-}) {
-  const gridTemplateColumns = `repeat(${columns.length + (onRowAction ? 1 : 0)}, minmax(0, 1fr))`;
-  return (
-    <section className="data-panel">
-      <div className="panel-headline">
-        <PanelTitle eyebrow="Live projection" title={title} subtitle={subtitle} />
-        {toolbar && <div className="panel-actions">{toolbar}</div>}
-      </div>
-      <div className="table">
-        <div className="table-head" style={{ gridTemplateColumns }}>
-          {columns.map(([label]) => <strong key={label}>{label}</strong>)}
-          {onRowAction && <strong>操作</strong>}
-        </div>
-        {rows.length === 0 ? (
-          <div className="empty-row">{empty}</div>
-        ) : rows.map((row, index) => (
-          <div key={index} className="table-row" style={{ gridTemplateColumns }}>
-            {columns.map(([label, keys]) => <TableCell key={label} label={label} value={fieldText(row, keys)} />)}
-            {onRowAction && (
-              <span className="row-actions">
-                <button className="mini-btn" type="button" onClick={() => onRowAction(row)}>
-                  {actionIcon === "eye" ? <Eye size={14} aria-hidden="true" /> : actionIcon === "plus" ? <Plus size={14} aria-hidden="true" /> : <Pencil size={14} aria-hidden="true" />}
-                  {actionLabel}
-                </button>
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="notice amber">
-        <strong>Dashboard 不绕过 EvoPilot 控制面。</strong>
-        <span>页面显示的是当前 API projection；最终状态以服务端返回的 requestId、status、nextAction 和 audit 为准。</span>
-      </div>
-    </section>
-  );
-}
-
-function TableCell({ label, value }: { label: string; value: string }) {
-  if (["Status", "Result"].includes(label) && value !== "-") {
-    return <span><span className={`status-pill ${statusClassName(value)}`}>{value}</span></span>;
-  }
-  return <span>{value}</span>;
-}
-
-function statusClassName(value: string) {
-  const normalized = value.toUpperCase();
-  if (normalized.includes("DRAFT") || normalized.includes("WAITING")) return "draft";
-  if (normalized.includes("FAIL") || normalized.includes("BLOCK") || normalized.includes("DISABLED")) return "red";
-  return "";
-}
-
-function PanelTitle({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
-  return (
-    <div className="panel-title">
-      <span>{eyebrow}</span>
-      <h3>{title}</h3>
-      {subtitle && <p>{subtitle}</p>}
-    </div>
-  );
-}
-
-function AdminDialog({
-  eyebrow,
-  title,
-  subtitle,
-  primaryLabel,
-  children,
-  busy,
-  disabled,
-  footerNote,
-  lastAction,
-  onClose,
-  onSubmit
-}: {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  primaryLabel: string;
-  children: ReactNode;
-  busy?: boolean;
-  disabled?: boolean;
-  footerNote?: string;
-  lastAction?: DashboardActionResult;
-  onClose: () => void;
-  onSubmit: () => void;
-}) {
-  return (
-    <div className="modal-backdrop" role="presentation">
-      <section className="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-dialog-title">
-        <header className="modal-header">
-          <div>
-            <span>{eyebrow}</span>
-            <h3 id="admin-dialog-title">{title}</h3>
-            {subtitle && <p>{subtitle}</p>}
-          </div>
-          <button className="icon-close" type="button" aria-label="关闭" onClick={onClose}><X size={15} aria-hidden="true" /></button>
-        </header>
-        <div className="modal-body">
-          {children}
-          <ActionEvidence lastAction={lastAction} />
-        </div>
-        <footer className="modal-footer">
-          <small>{footerNote ?? "保存后仍以 EvoPilot API 返回的 requestId、status、nextAction 为准。"}</small>
-          <div className="modal-footer-actions">
-            <button className="btn ghost" type="button" onClick={onClose}>取消</button>
-            <button className="btn green" type="button" disabled={busy || disabled} onClick={onSubmit}>{busy ? "submitting" : primaryLabel}</button>
-          </div>
-        </footer>
-      </section>
-    </div>
-  );
-}
-
-function ActionEvidence({ lastAction }: { lastAction?: DashboardActionResult }) {
-  return (
-    <div className="drawer-card">
-      <strong>Last action evidence</strong>
-      <small>{lastAction ? `${lastAction.actionLabel}: ${lastAction.status}` : "No action on this page yet."}</small>
-      <EvidenceRow label="requestId" value={lastAction?.requestId ?? "not returned"} />
-      <EvidenceRow label="nextAction" value={lastAction?.nextAction ?? "none"} />
     </div>
   );
 }

@@ -47,7 +47,8 @@ Ordinary users do not choose public `HarnessTemplate` files manually. Template m
 - [Cloud Deployment](deployment/cloud.md) explains operator-owned cloud deployment paths.
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v2.1.0 Release Notes](releases/2.1.0.md) is the EvoPilot v2.1 domain Harness execution compatibility body for the current public production baseline.
+- [EvoPilot Dashboard v2.2.0 Release Notes](releases/2.2.0.md) is the EvoPilot v2.2 Harness Knowledge Factory compatibility body for the current public production baseline.
+- [EvoPilot Dashboard v2.1.0 Release Notes](releases/2.1.0.md) is the EvoPilot v2.1 domain Harness execution compatibility body superseded by v2.2.
 - [EvoPilot Dashboard v1.0.13 Release Notes](releases/1.0.13.md) is the initial LLM Profiles and Agent Console project-binding body superseded by later Dashboard releases.
 - [EvoPilot Dashboard v1.0.10 Release Notes](releases/1.0.10.md) is the Workspaces usage rendering resilience body for the previous public production baseline.
 - [EvoPilot Dashboard v1.0.9 Release Notes](releases/1.0.9.md) is the project LLM usage visibility body for the previous public production baseline.

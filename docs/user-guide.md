@@ -103,3 +103,5 @@ Use **View evidence** when you need audit or AI-agent details:
 | Read audit | `GET /api/v1/audit` |
 
 Dashboard does not call CLI commands. It uses EvoPilot HTTP APIs through `src/api.ts`.
+
+The Harness Templates page includes **Harness Knowledge Factory**. It displays EvoPilot-returned `HarnessTemplateEvolution` runs with `sourceTypes`, `domainSignals`, and `gapClassifications`, and can create a new draft from `admin-note`, `source-project`, `source-corpus`, `production-log`, `evopilot-history`, attachment, repository, existing template, or runtime evidence sources. The browser does not read local files; source extraction, production-log redaction, snapshots, draft validation, approval, publish, and impact remain server-governed.

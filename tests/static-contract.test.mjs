@@ -15,6 +15,8 @@ const dashboardComponentFiles = [
   "src/dashboard/components/evidence.tsx",
   "src/dashboard/components/llm-profiles.tsx",
   "src/dashboard/components/management.tsx",
+  "src/dashboard/components/management-widgets.tsx",
+  "src/dashboard/components/templates.tsx",
   "src/dashboard/components/stage.tsx",
   "src/dashboard/components/workspace-usage.tsx"
 ];
@@ -159,7 +161,15 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Use my profile for this run",
     "workspace scope",
     "HarnessTemplateEvolution",
-    "database-product-harness@2.1.0",
+    "Harness Knowledge Factory",
+    "source-project",
+    "source-corpus",
+    "production-log",
+    "evopilot-history",
+    "gapClassificationsText",
+    "domainSignalsText",
+    "dashboard-knowledge-factory",
+    "database-product-harness@2.2.0",
     "domain=database-product",
     "Compatibility",
     "Harness layer",
@@ -549,7 +559,7 @@ test("dashboard test matrix covers browser e2e, visual regression, live e2e, and
   assert.match(mockApi, /req-project-preflight-blocked/);
   assert.match(mockApi, /connect-github-account/);
   assert.match(mockApi, /x-request-id/);
-  assert.match(mockApi, /database-product-harness@2\.1\.0/);
+  assert.match(mockApi, /database-product-harness@2\.2\.0/);
   assert.match(mockApi, /domain: "database-product"/);
   assert.match(mockApi, /domainHarnessRequiredActions/);
   assert.match(mockApi, /evidenceAdapters/);

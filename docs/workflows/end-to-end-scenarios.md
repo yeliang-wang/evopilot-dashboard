@@ -140,16 +140,17 @@ Do not create cross-tenant users from an ordinary operator session. Stop on `403
 
 ## Scenario 7: Platform Admin Starts Harness Template Evolution
 
-Use when an administrator wants to evolve a public HarnessTemplate knowledge pack without manually editing server state.
+Use when an administrator wants to evolve a public HarnessTemplate knowledge pack from historical projects, project corpora, attachments, production logs, EvoPilot goal/loop history, and existing evidence without manually editing server state.
 
 ### Browser Flow
 
 1. Log in as a platform administrator.
 2. Open **Harness Templates**.
 3. Review existing template versions returned by EvoPilot.
-4. Fill base template, target version, intent, source type, and source reference.
+4. Fill base template, target version, intent, source type, and source value. Source type may be `source-project`, `source-corpus`, `production-log`, `evopilot-history`, `attachment`, `github-repo`, `gitlab-repo`, `web-url`, `local-pack`, `existing-template`, `runtime-evidence`, or `admin-note`.
 5. Click **创建 evolution draft**.
-6. Open evidence or audit and report `evolutionId`, requestId, status, and nextAction when returned.
+6. Review the Harness Knowledge Factory table for `sourceTypes`, `domainSignals`, `gapClassifications`, status, and target version.
+7. Open evidence or audit and report `evolutionId`, requestId, status, and nextAction when returned.
 
 ### CLI-equivalent
 
@@ -161,4 +162,4 @@ harness template evolution advance
 
 ### WorkBuddy deviation guard
 
-Do not approve or publish a template evolution from Dashboard unless EvoPilot exposes that gate and the administrator has reviewed source coverage, generated pack, validation, diff, changelog, and project impact.
+Do not approve or publish a template evolution from Dashboard unless EvoPilot exposes that gate and the administrator has reviewed source coverage, redaction status, generated pack, validation, diff, changelog, gap classifications, and project impact.

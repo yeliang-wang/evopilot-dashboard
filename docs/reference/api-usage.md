@@ -29,6 +29,8 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Harness templates and policies | `GET /api/v1/harness/templates`, `GET /api/v1/harness/policies` |
 | LLM profiles | `GET /api/v1/llm-profiles`, `POST /api/v1/llm-profiles`, `POST /api/v1/llm-profiles/{profileId}/preflight` |
 | Project LLM default | `GET /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm/preflight` |
+
+The Harness Templates page renders EvoPilot's Harness Knowledge Factory projection from `GET /api/v1/harness/template-evolutions`. It displays `sourceTypes`, `domainSignals`, `gapClassifications`, target template/version, status, and next action when returned. Creation uses `POST /api/v1/harness/template-evolutions` and submits only the administrator-entered source object; file extraction, log redaction, snapshots, draft generation, approval, publish, and impact remain EvoPilot server responsibilities.
 | Audit | `GET /api/v1/audit` |
 
 ## Projection Context

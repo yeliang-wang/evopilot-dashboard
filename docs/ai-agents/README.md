@@ -49,8 +49,10 @@ Only operate these pages when the signed-in user is a platform administrator and
 | Tenants | Create tenant, workspace, tenant admin | `POST /api/v1/tenants` |
 | Workspaces | Create workspace boundary and quota | `POST /api/v1/workspaces` |
 | Users | Create scoped user with `mustChangePassword=true` | `POST /api/v1/users` |
-| Harness Templates | Create `HarnessTemplateEvolution` draft | `POST /api/v1/harness/template-evolutions` |
+| Harness Templates | Create `HarnessTemplateEvolution` draft through Harness Knowledge Factory | `POST /api/v1/harness/template-evolutions` |
 | Audit | Read request/action/failure trace | `GET /api/v1/audit` |
+
+Harness Knowledge Factory inputs include `source-project`, `source-corpus`, `production-log`, `evopilot-history`, attachments, repositories, existing templates, runtime evidence, and administrator notes. Stop at `REVIEW_REQUIRED` and report source coverage, `domainSignals`, `gapClassifications`, redaction status, generated pack, validation, diff, changelog, impact, requestId, and nextAction.
 
 If RBAC hides a page or the server returns `403`, stop and report a scope or role problem. Do not try to switch tenant/workspace as an ordinary user.
 

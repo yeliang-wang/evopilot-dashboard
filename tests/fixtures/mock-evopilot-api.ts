@@ -73,14 +73,14 @@ export async function mockEvoPilotApi(
           profileId: "default",
           version: 1,
           status: "DRAFT",
-          templateRef: "database-product-harness@2.1.0",
+          templateRef: "database-product-harness@2.2.0",
           sourceDigest: "sha256:mock-source-digest",
           compiledDigest: "sha256:mock-compiled-digest",
           policyRefs: ["release-governance@1", "observability-required@1"],
           sourceContent: {
             schema: "evopilot-project-harness-profile/v1",
             profileId: "default",
-            template: { templateId: "database-product-harness", version: "2.1.0" },
+            template: { templateId: "database-product-harness", version: "2.2.0" },
             runtime: {
               harnessLayer: "domain",
               domain: "database-product",
@@ -214,6 +214,23 @@ function ok(data: unknown, requestId: string): JsonResponse {
 }
 
 function defaultProjection(pathname: string): unknown {
+  if (pathname === "/api/v1/harness/template-evolutions") {
+    return {
+      schema: "evopilot-harness-template-evolution-list/v1",
+      evolutions: [{
+        evolutionId: "database-knowledge-factory-v2",
+        status: "REVIEW_REQUIRED",
+        targetTemplateId: "database-product-harness",
+        targetVersion: "2.2.0",
+        sourceCount: 4,
+        snapshotCount: 4,
+        sourceTypes: ["source-project", "source-corpus", "production-log", "evopilot-history"],
+        domainSignals: ["database-product-domain", "distributed-cache-domain", "scheduler-domain"],
+        gapClassifications: ["harness-template", "project-profile", "tenant-policy"],
+        nextAction: "review-approve-template-evolution"
+      }]
+    };
+  }
   return {
     schema: "evopilot-dashboard-projection/v1",
     path: pathname,

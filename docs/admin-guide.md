@@ -31,7 +31,7 @@ The Dashboard exposes mutating controls, but EvoPilot API remains the enforcemen
 | Harness profile activation | Require owner review of the generated/edited DRAFT before activation. | Review Pack shows generated profile version/digest; Last API Action shows activate status. |
 | Goal plan approval | Require Alpha/Beta/RC/GA phase plan review before approval. | Review Pack requires `confirmedBy` and `confirmation`; Audit can verify approval. |
 | Incident repair | Use requestId, traceId, failed node, root cause, and nextAction. | Audit and Evidence Drawer show troubleshooting contract; server logs remain authoritative. |
-| Harness template evolution | Use versioned template evolution runs before publish. | Harness Templates page creates evolution draft; approval/publish still requires administrator review of source coverage, generated pack, validation, diff, changelog, and impact. |
+| Harness template evolution | Use versioned template evolution runs before publish. | Harness Templates page creates evolution draft records through Knowledge Factory sources: historical projects, corpora, attachments, production logs, EvoPilot history, and existing evidence; approval/publish still requires administrator review of source coverage, redaction, generated pack, validation, diff, changelog, and impact. |
 
 If EvoPilot returns `403`, `409`, `PROJECT_HARNESS_PROFILE_POLICY_STALE`, `WAITING_APPROVAL`, `NO-GO`, or a repair-oriented `nextAction`, do not bypass it from the browser. Repair the server-side condition and rerun the same action.
 

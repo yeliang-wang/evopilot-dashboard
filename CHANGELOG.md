@@ -8,6 +8,24 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 2.2.0 - 2026-08-07
+
+### Added
+
+- Added Harness Knowledge Factory projection on the Harness Templates page, including source types, domain signals, gap classifications, status, and target version.
+- Added a template evolution creation dialog that can submit historical projects, project corpora, production logs, EvoPilot history, attachments, repositories, existing templates, runtime evidence, and administrator notes to EvoPilot.
+- Added browser/API documentation for the Knowledge Factory admin flow and stop/report fields.
+
+### Changed
+
+- Kept Dashboard as an EvoPilot HTTP client: extraction, redaction, snapshots, approval, publish, and impact remain server responsibilities.
+- Updated demo fixtures, static contracts, package version, installer defaults, Cloud/Distribution docs, release notes, and governance checks to `2.2.0`.
+
+### Validation
+
+- `npm run check`
+- Full release validation is required before publication: `npm run test:browser`, `npm run release:artifact`, `npm run verify:release-artifact`, and `git diff --check`.
+
 ## 2.1.0 - 2026-08-07
 
 ### Added

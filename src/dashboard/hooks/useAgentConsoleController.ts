@@ -101,10 +101,10 @@ export function useAgentConsoleController() {
   });
   const [templateForm, setTemplateForm] = useState<TemplateEvolutionForm>({
     baseTemplateId: "python-enterprise-harness",
-    targetVersion: "1.2.0",
-    intent: "Upgrade observability, exception triage, release evidence, and AI-agent runbook coverage.",
-    sourceType: "admin-note",
-    sourceUri: "Administrator lifecycle note"
+    targetVersion: "2.2.0",
+    intent: "Evolve domain HarnessTemplate coverage from historical projects, production logs, attachments, and EvoPilot loop history.",
+    sourceType: "source-project",
+    sourceUri: "registered-project-or-source-project-path"
   });
   const [llmProfileForm, setLlmProfileForm] = useState<LlmProfileForm>({
     profileId: "workspace-glm-52",
