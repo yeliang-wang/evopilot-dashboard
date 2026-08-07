@@ -7,7 +7,7 @@
 [![CI](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://react.dev/)
-[![Release](https://img.shields.io/badge/Release-v2.2.0%20GA-2ea043)](./docs/releases/2.2.0.md)
+[![Release](https://img.shields.io/badge/Release-v2.3.0%20GA-2ea043)](./docs/releases/2.3.0.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 Admins provision scoped users. Users sign in, connect GitHub/GitLab projects, describe goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` drafts, and run governed loops from a browser.
@@ -23,7 +23,7 @@ Admins provision scoped users. Users sign in, connect GitHub/GitLab projects, de
 | Entry | Use when | Command |
 | --- | --- | --- |
 | Run Dashboard | You have an EvoPilot API server and want the browser surface in one command | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
-| Self-host with EvoPilot | You want the API and Dashboard in one generated stack | `npx create-evopilot@2.2.0 self-host --dir evopilot-stack --init-env` |
+| Self-host with EvoPilot | You want the API and Dashboard in one generated stack | `npx create-evopilot@2.3.0 self-host --dir evopilot-stack --init-env` |
 | Connect to API | You deploy Dashboard as static assets behind a proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
 
 Desktop app and hosted Cloud trial are not published Dashboard surfaces yet. The supported public entry points are local browser run, self-hosted stack, and static deployment connected to EvoPilot API.

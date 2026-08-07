@@ -101,7 +101,7 @@ export function useAgentConsoleController() {
   });
   const [templateForm, setTemplateForm] = useState<TemplateEvolutionForm>({
     baseTemplateId: "python-enterprise-harness",
-    targetVersion: "2.2.0",
+    targetVersion: "",
     intent: "Evolve domain HarnessTemplate coverage from historical projects, production logs, attachments, and EvoPilot loop history.",
     sourceType: "source-project",
     sourceUri: "registered-project-or-source-project-path"

@@ -8,6 +8,24 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 2.3.0 - 2026-08-07
+
+### Added
+
+- Added HarnessTemplate match preview on the Harness Templates page through EvoPilot `POST /api/v1/harness/template-matches`.
+- Added Dashboard action coverage for creating `HarnessTemplateEvolution` runs with `autoMatch: true`.
+- Added mock API and static contract coverage for distributed-cache auto-match reports returned by EvoPilot.
+
+### Changed
+
+- Kept Dashboard as an EvoPilot HTTP client: template match decisions, candidate scoring, source digests, and next actions remain server-derived.
+- Updated package version, installer defaults, Cloud/Distribution docs, release notes, and governance checks to `2.3.0`.
+- Removed the default evolution target version from the dialog so EvoPilot's auto-match result can select either an existing template upgrade or a new domain target version.
+
+### Validation
+
+- Full release validation is required before publication: `npm run check`, `npm run test:browser`, `npm run release:artifact`, `npm run verify:release-artifact`, and `git diff --check`.
+
 ## 2.2.0 - 2026-08-07
 
 ### Added

@@ -1519,6 +1519,48 @@ pre {
   background: var(--panel-soft);
 }
 
+.dialog-inline-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.metric-grid.compact {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metric-cell {
+  min-width: 0;
+  min-height: 60px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+}
+
+.metric-cell small,
+.metric-cell strong {
+  overflow-wrap: anywhere;
+}
+
+.metric-cell small {
+  color: var(--faint);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.metric-cell strong {
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
 .modal-footer {
   min-width: 0;
   padding: 14px 18px;
@@ -2145,7 +2187,8 @@ pre {
   .metrics.two,
   .metrics.three,
   .capability-list,
-  .form-two {
+  .form-two,
+  .metric-grid.compact {
     grid-template-columns: minmax(0, 1fr);
   }
 

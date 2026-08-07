@@ -203,6 +203,38 @@ export async function mockEvoPilotApi(
       }, "req-goal-advance"));
     }
 
+    if (method === "POST" && url.pathname === "/api/v1/harness/template-matches") {
+      return fulfill(route, ok(templateMatchProjection(), "req-harness-template-match"));
+    }
+
+    if (method === "POST" && url.pathname === "/api/v1/harness/template-evolutions") {
+      return fulfill(route, {
+        status: 201,
+        requestId: "req-harness-template-evolution-create",
+        body: {
+          data: {
+            schema: "evopilot-harness-template-evolution-create-result/v1",
+            status: "CREATED",
+            evolution: {
+              schema: "evopilot-harness-template-evolution-run/v1",
+              evolutionId: "distributed-cache-harness-0.1.0-mock",
+              status: "CREATED",
+              baseTemplateRef: { templateId: "go-middleware-harness", version: "1.1.0", digest: "sha256:mock-go-template" },
+              targetTemplateId: "distributed-cache-harness",
+              targetVersion: "0.1.0",
+              sources: [],
+              snapshots: [],
+              autoMatch: templateMatchProjection().match,
+              blockers: [],
+              warnings: []
+            },
+            autoMatch: templateMatchProjection().match,
+            nextAction: "advance-template-evolution"
+          }
+        }
+      });
+    }
+
     return fulfill(route, ok(defaultProjection(url.pathname), requestIdFrom(key)));
   });
 
@@ -225,6 +257,7 @@ function defaultProjection(pathname: string): unknown {
         sourceCount: 4,
         snapshotCount: 4,
         sourceTypes: ["source-project", "source-corpus", "production-log", "evopilot-history"],
+        autoMatch: templateMatchProjection().match,
         domainSignals: ["database-product-domain", "distributed-cache-domain", "scheduler-domain"],
         gapClassifications: ["harness-template", "project-profile", "tenant-policy"],
         nextAction: "review-approve-template-evolution"
@@ -238,6 +271,41 @@ function defaultProjection(pathname: string): unknown {
     status: "READY",
     nextAction: "none",
     blockers: []
+  };
+}
+
+function templateMatchProjection(): { schema: string; match: Record<string, unknown>; nextAction: string } {
+  return {
+    schema: "evopilot-harness-template-match-result/v1",
+    match: {
+      schema: "evopilot-harness-template-match-report/v1",
+      decision: "CREATE_NEW_FROM_BASE",
+      confidence: 0.92,
+      baseTemplateRef: { templateId: "go-middleware-harness", version: "1.1.0", digest: "sha256:mock-go-template" },
+      targetTemplateId: "distributed-cache-harness",
+      targetVersion: "0.1.0",
+      targetHarnessLayer: "domain",
+      targetDomain: "distributed-cache",
+      languageSignals: ["languageSignal=go.mod"],
+      runtimeSignals: ["runtime=go", "languageSignal=go.mod"],
+      domainSignals: ["domain=distributed-cache", "domainSignal=distributed cache"],
+      sourceDigests: ["sha256:mock-source"],
+      candidateTemplates: [
+        {
+          templateRef: { templateId: "go-middleware-harness", version: "1.1.0", digest: "sha256:mock-go-template" },
+          harnessLayer: "runtime",
+          languageFamily: "go",
+          score: 146,
+          matchedSignals: ["languageSignal=go.mod"],
+          reasons: ["runtimeBase=go"]
+        }
+      ],
+      reasons: ["decision=CREATE_NEW_FROM_BASE", "domain=distributed-cache", "baseTemplate=go-middleware-harness@1.1.0", "target=distributed-cache-harness@0.1.0"],
+      llmAdjudication: { used: false, reason: "deterministic matcher used" },
+      nextAction: "advance-template-evolution",
+      generatedAt: "2026-08-07T00:00:00.000Z"
+    },
+    nextAction: "advance-template-evolution"
   };
 }
 

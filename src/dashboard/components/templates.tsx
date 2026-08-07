@@ -7,6 +7,8 @@ import {
   type DashboardActionResult
 } from "../../api";
 import {
+  asRecord,
+  dataEnvelope,
   fieldText,
   resultItems,
   type TemplateEvolutionForm
@@ -35,28 +37,43 @@ export function TemplatesPage({
     ...row,
     target: `${fieldText(row, ["targetTemplateId"])}@${fieldText(row, ["targetVersion"])}`,
     sourceTypesText: listText(row.sourceTypes) || String(row.sourceCount ?? "-"),
+    autoMatchText: autoMatchText(row.autoMatch),
     domainSignalsText: listText(row.domainSignals) || "-",
     gapClassificationsText: listText(row.gapClassifications) || "-"
   }));
   const [dialog, setDialog] = useState(false);
+  const matchPreview = matchPreviewFromAction(lastAction);
 
   function openEvolution(row?: RowRecord) {
     if (row) onForm({ ...form, baseTemplateId: fieldText(row, ["id", "templateId", "name"], form.baseTemplateId) });
     setDialog(true);
   }
 
+  const source = templateEvolutionSourceFromForm(form);
+  const matchAction: DashboardActionRequest = {
+    id: "admin-match-template-evolution",
+    label: "Preview HarnessTemplate match",
+    method: "POST",
+    path: apiSurface.harnessTemplateMatches,
+    body: {
+      intent: form.intent,
+      sources: [source]
+    }
+  };
   const action: DashboardActionRequest = {
     id: "admin-create-template-evolution",
     label: "Create HarnessTemplateEvolution",
     method: "POST",
     path: apiSurface.harnessTemplateEvolutions,
     body: {
-      baseTemplateId: form.baseTemplateId,
+      baseTemplateId: form.baseTemplateId || undefined,
       targetVersion: form.targetVersion || undefined,
       intent: form.intent,
-      sources: [templateEvolutionSourceFromForm(form)]
+      autoMatch: true,
+      sources: [source]
     }
   };
+  const formReady = Boolean(form.intent && form.sourceUri);
 
   return (
     <main className="management-workspace">
@@ -86,6 +103,7 @@ export function TemplatesPage({
             ["Status", ["status"]],
             ["Target", ["target"]],
             ["Sources", ["sourceTypesText"]],
+            ["Match", ["autoMatchText"]],
             ["Domain", ["domainSignalsText"]],
             ["Gaps", ["gapClassificationsText"]]
           ]}
@@ -96,21 +114,27 @@ export function TemplatesPage({
         <AdminDialog
           eyebrow="Template evolution"
           title="创建进化 run"
-          subtitle={`${form.baseTemplateId || "base template"} · target ${form.targetVersion || "next version"}`}
+          subtitle={`${form.baseTemplateId || "auto-match"} · target ${form.targetVersion || "matched or next version"}`}
           primaryLabel="创建 evolution draft"
           busy={busyAction === action.id}
-          disabled={!form.baseTemplateId || !form.intent}
+          disabled={!formReady}
           lastAction={lastAction}
           onClose={() => setDialog(false)}
           onSubmit={() => onRunAction(action)}
         >
-          <label><span>Base Template</span><input value={form.baseTemplateId} onChange={(event) => onForm({ ...form, baseTemplateId: event.currentTarget.value })} /></label>
+          <label><span>Base Template</span><input placeholder="auto-match when empty" value={form.baseTemplateId} onChange={(event) => onForm({ ...form, baseTemplateId: event.currentTarget.value })} /></label>
           <label><span>Target Version</span><input value={form.targetVersion} onChange={(event) => onForm({ ...form, targetVersion: event.currentTarget.value })} /></label>
           <label><span>Intent</span><textarea value={form.intent} onChange={(event) => onForm({ ...form, intent: event.currentTarget.value })} /></label>
           <div className="form-two">
             <label><span>Source Type</span><select value={form.sourceType} onChange={(event) => onForm({ ...form, sourceType: event.currentTarget.value })}>{templateEvolutionSourceTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
             <label><span>Source</span><input value={form.sourceUri} onChange={(event) => onForm({ ...form, sourceUri: event.currentTarget.value })} /></label>
           </div>
+          <div className="dialog-inline-actions">
+            <button className="btn ghost" type="button" disabled={busyAction === matchAction.id || !formReady} onClick={() => onRunAction(matchAction)}>
+              {busyAction === matchAction.id ? "matching" : "Preview template match"}
+            </button>
+          </div>
+          <MatchPreview match={matchPreview} />
         </AdminDialog>
       )}
     </main>
@@ -148,4 +172,50 @@ function templateEvolutionSourceFromForm(form: TemplateEvolutionForm): Record<st
 function listText(value: unknown): string {
   if (Array.isArray(value)) return value.map((item) => String(item)).filter(Boolean).slice(0, 4).join(", ");
   return typeof value === "string" ? value : "";
+}
+
+function autoMatchText(value: unknown): string {
+  const match = asRecord(value);
+  if (!match) return "-";
+  return `${fieldText(match, ["decision"])} ${fieldText(match, ["confidence"])}`;
+}
+
+function matchPreviewFromAction(action?: DashboardActionResult): RowRecord | undefined {
+  if (action?.actionId !== "admin-match-template-evolution") return undefined;
+  const payload = asRecord(dataEnvelope(action.data));
+  return asRecord(payload?.match);
+}
+
+function MatchPreview({ match }: { match?: RowRecord }) {
+  if (!match) {
+    return (
+      <div className="drawer-card">
+        <strong>Template match preview</strong>
+        <small>No match preview yet.</small>
+      </div>
+    );
+  }
+  const base = asRecord(match.baseTemplateRef);
+  const candidates = Array.isArray(match.candidateTemplates) ? match.candidateTemplates : [];
+  return (
+    <div className="drawer-card">
+      <strong>Template match preview</strong>
+      <small>{`${fieldText(match, ["decision"])} · confidence ${fieldText(match, ["confidence"])}`}</small>
+      <div className="metric-grid compact">
+        <MetricCell label="Base" value={`${fieldText(base, ["templateId"])}@${fieldText(base, ["version"])}`} />
+        <MetricCell label="Target" value={`${fieldText(match, ["targetTemplateId"])}@${fieldText(match, ["targetVersion"])}`} />
+        <MetricCell label="Domain" value={fieldText(match, ["targetDomain"])} />
+        <MetricCell label="Candidates" value={String(candidates.length)} />
+      </div>
+    </div>
+  );
+}
+
+function MetricCell({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="metric-cell">
+      <small>{label}</small>
+      <strong>{value}</strong>
+    </span>
+  );
 }

@@ -275,6 +275,7 @@ export const apiSurface = {
   projectLlmPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight`,
   harnessTemplates: "/api/v1/harness/templates",
   harnessTemplateValidate: "/api/v1/harness/templates/validate",
+  harnessTemplateMatches: "/api/v1/harness/template-matches",
   harnessTemplateEvolutions: "/api/v1/harness/template-evolutions",
   harnessPolicies: "/api/v1/harness/policies",
   projectHarnessProfiles: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles`,

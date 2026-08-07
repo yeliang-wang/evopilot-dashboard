@@ -162,12 +162,16 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "workspace scope",
     "HarnessTemplateEvolution",
     "Harness Knowledge Factory",
+    "Template match preview",
+    "Preview template match",
     "source-project",
     "source-corpus",
     "production-log",
     "evopilot-history",
     "gapClassificationsText",
     "domainSignalsText",
+    "autoMatchText",
+    "autoMatch: true",
     "dashboard-knowledge-factory",
     "database-product-harness@2.2.0",
     "domain=database-product",
@@ -273,6 +277,7 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/projects/${encodeURIComponent(projectId)}/devops/preflight",
     "/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight",
     "/api/v1/harness/templates",
+    "/api/v1/harness/template-matches",
     "/api/v1/harness/template-evolutions",
     "/api/v1/harness/policies",
     "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles",
@@ -346,6 +351,7 @@ test("optional sibling EvoPilot OpenAPI contains the dashboard contract paths", 
     "/api/v1/onboarding/project/checklist",
     "/api/v1/projects/{projectId}/usage",
     "/api/v1/harness/templates",
+    "/api/v1/harness/template-matches",
     "/api/v1/harness/template-evolutions",
     "/api/v1/harness/policies",
     "/api/v1/projects/{projectId}/harness-profiles",
@@ -559,6 +565,8 @@ test("dashboard test matrix covers browser e2e, visual regression, live e2e, and
   assert.match(mockApi, /req-project-preflight-blocked/);
   assert.match(mockApi, /connect-github-account/);
   assert.match(mockApi, /x-request-id/);
+  assert.match(mockApi, /req-harness-template-match/);
+  assert.match(mockApi, /distributed-cache-harness/);
   assert.match(mockApi, /database-product-harness@2\.2\.0/);
   assert.match(mockApi, /domain: "database-product"/);
   assert.match(mockApi, /domainHarnessRequiredActions/);
