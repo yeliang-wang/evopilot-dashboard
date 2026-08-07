@@ -73,6 +73,11 @@ export interface HarnessProfileDraft {
   architectureProfiles: string[];
   runtimeProfiles: string[];
   referenceBoundary?: string;
+  domainRequiredActions: string[];
+  evidenceAdapters: string[];
+  releaseBlockers: string[];
+  missingModuleBoundaries: string[];
+  repoProbeStatus?: string;
   generatedByEvidence: string[];
   validationSummary?: string;
   diffSummary?: string;
@@ -349,7 +354,12 @@ export function extractHarnessDraft(value: unknown): HarnessProfileDraft | undef
   const sourceContentValue = profile.sourceContent ?? data.sourceContent;
   const sourceRecord = asRecord(sourceContentValue);
   const runtimeRecord = asRecord(sourceRecord?.runtime);
+  const validationRecord = asRecord(sourceRecord?.validation);
+  const evidenceRecord = asRecord(sourceRecord?.evidence);
+  const rulesRecord = asRecord(sourceRecord?.rules);
   const metadataRecord = asRecord(sourceRecord?.metadata);
+  const repoProbeRecord = asRecord(metadataRecord?.repoProbe);
+  const domainRequiredActions = profileLabels(rulesRecord?.domainHarnessRequiredActions);
 
   const evidenceValues = [
     ...stringList(generatedBy?.evidence),
@@ -372,6 +382,11 @@ export function extractHarnessDraft(value: unknown): HarnessProfileDraft | undef
     architectureProfiles: profileLabels(runtimeRecord?.architectureProfiles ?? metadataRecord?.architectureProfiles),
     runtimeProfiles: profileLabels(runtimeRecord?.runtimeProfiles ?? metadataRecord?.runtimeProfiles),
     referenceBoundary: readableJson((runtimeRecord?.referenceBoundary ?? metadataRecord?.referenceBoundary) || undefined),
+    domainRequiredActions: domainRequiredActions.length > 0 ? domainRequiredActions : stringList(validationRecord?.requiredActions),
+    evidenceAdapters: profileLabels(evidenceRecord?.evidenceAdapters),
+    releaseBlockers: stringList(rulesRecord?.domainHarnessReleaseBlockers),
+    missingModuleBoundaries: stringList(validationRecord?.missingModuleBoundaries ?? repoProbeRecord?.missingModuleBoundaries),
+    repoProbeStatus: stringField(repoProbeRecord?.status),
     generatedByEvidence: evidenceValues,
     validationSummary: readableJson(validation || undefined),
     diffSummary: readableJson(diffFromActive || undefined),
@@ -385,7 +400,7 @@ export function profileLabels(value: unknown): string[] {
     .map((item) => {
       if (typeof item === "string") return item;
       const record = asRecord(item);
-      return stringField(record?.id) ?? stringField(record?.name) ?? stringField(record?.referenceProduct);
+      return stringField(record?.id) ?? stringField(record?.name) ?? stringField(record?.artifact) ?? stringField(record?.referenceProduct);
     })
     .filter((item): item is string => Boolean(item));
 }
@@ -477,7 +492,7 @@ export function defaultDraft(context: ProjectLoopContext): HarnessProfileDraft {
       "  id: profile_draft_41c8",
       "  status: DRAFT",
       "  inherits:",
-      "    - database-product-harness@2.0.0",
+      "    - database-product-harness@2.1.0",
       "  scope:",
       "    include: [self-developed database product, SQL engine, storage engine, recovery]",
       "    exclude: [evolving PostgreSQL or MySQL upstreams as the product]",
@@ -489,6 +504,9 @@ export function defaultDraft(context: ProjectLoopContext): HarnessProfileDraft {
       "  controls:",
       "    domainRules: [SQL compatibility, transaction isolation, crash recovery]",
       "    referenceBoundary: PostgreSQL/MySQL are compatibility oracles only",
+      "    requiredActions: [declare-database-product-boundary, map-engine-module-boundaries, bind-sql-compatibility-suite, bind-correctness-and-recovery-suite]",
+      "    evidenceAdapters: [sql-compatibility-report, differential-oracle-report, crash-recovery-log, benchmark-summary]",
+      "    releaseBlockers: [missing product boundary, missing module boundary map, missing SQL compatibility report, missing recovery proof]",
       "    exceptionHandling:",
       "      required: [sqlState, queryId, transactionId, traceId]",
       "      validation: release-blocking SQL and protocol error contract tests",
@@ -504,13 +522,18 @@ export function defaultDraft(context: ProjectLoopContext): HarnessProfileDraft {
     sourceDigest: "sha256:7aa1c8...e912",
     compiledDigest: "sha256:41c8...compiled",
     policyRefs: [],
-    templateRef: "database-product-harness@2.0.0",
+    templateRef: "database-product-harness@2.1.0",
     harnessLayer: "domain",
     domain: "database-product",
     compatibilityProfiles: ["postgres-compatible", "mysql-compatible", "ansi-sql"],
     architectureProfiles: ["distributed", "htap", "mpp"],
     runtimeProfiles: ["java", "go", "rust", "generic"],
     referenceBoundary: "PostgreSQL and MySQL are compatibility references and differential oracles, not the evolved product.",
+    domainRequiredActions: ["declare-database-product-boundary", "map-engine-module-boundaries", "bind-sql-compatibility-suite", "bind-correctness-and-recovery-suite"],
+    evidenceAdapters: ["sql-compatibility-report", "differential-oracle-report", "crash-recovery-log", "benchmark-summary"],
+    releaseBlockers: ["missing product boundary", "missing module boundary map", "missing SQL compatibility report", "missing recovery proof"],
+    missingModuleBoundaries: [],
+    repoProbeStatus: "PROBED",
     generatedByEvidence: ["templateSelection=auto-match", "domain=database-product", "domainSignal=database product", `project=${projectId}`],
     validationSummary: "32 checks; SQL compatibility, recovery, benchmark, observability, and release gates are release-blocking.",
     diffSummary: "No active profile in demo baseline.",
@@ -535,7 +558,7 @@ export function initialMessages(step: ConsoleStep): ChatMessage[] {
       id: "template",
       role: "agent",
       title: "EvoPilot",
-      text: "项目上下文已解析。EvoPilot 自动匹配更贴合的企业级 Web Service HarnessTemplate，不要求普通用户手动选择模板。",
+      text: "项目上下文已解析。EvoPilot 自动匹配更贴合的领域 HarnessTemplate，不要求普通用户手动选择模板。",
       time: "09:31",
       card: "template"
     });

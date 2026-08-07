@@ -165,6 +165,10 @@ export function EvidenceDrawer({
         <EvidenceRow label="compiledDigest" value={profileDraft.compiledDigest ?? "not returned"} />
         <EvidenceRow label="policyRefs" value={profileDraft.policyRefs.join(", ") || "none"} />
         <EvidenceRow label="generatedBy" value={profileDraft.generatedByEvidence.join("; ") || "not returned"} />
+        <EvidenceRow label="requiredActions" value={profileDraft.domainRequiredActions.join(", ") || "not returned"} />
+        <EvidenceRow label="evidenceAdapters" value={profileDraft.evidenceAdapters.join(", ") || "not returned"} />
+        <EvidenceRow label="releaseBlockers" value={profileDraft.releaseBlockers.join(", ") || "none"} />
+        <EvidenceRow label="repoProbe" value={`${profileDraft.repoProbeStatus ?? "not returned"} · missing=${profileDraft.missingModuleBoundaries.join(", ") || "none"}`} />
         <EvidenceRow label="lastAction" value={lastAction ? `${lastAction.method} ${lastAction.path} · status=${lastAction.status}` : "none"} />
         <EvidenceRow label="nextAction" value={lastAction?.nextAction ?? "none"} />
         <div className="drawer-card">

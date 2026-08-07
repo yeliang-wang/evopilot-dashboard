@@ -73,14 +73,14 @@ export async function mockEvoPilotApi(
           profileId: "default",
           version: 1,
           status: "DRAFT",
-          templateRef: "database-product-harness@2.0.0",
+          templateRef: "database-product-harness@2.1.0",
           sourceDigest: "sha256:mock-source-digest",
           compiledDigest: "sha256:mock-compiled-digest",
           policyRefs: ["release-governance@1", "observability-required@1"],
           sourceContent: {
             schema: "evopilot-project-harness-profile/v1",
             profileId: "default",
-            template: { templateId: "database-product-harness", version: "2.0.0" },
+            template: { templateId: "database-product-harness", version: "2.1.0" },
             runtime: {
               harnessLayer: "domain",
               domain: "database-product",
@@ -99,9 +99,52 @@ export async function mockEvoPilotApi(
                 forbiddenRoles: ["replace the owner's product"]
               }
             },
+            validation: {
+              requiredActions: [
+                "declare-database-product-boundary",
+                "map-engine-module-boundaries",
+                "bind-sql-compatibility-suite",
+                "bind-correctness-and-recovery-suite"
+              ],
+              missingModuleBoundaries: []
+            },
+            evidence: {
+              evidenceAdapters: [
+                { artifact: "sql-compatibility-report", commandGroup: "functional" },
+                { artifact: "differential-oracle-report", commandGroup: "functional" },
+                { artifact: "crash-recovery-log", commandGroup: "functional" },
+                { artifact: "benchmark-summary", commandGroup: "functional" }
+              ]
+            },
+            rules: {
+              domainHarnessRequiredActions: [
+                { id: "declare-database-product-boundary" },
+                { id: "map-engine-module-boundaries" },
+                { id: "bind-sql-compatibility-suite" },
+                { id: "bind-correctness-and-recovery-suite" }
+              ],
+              domainHarnessReleaseBlockers: [
+                "missing product boundary declaration",
+                "missing module boundary map",
+                "missing SQL compatibility report",
+                "missing crash recovery proof"
+              ]
+            },
             governance: {
               profileActivationRequiresApproval: true,
               promotionRequiresReleaseDecision: true
+            },
+            metadata: {
+              repoProbe: {
+                schema: "evopilot-domain-harness-repo-probe/v1",
+                status: "PROBED",
+                domain: "database-product",
+                missingModuleBoundaries: [],
+                moduleSignals: [
+                  { id: "planner", matchedPaths: ["src/planner"] },
+                  { id: "storage", matchedPaths: ["src/storage"] }
+                ]
+              }
             }
           },
           compiledContent: "compiled v2 domain harness profile",

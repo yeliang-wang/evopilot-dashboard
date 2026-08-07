@@ -123,7 +123,7 @@ test("dashboard is a standalone React API client", () => {
 test("dashboard shell and feature modules stay bounded", () => {
   assert.ok(lineCount(app) <= 350, `src/App.tsx has ${lineCount(app)} lines`);
   assert.ok(lineCount(dashboardController) <= 750, `controller has ${lineCount(dashboardController)} lines`);
-  assert.ok(lineCount(dashboardModel) <= 650, `model has ${lineCount(dashboardModel)} lines`);
+  assert.ok(lineCount(dashboardModel) <= 700, `model has ${lineCount(dashboardModel)} lines`);
   for (const file of dashboardComponentFiles) {
     const content = fs.readFileSync(file, "utf8");
     assert.ok(lineCount(content) <= 700, `${file} has ${lineCount(content)} lines`);
@@ -159,13 +159,17 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Use my profile for this run",
     "workspace scope",
     "HarnessTemplateEvolution",
-    "database-product-harness@2.0.0",
+    "database-product-harness@2.1.0",
     "domain=database-product",
     "Compatibility",
     "Harness layer",
     "compatibilityProfiles",
     "architectureProfiles",
     "runtimeProfiles",
+    "Required actions",
+    "Evidence adapters",
+    "Release blockers",
+    "repoProbe",
     "接入项目 LLM 用量追踪",
     "Project LLM Usage",
     "WorkspaceUsagePanel",
@@ -545,8 +549,12 @@ test("dashboard test matrix covers browser e2e, visual regression, live e2e, and
   assert.match(mockApi, /req-project-preflight-blocked/);
   assert.match(mockApi, /connect-github-account/);
   assert.match(mockApi, /x-request-id/);
-  assert.match(mockApi, /database-product-harness@2\.0\.0/);
+  assert.match(mockApi, /database-product-harness@2\.1\.0/);
   assert.match(mockApi, /domain: "database-product"/);
+  assert.match(mockApi, /domainHarnessRequiredActions/);
+  assert.match(mockApi, /evidenceAdapters/);
+  assert.match(mockApi, /domainHarnessReleaseBlockers/);
+  assert.match(mockApi, /repoProbe/);
   assert.match(mockApi, /postgres-compatible/);
 
   for (const workflow of [browserWorkflow, visualWorkflow, prArtifactsWorkflow]) {

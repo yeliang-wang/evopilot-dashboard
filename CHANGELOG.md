@@ -8,6 +8,28 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 2.1.0 - 2026-08-07
+
+### Added
+
+- Added Agent Console display for EvoPilot v2.1 domain Harness execution fields: required actions, evidence adapters, release blockers, repository probe status, and missing module boundaries.
+- Updated demo mode and mocked browser API fixtures to use `database-product-harness@2.1.0` with structured `domainHarnessRequiredActions`, `evidenceAdapters`, `domainHarnessReleaseBlockers`, and `repoProbe` data.
+- Added static contract coverage for the v2.1 domain execution fields.
+
+### Changed
+
+- Updated package version, installer default image tag, Cloud/Distribution docs, release notes, and open-source governance pointers to `2.1.0`.
+- Kept Dashboard as an EvoPilot HTTP client; domain Harness matching and release-blocking evidence remain server-derived.
+
+### Validation
+
+- `npm run check`
+- `npm run smoke:console`
+- `npm run test:visual`
+- `npm run release:artifact`
+- `npm run verify:release-artifact`
+- `git diff --check`
+
 ## 2.0.0 - 2026-08-07
 
 ### Added
