@@ -277,6 +277,7 @@ export const apiSurface = {
   harnessTemplateValidate: "/api/v1/harness/templates/validate",
   harnessTemplateMatches: "/api/v1/harness/template-matches",
   harnessTemplateEvolutions: "/api/v1/harness/template-evolutions",
+  harnessTemplateEvolve: "/api/v1/harness/template-evolutions/evolve",
   harnessPolicies: "/api/v1/harness/policies",
   projectHarnessProfiles: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles`,
   projectHarnessProfileGenerate: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/generate`,

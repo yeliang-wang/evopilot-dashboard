@@ -61,14 +61,14 @@ export function TemplatesPage({
     }
   };
   const action: DashboardActionRequest = {
-    id: "admin-create-template-evolution",
-    label: "Create HarnessTemplateEvolution",
+    id: "admin-harness-evolve",
+    label: "Evolve Harness from source",
     method: "POST",
-    path: apiSurface.harnessTemplateEvolutions,
+    path: apiSurface.harnessTemplateEvolve,
     body: {
       baseTemplateId: form.baseTemplateId || undefined,
       targetVersion: form.targetVersion || undefined,
-      intent: form.intent,
+      goal: form.intent,
       autoMatch: true,
       sources: [source]
     }
@@ -80,7 +80,7 @@ export function TemplatesPage({
       <section className="management-stack">
         <DataPanel
           title="企业级 HarnessTemplate 知识包"
-          subtitle="新项目自动匹配模板；管理员通过版本、changelog 和 evolution run 管理生命周期。"
+          subtitle="新项目自动匹配模板；普通入口一键生成 review draft，管理员继续管理 approve、publish 和 impact。"
           rows={templates}
           columns={[
             ["Template", ["id", "templateId", "name"]],
@@ -89,7 +89,7 @@ export function TemplatesPage({
             ["Status", ["status", "state"]]
           ]}
           empty="No templates returned by EvoPilot."
-          toolbar={<button className="btn primary" type="button" onClick={() => openEvolution()}><Plus size={15} aria-hidden="true" /> 创建 evolution draft</button>}
+          toolbar={<button className="btn primary" type="button" onClick={() => openEvolution()}><Plus size={15} aria-hidden="true" /> 一键进化 Harness</button>}
           actionLabel="进化"
           actionIcon="plus"
           onRowAction={openEvolution}
@@ -113,9 +113,9 @@ export function TemplatesPage({
       {dialog && (
         <AdminDialog
           eyebrow="Template evolution"
-          title="创建进化 run"
+          title="一键进化 Harness"
           subtitle={`${form.baseTemplateId || "auto-match"} · target ${form.targetVersion || "matched or next version"}`}
-          primaryLabel="创建 evolution draft"
+          primaryLabel="生成 review draft"
           busy={busyAction === action.id}
           disabled={!formReady}
           lastAction={lastAction}
@@ -161,7 +161,7 @@ function templateEvolutionSourceFromForm(form: TemplateEvolutionForm): Record<st
     type: form.sourceType,
     name: form.sourceUri || form.sourceType,
     metadata: {
-      enteredFrom: "dashboard-knowledge-factory"
+      enteredFrom: "dashboard-harness-evolve"
     }
   };
   if (form.sourceType === "admin-note" || form.sourceType === "production-log") source.contentText = form.sourceUri;
@@ -181,9 +181,9 @@ function autoMatchText(value: unknown): string {
 }
 
 function matchPreviewFromAction(action?: DashboardActionResult): RowRecord | undefined {
-  if (action?.actionId !== "admin-match-template-evolution") return undefined;
+  if (action?.actionId !== "admin-match-template-evolution" && action?.actionId !== "admin-harness-evolve") return undefined;
   const payload = asRecord(dataEnvelope(action.data));
-  return asRecord(payload?.match);
+  return asRecord(payload?.match) ?? asRecord(payload?.autoMatch);
 }
 
 function MatchPreview({ match }: { match?: RowRecord }) {

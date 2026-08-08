@@ -162,6 +162,8 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "workspace scope",
     "HarnessTemplateEvolution",
     "Harness Knowledge Factory",
+    "一键进化 Harness",
+    "Evolve Harness from source",
     "Template match preview",
     "Preview template match",
     "source-project",
@@ -172,7 +174,7 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "domainSignalsText",
     "autoMatchText",
     "autoMatch: true",
-    "dashboard-knowledge-factory",
+    "dashboard-harness-evolve",
     "database-product-harness@2.2.0",
     "domain=database-product",
     "Compatibility",
@@ -279,6 +281,7 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/harness/templates",
     "/api/v1/harness/template-matches",
     "/api/v1/harness/template-evolutions",
+    "/api/v1/harness/template-evolutions/evolve",
     "/api/v1/harness/policies",
     "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles",
     "/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/generate",
@@ -353,6 +356,7 @@ test("optional sibling EvoPilot OpenAPI contains the dashboard contract paths", 
     "/api/v1/harness/templates",
     "/api/v1/harness/template-matches",
     "/api/v1/harness/template-evolutions",
+    "/api/v1/harness/template-evolutions/evolve",
     "/api/v1/harness/policies",
     "/api/v1/projects/{projectId}/harness-profiles",
     "/api/v1/projects/{projectId}/harness-profiles/generate",
@@ -566,6 +570,7 @@ test("dashboard test matrix covers browser e2e, visual regression, live e2e, and
   assert.match(mockApi, /connect-github-account/);
   assert.match(mockApi, /x-request-id/);
   assert.match(mockApi, /req-harness-template-match/);
+  assert.match(mockApi, /evopilot-harness-evolve-result\/v1/);
   assert.match(mockApi, /distributed-cache-harness/);
   assert.match(mockApi, /database-product-harness@2\.2\.0/);
   assert.match(mockApi, /domain: "database-product"/);

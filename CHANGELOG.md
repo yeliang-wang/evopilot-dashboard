@@ -8,6 +8,23 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 2.4.0 - 2026-08-08
+
+### Added
+
+- Added Dashboard API wiring for EvoPilot `POST /api/v1/harness/template-evolutions/evolve`.
+- Added the one-command Harness evolution action on the Harness Templates page so administrators can submit a source project and goal to EvoPilot's server-governed evolve workflow.
+- Added mock API and static contract coverage for `evopilot-harness-evolve-result/v1` review draft results.
+
+### Changed
+
+- Kept Dashboard as an EvoPilot HTTP client: source scanning, auto-match, draft generation, validation, approval, publish, and impact remain server responsibilities.
+- Updated package version, Cloud/Distribution docs, release notes, and governance checks to `2.4.0`.
+
+### Validation
+
+- Full release validation is required before publication: `npm run check`, `npm run test:browser`, `npm run release:artifact`, `npm run verify:release-artifact`, and `git diff --check`.
+
 ## 2.3.0 - 2026-08-07
 
 ### Added

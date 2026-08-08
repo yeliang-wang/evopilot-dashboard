@@ -207,6 +207,16 @@ export async function mockEvoPilotApi(
       return fulfill(route, ok(templateMatchProjection(), "req-harness-template-match"));
     }
 
+    if (method === "POST" && url.pathname === "/api/v1/harness/template-evolutions/evolve") {
+      return fulfill(route, {
+        status: 201,
+        requestId: "req-harness-evolve",
+        body: {
+          data: harnessEvolveProjection()
+        }
+      });
+    }
+
     if (method === "POST" && url.pathname === "/api/v1/harness/template-evolutions") {
       return fulfill(route, {
         status: 201,
@@ -306,6 +316,40 @@ function templateMatchProjection(): { schema: string; match: Record<string, unkn
       generatedAt: "2026-08-07T00:00:00.000Z"
     },
     nextAction: "advance-template-evolution"
+  };
+}
+
+function harnessEvolveProjection(): Record<string, unknown> {
+  return {
+    schema: "evopilot-harness-evolve-result/v1",
+    status: "REVIEW_REQUIRED",
+    evolutionId: "distributed-cache-harness-0.1.0-mock",
+    evolution: {
+      schema: "evopilot-harness-template-evolution-run/v1",
+      evolutionId: "distributed-cache-harness-0.1.0-mock",
+      status: "REVIEW_REQUIRED",
+      baseTemplateRef: { templateId: "go-middleware-harness", version: "1.1.0", digest: "sha256:mock-go-template" },
+      targetTemplateId: "distributed-cache-harness",
+      targetVersion: "0.1.0",
+      sources: [],
+      snapshots: [{ type: "source-project", contentDigest: "sha256:mock-source" }],
+      autoMatch: templateMatchProjection().match,
+      blockers: [],
+      warnings: []
+    },
+    autoMatch: templateMatchProjection().match,
+    validation: { status: "VALIDATED", blockers: [] },
+    workflow: {
+      mode: "create",
+      defaultStop: "REVIEW_REQUIRED",
+      steps: [
+        { action: "create", status: "CREATED", nextAction: "advance-template-evolution" },
+        { action: "advance", status: "SOURCES_COLLECTED", nextAction: "analyze-template-evolution" },
+        { action: "advance", status: "ANALYZED", nextAction: "draft-template-evolution" },
+        { action: "advance", status: "REVIEW_REQUIRED", nextAction: "review-approve-template-evolution" }
+      ]
+    },
+    nextAction: "review-approve-template-evolution"
   };
 }
 
