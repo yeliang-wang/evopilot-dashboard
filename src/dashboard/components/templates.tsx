@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import {
   apiSurface,
   type ApiResult,
@@ -32,7 +32,24 @@ export function TemplatesPage({
   onForm: (form: TemplateEvolutionForm) => void;
   onRunAction: (action: DashboardActionRequest) => void;
 }) {
-  const templates = resultItems(snapshot.templates, ["templates"]).slice(0, 8);
+  const templates = resultItems(snapshot.templates, ["templates"]).slice(0, 12);
+  const catalogMounts = resultItems(snapshot.harnessCatalogs, ["mounts"]).slice(0, 8).map((row) => ({
+    ...row,
+    sourceText: fieldText(row, ["source"]),
+    readStatusText: `${fieldText(row, ["lastReadStatus", "status"])} · ${fieldText(row, ["templateCount"], "0")} Harness`,
+    digestText: fieldText(row, ["catalogDigest"])
+  }));
+  const expertRows = templates
+    .filter((row) => fieldText(row, ["harnessLayer"], fieldText(asRecord(row.runtimePatterns), ["harnessLayer"], "runtime")) === "domain")
+    .map((row) => ({
+      ...row,
+      expert: `${fieldText(row, ["name", "id"])} Expert`,
+      domainText: fieldText(row, ["domain"], fieldText(asRecord(row.runtimePatterns), ["domain"])),
+      versionText: `${fieldText(row, ["id"])}@${fieldText(row, ["version"])}`,
+      catalogText: fieldText(asRecord(row.catalogRef), ["catalogId"], "built-in")
+    }))
+    .slice(0, 8);
+  const connectorRows = connectorCatalogRows();
   const evolutions = resultItems(snapshot.templateEvolutions, ["evolutions"]).slice(0, 8).map((row) => ({
     ...row,
     target: `${fieldText(row, ["targetTemplateId"])}@${fieldText(row, ["targetVersion"])}`,
@@ -41,12 +58,18 @@ export function TemplatesPage({
     domainSignalsText: listText(row.domainSignals) || "-",
     gapClassificationsText: listText(row.gapClassifications) || "-"
   }));
-  const [dialog, setDialog] = useState(false);
+  const [dialog, setDialog] = useState<"evolution" | "catalog" | undefined>();
+  const [hubTab, setHubTab] = useState<"experts" | "harness" | "connectors">("experts");
+  const [catalogForm, setCatalogForm] = useState({
+    source: "/path/to/evopilot-harness/published",
+    catalogId: "local-harness-catalog",
+    name: "Local Harness Catalog"
+  });
   const matchPreview = matchPreviewFromAction(lastAction);
 
   function openEvolution(row?: RowRecord) {
     if (row) onForm({ ...form, baseTemplateId: fieldText(row, ["id", "templateId", "name"], form.baseTemplateId) });
-    setDialog(true);
+    setDialog("evolution");
   }
 
   const source = templateEvolutionSourceFromForm(form);
@@ -73,27 +96,104 @@ export function TemplatesPage({
       sources: [source]
     }
   };
+  const mountCatalogAction: DashboardActionRequest = {
+    id: "admin-mount-harness-catalog",
+    label: "Mount Published Harness Catalog",
+    method: "POST",
+    path: apiSurface.harnessCatalogs,
+    body: {
+      source: catalogForm.source,
+      catalogId: catalogForm.catalogId || undefined,
+      name: catalogForm.name || undefined
+    }
+  };
   const formReady = Boolean(form.intent && form.sourceUri);
 
   return (
     <main className="management-workspace">
       <section className="management-stack">
+        <div className="hub-tabs" role="tablist" aria-label="Harness Hub">
+          <button type="button" className={hubTab === "experts" ? "active" : ""} onClick={() => setHubTab("experts")}>专家</button>
+          <button type="button" className={hubTab === "harness" ? "active" : ""} onClick={() => setHubTab("harness")}>Harness</button>
+          <button type="button" className={hubTab === "connectors" ? "active" : ""} onClick={() => setHubTab("connectors")}>连接器</button>
+        </div>
         <DataPanel
-          title="企业级 HarnessTemplate 知识包"
-          subtitle="新项目自动匹配模板；普通入口一键生成 review draft，管理员继续管理 approve、publish 和 impact。"
-          rows={templates}
+          title="Catalog 挂载"
+          subtitle="从 EvoPilot 已挂载的 Published Harness Catalog 展示领域专家资产、可用 Harness 和连接器入口。"
+          rows={catalogMounts}
           columns={[
-            ["Template", ["id", "templateId", "name"]],
-            ["Version", ["version"]],
-            ["Type", ["softwareType", "language", "category"]],
-            ["Status", ["status", "state"]]
+            ["Catalog", ["name", "catalogId"]],
+            ["Source", ["sourceText"]],
+            ["Status", ["readStatusText"]],
+            ["Digest", ["digestText"]]
           ]}
-          empty="No templates returned by EvoPilot."
-          toolbar={<button className="btn primary" type="button" onClick={() => openEvolution()}><Plus size={15} aria-hidden="true" /> 一键进化 Harness</button>}
-          actionLabel="进化"
-          actionIcon="plus"
-          onRowAction={openEvolution}
+          empty="No Published Harness Catalog mounted in EvoPilot."
+          toolbar={<button className="btn primary" type="button" onClick={() => setDialog("catalog")}><Plus size={15} aria-hidden="true" /> 挂载 Catalog</button>}
+          actionLabel="scan"
+          actionIcon="eye"
+          onRowAction={(row) => onRunAction({
+            id: `admin-scan-harness-catalog-${fieldText(row, ["catalogId"])}`,
+            label: "Scan Published Harness Catalog",
+            method: "POST",
+            path: apiSurface.harnessCatalogScan(fieldText(row, ["catalogId"])),
+            body: {}
+          })}
         />
+        {hubTab === "experts" && (
+          <DataPanel
+            title="领域专家资产"
+            subtitle="专家资产由领域 Harness 表达；项目接入时 EvoPilot 仍自动匹配并生成 ProjectHarnessProfile DRAFT。"
+            rows={expertRows}
+            columns={[
+              ["Expert", ["expert"]],
+              ["Domain", ["domainText"]],
+              ["Version", ["versionText"]],
+              ["Catalog", ["catalogText"]]
+            ]}
+            empty="No domain Harness experts returned by EvoPilot."
+            actionLabel="进化"
+            actionIcon="plus"
+            onRowAction={openEvolution}
+          />
+        )}
+        {hubTab === "harness" && (
+          <DataPanel
+            title="可用 Harness"
+            subtitle="EvoPilot 自动匹配这些 Harness；Catalog 新增 Harness 后，下一次读取即可进入候选池。"
+            rows={templates}
+            columns={[
+              ["Template", ["id", "templateId", "name"]],
+              ["Version", ["version"]],
+              ["Layer", ["harnessLayer", "languageFamily"]],
+              ["Digest", ["digest"]]
+            ]}
+            empty="No templates returned by EvoPilot."
+            toolbar={<button className="btn ghost" type="button" onClick={() => onRunAction({ id: "admin-refresh-harness-catalogs", label: "Refresh Harness Catalogs", method: "GET", path: apiSurface.harnessCatalogs })}><RefreshCw size={15} aria-hidden="true" /> 刷新 Hub</button>}
+            actionLabel="进化"
+            actionIcon="plus"
+            onRowAction={openEvolution}
+          />
+        )}
+        {hubTab === "connectors" && (
+          <DataPanel
+            title="Harness 进化连接器"
+            subtitle="连接器用于把历史项目、附件、生产日志和运行证据提交给 EvoPilot HarnessTemplateEvolution。"
+            rows={connectorRows}
+            columns={[
+              ["Connector", ["name"]],
+              ["Source", ["sourceType"]],
+              ["Scope", ["scope"]],
+              ["Status", ["status"]]
+            ]}
+            empty="No connectors configured."
+            actionLabel="使用"
+            actionIcon="plus"
+            onRowAction={(row) => {
+              onForm({ ...form, sourceType: fieldText(row, ["sourceType"], form.sourceType) });
+              setDialog("evolution");
+            }}
+          />
+        )}
         <DataPanel
           title="Harness Knowledge Factory"
           subtitle="从历史项目、项目语料、附件、生产日志和 EvoPilot history 形成 reviewable HarnessTemplateEvolution。"
@@ -108,9 +208,44 @@ export function TemplatesPage({
             ["Gaps", ["gapClassificationsText"]]
           ]}
           empty="No HarnessTemplateEvolution runs returned by EvoPilot."
+          toolbar={<button className="btn primary" type="button" onClick={() => openEvolution()}><Plus size={15} aria-hidden="true" /> 一键进化 Harness</button>}
+        />
+        <DataPanel
+          title="Legacy HarnessTemplate 投影"
+          subtitle="兼容旧模板 projection；后续用户入口优先使用 Harness Hub。"
+          rows={templates}
+          columns={[
+            ["Template", ["id", "templateId", "name"]],
+            ["Version", ["version"]],
+            ["Type", ["softwareType", "language", "category"]],
+            ["Status", ["status", "state"]]
+          ]}
+          empty="No templates returned by EvoPilot."
+          actionLabel="进化"
+          actionIcon="plus"
+          onRowAction={openEvolution}
         />
       </section>
-      {dialog && (
+      {dialog === "catalog" && (
+        <AdminDialog
+          eyebrow="Published Harness Catalog"
+          title="挂载 Catalog"
+          subtitle={catalogForm.catalogId || "local catalog"}
+          primaryLabel="挂载并扫描"
+          busy={busyAction === mountCatalogAction.id}
+          disabled={!catalogForm.source}
+          lastAction={lastAction}
+          onClose={() => setDialog(undefined)}
+          onSubmit={() => onRunAction(mountCatalogAction)}
+        >
+          <label><span>Catalog Source</span><input value={catalogForm.source} onChange={(event) => setCatalogForm({ ...catalogForm, source: event.currentTarget.value })} /></label>
+          <div className="form-two">
+            <label><span>Catalog ID</span><input value={catalogForm.catalogId} onChange={(event) => setCatalogForm({ ...catalogForm, catalogId: event.currentTarget.value })} /></label>
+            <label><span>Name</span><input value={catalogForm.name} onChange={(event) => setCatalogForm({ ...catalogForm, name: event.currentTarget.value })} /></label>
+          </div>
+        </AdminDialog>
+      )}
+      {dialog === "evolution" && (
         <AdminDialog
           eyebrow="Template evolution"
           title="一键进化 Harness"
@@ -119,7 +254,7 @@ export function TemplatesPage({
           busy={busyAction === action.id}
           disabled={!formReady}
           lastAction={lastAction}
-          onClose={() => setDialog(false)}
+          onClose={() => setDialog(undefined)}
           onSubmit={() => onRunAction(action)}
         >
           <label><span>Base Template</span><input placeholder="auto-match when empty" value={form.baseTemplateId} onChange={(event) => onForm({ ...form, baseTemplateId: event.currentTarget.value })} /></label>
@@ -139,6 +274,17 @@ export function TemplatesPage({
       )}
     </main>
   );
+}
+
+function connectorCatalogRows(): RowRecord[] {
+  return [
+    { name: "Source Project", sourceType: "source-project", scope: "local path or registered project", status: "available" },
+    { name: "Source Corpus", sourceType: "source-corpus", scope: "multiple historical projects", status: "available" },
+    { name: "Attachment", sourceType: "attachment", scope: "ppt, pdf, word, xlsx, text", status: "available" },
+    { name: "Production Log", sourceType: "production-log", scope: "redacted runtime logs", status: "available" },
+    { name: "EvoPilot History", sourceType: "evopilot-history", scope: "goal loop history and evidence", status: "available" },
+    { name: "Runtime Evidence", sourceType: "runtime-evidence", scope: "evidence bundle reference", status: "available" }
+  ];
 }
 
 const templateEvolutionSourceTypes = [

@@ -14,7 +14,7 @@ Ordinary users must not edit tenant/workspace/actor scope. Platform administrato
 
 | Expected navigation |
 |---|
-| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit` |
+| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Hub`, `LLM Profiles`, `Audit` |
 
 The sidebar must not show workspace/project cards, active sessions, recent decisions, user footers, or a `Projects` menu.
 
@@ -70,7 +70,7 @@ Expected fields:
 | Tenants | tenant table, `初始化新租户`, create action, audit evidence |
 | Workspaces | workspace table, owner and quota fields, project LLM/token usage projection, create action |
 | Users | user table, role/status fields, `mustChangePassword=true` behavior in docs |
-| Harness Templates | template table, evolution intent, source type, create evolution draft |
+| Harness Hub | template table, evolution intent, source type, create evolution draft |
 | Audit | audit rows, requestId, last action, nextAction, blockers, failure trace |
 
 ## Blocker State

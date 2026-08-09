@@ -35,11 +35,11 @@ Ordinary users do not choose the public `HarnessTemplate` manually. Template sel
 | `Tenants` |
 | `Workspaces` |
 | `Users` |
-| `Harness Templates` |
+| `Harness Hub` |
 | `LLM Profiles` |
 | `Audit` |
 
-Project context, active sessions, recent decisions, and user details are not sidebar content. They appear in the main Agent Console, the relevant admin page, or the Evidence Drawer. `Tenants`, `Workspaces`, `Users`, `Harness Templates`, and `LLM Profiles` call EvoPilot APIs and still obey RBAC, audit, and `nextAction` stop rules.
+Project context, active sessions, recent decisions, and user details are not sidebar content. They appear in the main Agent Console, the relevant admin page, or the Evidence Drawer. `Tenants`, `Workspaces`, `Users`, `Harness Hub`, and `LLM Profiles` call EvoPilot APIs and still obey RBAC, audit, and `nextAction` stop rules.
 
 ## Delivery Chain
 
@@ -104,4 +104,4 @@ Use **View evidence** when you need audit or AI-agent details:
 
 Dashboard does not call CLI commands. It uses EvoPilot HTTP APIs through `src/api.ts`.
 
-The Harness Templates page includes **Harness Knowledge Factory**. It displays EvoPilot-returned `HarnessTemplateEvolution` runs with `sourceTypes`, `domainSignals`, and `gapClassifications`, and can create a new draft from `admin-note`, `source-project`, `source-corpus`, `production-log`, `evopilot-history`, attachment, repository, existing template, or runtime evidence sources. The browser does not read local files; source extraction, production-log redaction, snapshots, draft validation, approval, publish, and impact remain server-governed.
+The Harness Hub page includes **Harness Knowledge Factory**. It displays EvoPilot-returned `HarnessTemplateEvolution` runs with `sourceTypes`, `domainSignals`, and `gapClassifications`, and can create a new draft from `admin-note`, `source-project`, `source-corpus`, `production-log`, `evopilot-history`, attachment, repository, existing template, or runtime evidence sources. The browser does not read local files; source extraction, production-log redaction, snapshots, draft validation, approval, publish, and impact remain server-governed.

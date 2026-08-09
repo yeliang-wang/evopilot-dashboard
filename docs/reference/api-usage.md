@@ -25,13 +25,14 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Tenants | `GET /api/v1/tenants`, `POST /api/v1/tenants` |
 | Workspaces | `GET /api/v1/workspaces`, `POST /api/v1/workspaces`, `GET /api/v1/workspaces/{workspaceId}/usage` |
 | Users | `GET /api/v1/users`, `POST /api/v1/users` |
+| Harness Catalogs | `GET /api/v1/harness/catalogs`, `POST /api/v1/harness/catalogs`, `POST /api/v1/harness/catalogs/{catalogId}/scan` |
 | Harness template evolution | `GET /api/v1/harness/template-evolutions`, `POST /api/v1/harness/template-evolutions` |
 | Harness templates and policies | `GET /api/v1/harness/templates`, `GET /api/v1/harness/policies` |
 | LLM profiles | `GET /api/v1/llm-profiles`, `POST /api/v1/llm-profiles`, `POST /api/v1/llm-profiles/{profileId}/preflight` |
 | Project LLM default | `GET /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm/preflight` |
-
-The Harness Templates page renders EvoPilot's Harness Knowledge Factory projection from `GET /api/v1/harness/template-evolutions`. It displays `sourceTypes`, `domainSignals`, `gapClassifications`, target template/version, status, and next action when returned. Creation uses `POST /api/v1/harness/template-evolutions` and submits only the administrator-entered source object; file extraction, log redaction, snapshots, draft generation, approval, publish, and impact remain EvoPilot server responsibilities.
 | Audit | `GET /api/v1/audit` |
+
+The Harness Hub page renders Catalog mounts from `GET /api/v1/harness/catalogs`, available Harness definitions from `GET /api/v1/harness/templates`, and EvoPilot's Harness Knowledge Factory projection from `GET /api/v1/harness/template-evolutions`. It displays Catalog status/digests, domain Harness experts, connector source types, `sourceTypes`, `domainSignals`, `gapClassifications`, target template/version, status, and next action when returned. Catalog mounting and scanning go through EvoPilot API; file extraction, log redaction, snapshots, draft generation, approval, publish, impact, and `CATALOG.md` parsing remain EvoPilot server responsibilities.
 
 ## Projection Context
 
@@ -79,7 +80,7 @@ Workspace usage and project LLM usage are server projections. Dashboard displays
 |---|---|
 | `# Agent Console` | ordinary project owner/operator flow |
 | `Tenants`, `Workspaces`, `Users` | platform or tenant administration through EvoPilot RBAC |
-| `Harness Templates` | administrator template evolution lifecycle, not direct project harness activation |
+| `Harness Hub` | administrator template evolution lifecycle, not direct project harness activation |
 | `LLM Profiles` | workspace profile registration for project defaults and user profile registration for run overrides |
 | `Audit` | current authorized audit scope |
 

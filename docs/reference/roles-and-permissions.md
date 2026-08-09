@@ -17,7 +17,7 @@
 
 | Navigation |
 |---|
-| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit` |
+| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Hub`, `LLM Profiles`, `Audit` |
 
 The sidebar is fixed. RBAC is enforced by EvoPilot API responses and page actions, not by adding extra project/session blocks to the left navigation.
 

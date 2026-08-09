@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="${EVOPILOT_DASHBOARD_INSTALL_VERSION:-2.4.0}"
+VERSION="${EVOPILOT_DASHBOARD_INSTALL_VERSION:-2.5.0}"
 DIR="${EVOPILOT_DASHBOARD_INSTALL_DIR:-evopilot-dashboard-run}"
 IMAGE="${EVOPILOT_DASHBOARD_IMAGE:-ghcr.io/yeliang-wang/evopilot-dashboard:${VERSION}}"
 API_URL="${EVOPILOT_API_BASE_URL:-http://host.docker.internal:19876}"

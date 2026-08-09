@@ -36,7 +36,7 @@ Assume the user account has already been created by an EvoPilot administrator. D
 
 | Expected left navigation |
 |---|
-| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit` |
+| `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Hub`, `LLM Profiles`, `Audit` |
 
 The left navigation must not contain workspace/project cards, active sessions, recent decisions, a user footer, or a `Projects` menu.
 
@@ -49,7 +49,7 @@ Only operate these pages when the signed-in user is a platform administrator and
 | Tenants | Create tenant, workspace, tenant admin | `POST /api/v1/tenants` |
 | Workspaces | Create workspace boundary and quota | `POST /api/v1/workspaces` |
 | Users | Create scoped user with `mustChangePassword=true` | `POST /api/v1/users` |
-| Harness Templates | Create `HarnessTemplateEvolution` draft through Harness Knowledge Factory | `POST /api/v1/harness/template-evolutions` |
+| Harness Hub | Create `HarnessTemplateEvolution` draft through Harness Knowledge Factory | `POST /api/v1/harness/template-evolutions` |
 | Audit | Read request/action/failure trace | `GET /api/v1/audit` |
 
 Harness Knowledge Factory inputs include `source-project`, `source-corpus`, `production-log`, `evopilot-history`, attachments, repositories, existing templates, runtime evidence, and administrator notes. Stop at `REVIEW_REQUIRED` and report source coverage, `domainSignals`, `gapClassifications`, redaction status, generated pack, validation, diff, changelog, impact, requestId, and nextAction.

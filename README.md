@@ -7,7 +7,7 @@
 [![CI](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/yeliang-wang/evopilot-dashboard/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://react.dev/)
-[![Release](https://img.shields.io/badge/Release-v2.4.0%20GA-2ea043)](./docs/releases/2.4.0.md)
+[![Release](https://img.shields.io/badge/Release-v2.5.0%20GA-2ea043)](./docs/releases/2.5.0.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 Admins provision scoped users. Users sign in, connect GitHub/GitLab projects, describe goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` drafts, and run governed loops from a browser.
@@ -23,7 +23,7 @@ Admins provision scoped users. Users sign in, connect GitHub/GitLab projects, de
 | Entry | Use when | Command |
 | --- | --- | --- |
 | Run Dashboard | You have an EvoPilot API server and want the browser surface in one command | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
-| Self-host with EvoPilot | You want the API and Dashboard in one generated stack | `npx create-evopilot@2.4.0 self-host --dir evopilot-stack --init-env` |
+| Self-host with EvoPilot | You want the API and Dashboard in one generated stack | `npx create-evopilot@2.5.0 self-host --dir evopilot-stack --init-env` |
 | Connect to API | You deploy Dashboard as static assets behind a proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
 
 Desktop app and hosted Cloud trial are not published Dashboard surfaces yet. The supported public entry points are local browser run, self-hosted stack, and static deployment connected to EvoPilot API.
@@ -41,14 +41,14 @@ EvoPilot automatically matches the `HarnessTemplate`, combines it with repositor
 
 EvoPilot API remains the system of record. Dashboard is a standalone React HTTP client; it does not own project, harness, loop, evidence, audit, release, user, tenant, or credential state.
 
-Login is the first screen. The left navigation follows the fixed product baseline: `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, and `Audit`. Project context, sessions, decisions, and evidence stay inside the main console or drawer, not in the sidebar.
+Login is the first screen. The left navigation follows the fixed product baseline: `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Hub`, `LLM Profiles`, and `Audit`. Project context, sessions, decisions, and evidence stay inside the main console or drawer, not in the sidebar.
 
 ## Core Capabilities
 
 | Area | What the Dashboard does |
 | --- | --- |
 | Agent Console | Project intake, delivery-chain selection, goal loop target submission, harness draft review, and loop operation in one chat-first workspace. |
-| Harness governance | EvoPilot auto-matches templates; users review `ProjectHarnessProfile.yaml` before activation. |
+| Harness governance | EvoPilot auto-matches templates; users review `ProjectHarnessProfile.yaml` before activation. Administrators use Harness Hub / 专家市场 to view Catalog mounts, domain Harness experts, connector inputs, and Knowledge Factory runs. |
 | Evidence | Request IDs, source/CI boundary, LLM profile, digests, policy refs, logs, blockers, `nextAction`, release decisions, and token usage in the Evidence Drawer. |
 | Project LLM usage | Workspaces shows EvoPilot-projected project/provider/model/profile usage, token totals, latest loop tokens, and request IDs. |
 | LLM Profiles | Workspace/user profile registration, provider preset selection, profile preflight, project default binding, and per-run user override entry points. |

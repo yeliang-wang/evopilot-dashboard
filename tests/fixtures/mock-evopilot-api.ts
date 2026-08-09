@@ -217,6 +217,33 @@ export async function mockEvoPilotApi(
       });
     }
 
+    if (method === "POST" && url.pathname === "/api/v1/harness/catalogs") {
+      return fulfill(route, {
+        status: 201,
+        requestId: "req-harness-catalog-mount",
+        body: {
+          data: {
+            schema: "evopilot-harness-catalog-mount-result/v1",
+            mount: harnessCatalogProjection().mounts[0],
+            scan: harnessCatalogScanProjection(),
+            templates: harnessTemplateProjection().templates,
+            nextAction: "use-catalog-harness-for-project-auto-match"
+          }
+        }
+      });
+    }
+
+    if (method === "POST" && /^\/api\/v1\/harness\/catalogs\/[^/]+\/scan$/.test(url.pathname)) {
+      return fulfill(route, ok({
+        schema: "evopilot-harness-catalog-scan-result/v1",
+        scan: harnessCatalogScanProjection(),
+        mount: harnessCatalogProjection().mounts[0],
+        catalog: harnessCatalogProjection().catalogs[0],
+        templates: harnessTemplateProjection().templates,
+        nextAction: "use-catalog-harness-for-project-auto-match"
+      }, "req-harness-catalog-scan"));
+    }
+
     if (method === "POST" && url.pathname === "/api/v1/harness/template-evolutions") {
       return fulfill(route, {
         status: 201,
@@ -256,6 +283,12 @@ function ok(data: unknown, requestId: string): JsonResponse {
 }
 
 function defaultProjection(pathname: string): unknown {
+  if (pathname === "/api/v1/harness/catalogs") {
+    return harnessCatalogProjection();
+  }
+  if (pathname === "/api/v1/harness/templates") {
+    return harnessTemplateProjection();
+  }
   if (pathname === "/api/v1/harness/template-evolutions") {
     return {
       schema: "evopilot-harness-template-evolution-list/v1",
@@ -281,6 +314,113 @@ function defaultProjection(pathname: string): unknown {
     status: "READY",
     nextAction: "none",
     blockers: []
+  };
+}
+
+function harnessCatalogProjection(): {
+  schema: string;
+  catalogs: Record<string, unknown>[];
+  mounts: Record<string, unknown>[];
+  scans: Record<string, unknown>[];
+  templates: Record<string, unknown>[];
+  nextAction: string;
+} {
+  const scan = harnessCatalogScanProjection();
+  return {
+    schema: "evopilot-harness-catalog-list/v1",
+    catalogs: [scan.catalog],
+    mounts: [scan.mount],
+    scans: [scan],
+    templates: harnessTemplateProjection().templates,
+    nextAction: "use-catalog-harness-for-project-auto-match"
+  };
+}
+
+function harnessCatalogScanProjection(): Record<string, unknown> & {
+  mount: Record<string, unknown>;
+  catalog: Record<string, unknown>;
+  templates: Record<string, unknown>[];
+} {
+  return {
+    schema: "evopilot-harness-catalog-scan-result/v1",
+    status: "READY",
+    scannedAt: "2026-08-09T00:00:00.000Z",
+    mount: {
+      schema: "evopilot-harness-catalog-mount/v1",
+      catalogId: "evopilot-public-harness-catalog",
+      name: "EvoPilot Public Harness Catalog",
+      source: "/opt/evopilot-harness/published",
+      status: "ACTIVE",
+      lastReadStatus: "READY",
+      catalogDigest: "sha256:mock-catalog",
+      templateCount: 3
+    },
+    catalog: {
+      schema: "evopilot-published-harness-catalog/v1",
+      catalogId: "evopilot-public-harness-catalog",
+      catalogVersion: 1,
+      catalogDigest: "sha256:mock-catalog",
+      compatibleEvopilot: ">=2.5.0",
+      entries: [
+        { name: "database-product-harness", version: "2.2.0", layer: "domain", domain: "database-product", status: "published", path: "./database-product-harness/2.2.0/template.yaml", digest: "sha256:mock-db-entry", tags: ["database"] },
+        { name: "api-gateway-harness", version: "2.2.0", layer: "domain", domain: "api-gateway", status: "published", path: "./api-gateway-harness/2.2.0/template.yaml", digest: "sha256:mock-gateway-entry", tags: ["gateway"] },
+        { name: "distributed-cache-harness", version: "0.1.0", layer: "domain", domain: "distributed-cache", status: "published", path: "./distributed-cache-harness/0.1.0/template.yaml", digest: "sha256:mock-cache-entry", tags: ["cache"] }
+      ],
+      warnings: []
+    },
+    templates: harnessTemplateProjection().templates,
+    entries: [],
+    warnings: []
+  };
+}
+
+function harnessTemplateProjection(): { schema: string; templates: Record<string, unknown>[] } {
+  return {
+    schema: "evopilot-harness-template-set/v1",
+    templates: [
+      {
+        id: "database-product-harness",
+        name: "Database Product Harness",
+        version: "2.2.0",
+        harnessLayer: "domain",
+        domain: "database-product",
+        digest: "sha256:mock-db-template",
+        catalogRef: {
+          catalogId: "evopilot-public-harness-catalog",
+          catalogDigest: "sha256:mock-catalog",
+          entryPath: "./database-product-harness/2.2.0/template.yaml",
+          entryDigest: "sha256:mock-db-entry"
+        }
+      },
+      {
+        id: "api-gateway-harness",
+        name: "API Gateway Harness",
+        version: "2.2.0",
+        harnessLayer: "domain",
+        domain: "api-gateway",
+        digest: "sha256:mock-gateway-template",
+        catalogRef: {
+          catalogId: "evopilot-public-harness-catalog",
+          catalogDigest: "sha256:mock-catalog",
+          entryPath: "./api-gateway-harness/2.2.0/template.yaml",
+          entryDigest: "sha256:mock-gateway-entry"
+        }
+      },
+      {
+        id: "distributed-cache-harness",
+        name: "Distributed Cache Harness",
+        version: "0.1.0",
+        harnessLayer: "domain",
+        domain: "distributed-cache",
+        digest: "sha256:mock-cache-template",
+        catalogRef: {
+          catalogId: "evopilot-public-harness-catalog",
+          catalogDigest: "sha256:mock-catalog",
+          entryPath: "./distributed-cache-harness/0.1.0/template.yaml",
+          entryDigest: "sha256:mock-cache-entry"
+        }
+      }
+    ]
   };
 }
 

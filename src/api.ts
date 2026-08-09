@@ -274,6 +274,9 @@ export const apiSurface = {
   projectLlm: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm`,
   projectLlmPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight`,
   harnessTemplates: "/api/v1/harness/templates",
+  harnessCatalogs: "/api/v1/harness/catalogs",
+  harnessCatalog: (catalogId: string) => `/api/v1/harness/catalogs/${encodeURIComponent(catalogId)}`,
+  harnessCatalogScan: (catalogId: string) => `/api/v1/harness/catalogs/${encodeURIComponent(catalogId)}/scan`,
   harnessTemplateValidate: "/api/v1/harness/templates/validate",
   harnessTemplateMatches: "/api/v1/harness/template-matches",
   harnessTemplateEvolutions: "/api/v1/harness/template-evolutions",
@@ -347,6 +350,7 @@ export async function loadDashboardApiSnapshot(
   const calls: Array<[string, string]> = [
     ["summary", apiSurface.summary],
     ["projects", apiSurface.projects],
+    ["harnessCatalogs", apiSurface.harnessCatalogs],
     ["templates", apiSurface.harnessTemplates],
     ["templateEvolutions", apiSurface.harnessTemplateEvolutions],
     ["policies", apiSurface.harnessPolicies],

@@ -14,7 +14,7 @@ Platform administrators, tenant administrators, and operations staff.
 | User and scope setup | Tenants / Workspaces / Users | user role, tenant, workspace, status, audit row |
 | Project credentials | Agent Console | server-side secret or tokenRef saved, checklist/preflight result |
 | DevOps boundary | Agent Console | executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary |
-| Harness governance | Agent Console Review Pack / Harness Templates | templateRef, policyRefs, profile validation, source/compiled digest, template evolution evidence |
+| Harness governance | Agent Console Review Pack / Harness Hub | templateRef, policyRefs, profile validation, source/compiled digest, template evolution evidence |
 | Phase governance | Agent Console | Alpha/Beta/RC/GA phase plan, owner confirmation, approval audit |
 | Release governance | Agent Console / Audit | TargetEvidencePackage, PhasePackage, releaseDecision |
 | Troubleshooting | Audit / Evidence Drawer | requestId, traceId, actor, operation, error, nextAction |
@@ -31,7 +31,7 @@ The Dashboard exposes mutating controls, but EvoPilot API remains the enforcemen
 | Harness profile activation | Require owner review of the generated/edited DRAFT before activation. | Review Pack shows generated profile version/digest; Last API Action shows activate status. |
 | Goal plan approval | Require Alpha/Beta/RC/GA phase plan review before approval. | Review Pack requires `confirmedBy` and `confirmation`; Audit can verify approval. |
 | Incident repair | Use requestId, traceId, failed node, root cause, and nextAction. | Audit and Evidence Drawer show troubleshooting contract; server logs remain authoritative. |
-| Harness template evolution | Use versioned template evolution runs before publish. | Harness Templates page creates evolution draft records through Knowledge Factory sources: historical projects, corpora, attachments, production logs, EvoPilot history, and existing evidence; approval/publish still requires administrator review of source coverage, redaction, generated pack, validation, diff, changelog, and impact. |
+| Harness template evolution | Use versioned template evolution runs before publish. | Harness Hub page creates evolution draft records through Knowledge Factory sources: historical projects, corpora, attachments, production logs, EvoPilot history, and existing evidence; approval/publish still requires administrator review of source coverage, redaction, generated pack, validation, diff, changelog, and impact. |
 
 If EvoPilot returns `403`, `409`, `PROJECT_HARNESS_PROFILE_POLICY_STALE`, `WAITING_APPROVAL`, `NO-GO`, or a repair-oriented `nextAction`, do not bypass it from the browser. Repair the server-side condition and rerun the same action.
 

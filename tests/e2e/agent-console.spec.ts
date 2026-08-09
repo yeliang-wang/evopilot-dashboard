@@ -72,6 +72,25 @@ test.describe("Agent Console browser matrix", () => {
     await expect(page.getByText("API action evidence")).toBeVisible();
     expect(unexpectedErrors(errors, ["409 (Conflict)"])).toEqual([]);
   });
+
+  test("mock API renders Harness Hub Catalog projections", async ({ page }) => {
+    await ignoreFavicon(page);
+    const api = await mockEvoPilotApi(page, "happy-path");
+    const errors = collectBrowserErrors(page);
+
+    await page.goto("/");
+    await page.getByLabel("Password").fill("mock-password");
+    await page.getByLabel("Password").press("Enter");
+    await page.getByRole("button", { name: "Harness Hub" }).click();
+
+    await expect(page.getByRole("heading", { name: "Harness Hub / 专家市场" })).toBeVisible();
+    await expect(page.getByText("EvoPilot Public Harness Catalog")).toBeVisible();
+    await expect(page.getByText("Distributed Cache Harness Expert")).toBeVisible();
+    await expect(page.getByText("distributed-cache-harness@0.1.0")).toBeVisible();
+    expect(api.calls).toContain("GET /api/v1/harness/catalogs");
+    expect(api.calls).toContain("GET /api/v1/harness/templates");
+    expect(errors).toEqual([]);
+  });
 });
 
 async function ignoreFavicon(page: Page): Promise<void> {

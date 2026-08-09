@@ -154,7 +154,14 @@ test("dashboard implements the Agent Console v2 information architecture", () =>
     "Tenants",
     "Workspaces",
     "Users",
-    "Harness Templates",
+    "Harness Hub",
+    "Harness Hub / 专家市场",
+    "Published Harness Catalog",
+    "挂载 Catalog",
+    "Mount Published Harness Catalog",
+    "Scan Published Harness Catalog",
+    "catalogDigest",
+    "catalogRef",
     "LLM Profiles",
     "Register LLM Profile",
     "Project LLM Profile",
@@ -279,6 +286,9 @@ test("dashboard call sites cover current EvoPilot API control-plane surfaces", (
     "/api/v1/projects/${encodeURIComponent(projectId)}/devops/preflight",
     "/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight",
     "/api/v1/harness/templates",
+    "/api/v1/harness/catalogs",
+    "/api/v1/harness/catalogs/${encodeURIComponent(catalogId)}",
+    "/api/v1/harness/catalogs/${encodeURIComponent(catalogId)}/scan",
     "/api/v1/harness/template-matches",
     "/api/v1/harness/template-evolutions",
     "/api/v1/harness/template-evolutions/evolve",
@@ -354,6 +364,9 @@ test("optional sibling EvoPilot OpenAPI contains the dashboard contract paths", 
     "/api/v1/onboarding/project/checklist",
     "/api/v1/projects/{projectId}/usage",
     "/api/v1/harness/templates",
+    "/api/v1/harness/catalogs",
+    "/api/v1/harness/catalogs/{catalogId}",
+    "/api/v1/harness/catalogs/{catalogId}/scan",
     "/api/v1/harness/template-matches",
     "/api/v1/harness/template-evolutions",
     "/api/v1/harness/template-evolutions/evolve",
@@ -440,7 +453,7 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
     "Tenants",
     "Workspaces",
     "Users",
-    "Harness Templates",
+    "Harness Hub",
     "HarnessTemplateEvolution",
     "WorkBuddy",
     "ordinary-user core flow"
@@ -453,7 +466,7 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
   assert.match(docsAiAgents, /Admin Browser Operations/);
   assert.match(docsDashboardMap, /Dashboard Page Map/);
   assert.match(docsDashboardMap, /Left Navigation/);
-  assert.match(docsDashboardMap, /`# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, `Audit`/);
+  assert.match(docsDashboardMap, /`# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Hub`, `LLM Profiles`, `Audit`/);
   assert.match(docsExpectedStates, /ProjectHarnessProfile YAML Review/);
   assert.match(docsExpectedStates, /Authentication States/);
   assert.match(docsExpectedStates, /Admin Page States/);
@@ -473,7 +486,7 @@ test("dashboard docs are updated for Agent Console v2 and AI agents", () => {
   assert.match(docsApiUsage, /Projection Context/);
   assert.match(docsRoles, /Dashboard Navigation By Role/);
   assert.match(docsGettingStarted, /first screen is the EvoPilot login page/);
-  assert.match(docsAdmin, /Harness Templates page creates evolution draft/);
+  assert.match(docsAdmin, /Harness Hub page creates evolution draft/);
   assert.match(docsDigitalHuman, /# Agent Console/);
   assert.doesNotMatch(allDocs, /three top-level pages/);
   assert.doesNotMatch(allDocs, /Projects \/ Runs \/ Ops/);
@@ -532,6 +545,7 @@ test("production and console smoke validate API compatibility", () => {
   assert.match(consoleSmoke, /AbortController/);
   assert.match(consoleSmoke, /auth\.login/);
   assert.match(consoleSmoke, /summary\.authenticated/);
+  assert.match(consoleSmoke, /harness\.catalogs/);
   assert.match(consoleSmoke, /harness\.templates/);
   assert.match(consoleSmoke, /goals\.list/);
   assert.match(consoleSmoke, /release\.targets/);

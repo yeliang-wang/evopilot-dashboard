@@ -8,6 +8,24 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 2.5.0 - 2026-08-09
+
+### Added
+
+- Added Harness Hub / 专家市场 as the administrator surface for external Published Harness Catalog mounts, domain Harness experts, connector source types, available Harness rows, and Harness Knowledge Factory runs.
+- Added Dashboard API wiring for EvoPilot `GET/POST /api/v1/harness/catalogs` and `POST /api/v1/harness/catalogs/{catalogId}/scan`.
+- Added mock API and static contract coverage for external Catalog listing and scan actions while keeping file reading inside EvoPilot API.
+
+### Changed
+
+- Renamed the visible sidebar and docs from Harness Templates to Harness Hub while preserving the internal `TemplatesPage` component boundary.
+- Kept Dashboard as an EvoPilot HTTP client: Catalog source scanning, file reads, template matching, project profile generation, approval, publish, and impact remain server responsibilities.
+- Updated package version, installer default image tag, Cloud/Distribution docs, release notes, and governance checks to `2.5.0`.
+
+### Validation
+
+- Full release validation is required before publication: `npm run check`, `npm run test:browser`, `npm run release:artifact`, `npm run verify:release-artifact`, and `git diff --check`.
+
 ## 2.4.0 - 2026-08-08
 
 ### Added

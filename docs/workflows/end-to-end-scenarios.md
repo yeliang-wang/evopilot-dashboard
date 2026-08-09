@@ -122,7 +122,7 @@ Use when a platform administrator prepares a tenant/workspace and user for a rea
 ### Browser Flow
 
 1. Log in as a platform administrator.
-2. Confirm the left navigation includes **Tenants**, **Workspaces**, **Users**, **Harness Templates**, **LLM Profiles**, and **Audit**.
+2. Confirm the left navigation includes **Tenants**, **Workspaces**, **Users**, **Harness Hub**, **LLM Profiles**, and **Audit**.
 3. Open **Tenants** and create the tenant, initial workspace, and tenant admin.
 4. Open **Users** and create project owner or operator users with `mustChangePassword=true`.
 5. Open **Audit** and verify the request IDs and actions are visible.
@@ -145,7 +145,7 @@ Use when an administrator wants to evolve a public HarnessTemplate knowledge pac
 ### Browser Flow
 
 1. Log in as a platform administrator.
-2. Open **Harness Templates**.
+2. Open **Harness Hub**.
 3. Review existing template versions returned by EvoPilot.
 4. Fill base template, target version, intent, source type, and source value. Source type may be `source-project`, `source-corpus`, `production-log`, `evopilot-history`, `attachment`, `github-repo`, `gitlab-repo`, `web-url`, `local-pack`, `existing-template`, `runtime-evidence`, or `admin-note`.
 5. Click **创建 evolution draft**.

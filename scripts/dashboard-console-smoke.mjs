@@ -39,6 +39,7 @@ if (!token) {
 }
 
 await check("summary.authenticated", dashboardBaseUrl, "/api/v1/summary", { token, expectStatus: 200 });
+await check("harness.catalogs", dashboardBaseUrl, "/api/v1/harness/catalogs", { token, expectStatus: 200 });
 await check("harness.templates", dashboardBaseUrl, "/api/v1/harness/templates", { token, expectStatus: 200 });
 await check("projects.list", dashboardBaseUrl, "/api/v1/projects", { token, expectStatus: 200 });
 await check("goals.list", dashboardBaseUrl, "/api/v1/goals", { token, expectStatus: 200 });

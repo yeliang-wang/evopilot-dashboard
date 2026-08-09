@@ -20,7 +20,7 @@ Use this when a user, WorkBuddy browser operator, or digital human opens Dashboa
 4. Click **登录**.
 5. If the server requires password change, enter current and new password, then submit.
 6. Confirm tenant, workspace, actor, role, and `scope locked` in the header.
-7. Confirm the left navigation shows only `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Templates`, `LLM Profiles`, and `Audit`.
+7. Confirm the left navigation shows only `# Agent Console`, `Tenants`, `Workspaces`, `Users`, `Harness Hub`, `LLM Profiles`, and `Audit`.
 8. Click the API refresh chip if projections did not load automatically.
 
 ## Expected Result
