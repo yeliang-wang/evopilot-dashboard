@@ -8,6 +8,12 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 3.1.2 - 2026-08-09
+
+### Fixed
+
+- Passed `EVOPILOT_HARNESS_HUB_URL` through the ECS immutable image Compose template so digest-based Dashboard deployment keeps the embedded `evopilot-harness` Hub browser URL.
+
 ## 3.1.1 - 2026-08-09
 
 ### Fixed

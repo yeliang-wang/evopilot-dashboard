@@ -31,6 +31,7 @@ const dockerignore = read(".dockerignore");
 const nginx = read("nginx.conf.template");
 const compose = read("compose.yaml");
 const productionCompose = read("compose.production.yaml");
+const immutableCompose = read("deploy/ecs/compose.immutable.yaml");
 const hostNginx = read("deploy/nginx/evopilot-dashboard.conf.example");
 const consoleSmoke = read("scripts/dashboard-console-smoke.mjs");
 const productionSmoke = read("scripts/production-compat-smoke.mjs");
@@ -55,14 +56,14 @@ const docs = [
   "docs/workflows/project-onboarding.md",
   "docs/workflows/source-to-ga-loop.md",
   "docs/workflows/release-decision-review.md",
-  "docs/releases/3.1.1.md"
+  "docs/releases/3.1.2.md"
 ].filter((file) => fs.existsSync(file)).map(read).join("\n");
 
 test("dashboard is a standalone React HTTP API client", () => {
   assert.match(index, /config\.js/);
   assert.match(index, /id="root"/);
   assert.match(index, /type="module" src="\/src\/main\.tsx"/);
-  assert.match(packageJson, /"version": "3\.1\.1"/);
+  assert.match(packageJson, /"version": "3\.1\.2"/);
   assert.match(packageJson, /"react"/);
   assert.match(packageJson, /"lucide-react"/);
   assert.match(api, /configuredApiBaseUrl/);
@@ -183,12 +184,13 @@ test("release, governance, and deployment contracts remain present", () => {
   assert.match(compose, /EVOPILOT_HARNESS_HUB_URL/);
   assert.match(productionCompose, /EVOPILOT_DOCKER_NETWORK:-evopilot_default/);
   assert.match(productionCompose, /EVOPILOT_HARNESS_HUB_URL/);
+  assert.match(immutableCompose, /EVOPILOT_HARNESS_HUB_URL/);
   assert.match(hostNginx, /proxy_pass http:\/\/127\.0\.0\.1:18080/);
   assert.match(dockerignore, /node_modules/);
   assert.match(dockerignore, /\.git/);
   assert.match(releaseBuilder, /evopilot-dashboard/);
   assert.match(releaseVerifier, /SHA256SUMS/);
-  assert.match(governanceVerifier, /docs\/releases\/3\.1\.1\.md/);
+  assert.match(governanceVerifier, /docs\/releases\/3\.1\.2\.md/);
 });
 
 test("production build includes runtime dashboard scripts", () => {
