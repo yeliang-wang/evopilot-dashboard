@@ -55,14 +55,14 @@ const docs = [
   "docs/workflows/project-onboarding.md",
   "docs/workflows/source-to-ga-loop.md",
   "docs/workflows/release-decision-review.md",
-  "docs/releases/3.1.0.md"
+  "docs/releases/3.1.1.md"
 ].filter((file) => fs.existsSync(file)).map(read).join("\n");
 
 test("dashboard is a standalone React HTTP API client", () => {
   assert.match(index, /config\.js/);
   assert.match(index, /id="root"/);
   assert.match(index, /type="module" src="\/src\/main\.tsx"/);
-  assert.match(packageJson, /"version": "3\.1\.0"/);
+  assert.match(packageJson, /"version": "3\.1\.1"/);
   assert.match(packageJson, /"react"/);
   assert.match(packageJson, /"lucide-react"/);
   assert.match(api, /configuredApiBaseUrl/);
@@ -180,13 +180,15 @@ test("release, governance, and deployment contracts remain present", () => {
   assert.match(nginx, /location \/api\//);
   assert.match(nginx, /proxy_pass \$\{EVOPILOT_API_BASE_URL\}/);
   assert.match(compose, /EVOPILOT_DASHBOARD_PORT:-8080/);
+  assert.match(compose, /EVOPILOT_HARNESS_HUB_URL/);
   assert.match(productionCompose, /EVOPILOT_DOCKER_NETWORK:-evopilot_default/);
+  assert.match(productionCompose, /EVOPILOT_HARNESS_HUB_URL/);
   assert.match(hostNginx, /proxy_pass http:\/\/127\.0\.0\.1:18080/);
   assert.match(dockerignore, /node_modules/);
   assert.match(dockerignore, /\.git/);
   assert.match(releaseBuilder, /evopilot-dashboard/);
   assert.match(releaseVerifier, /SHA256SUMS/);
-  assert.match(governanceVerifier, /docs\/releases\/3\.1\.0\.md/);
+  assert.match(governanceVerifier, /docs\/releases\/3\.1\.1\.md/);
 });
 
 test("production build includes runtime dashboard scripts", () => {

@@ -8,6 +8,12 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 3.1.1 - 2026-08-09
+
+### Fixed
+
+- Passed `EVOPILOT_HARNESS_HUB_URL` through the local and production Compose files so ECS/self-hosted Dashboard containers expose a browser-reachable external `evopilot-harness` Hub URL in `/config.js`.
+
 ## 3.1.0 - 2026-08-09
 
 ### Added

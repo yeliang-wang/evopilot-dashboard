@@ -2,13 +2,13 @@
 
 > Deploy EvoPilot Dashboard on operator-owned cloud infrastructure while keeping EvoPilot API as the system of record.
 
-This guide covers cloud container and static hosting entrypoints for Dashboard `v3.1.0`. It does not announce a hosted EvoPilot Cloud trial or a managed SaaS product. Operators own the cloud project, DNS, TLS, secrets, EvoPilot API endpoint, and evopilot-harness Hub endpoint.
+This guide covers cloud container and static hosting entrypoints for Dashboard `v3.1.1`. It does not announce a hosted EvoPilot Cloud trial or a managed SaaS product. Operators own the cloud project, DNS, TLS, secrets, EvoPilot API endpoint, and evopilot-harness Hub endpoint.
 
 ## Required Contract
 
 | Requirement | Value |
 | --- | --- |
-| Dashboard image | `ghcr.io/yeliang-wang/evopilot-dashboard:3.1.0` |
+| Dashboard image | `ghcr.io/yeliang-wang/evopilot-dashboard:3.1.1` |
 | Runtime port | `8080` |
 | Health path | `/health` |
 | Browser config | `EVOPILOT_API_BASE_URL` and `EVOPILOT_HARNESS_HUB_URL` for container injection or `public/config.js` for static assets |
@@ -22,7 +22,7 @@ Use a container service when the platform should serve the built Dashboard image
 
 ```bash
 gcloud run deploy evopilot-dashboard \
-  --image ghcr.io/yeliang-wang/evopilot-dashboard:3.1.0 \
+  --image ghcr.io/yeliang-wang/evopilot-dashboard:3.1.1 \
   --port 8080 \
   --set-env-vars EVOPILOT_API_BASE_URL=https://evopilot.example.com,EVOPILOT_HARNESS_HUB_URL=https://harness.example.com \
   --allow-unauthenticated
@@ -42,7 +42,7 @@ curl -i https://dashboard.example.com/api/v1/summary
 Use the same container contract on Fly.io, ECS, Azure Container Apps, or any managed container service:
 
 ```text
-image: ghcr.io/yeliang-wang/evopilot-dashboard:3.1.0
+image: ghcr.io/yeliang-wang/evopilot-dashboard:3.1.1
 port: 8080
 env:
   EVOPILOT_API_BASE_URL: https://evopilot.example.com

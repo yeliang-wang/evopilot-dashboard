@@ -48,7 +48,7 @@ npm run dashboard:run -- \
 From a release tag, bootstrap without cloning:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yeliang-wang/evopilot-dashboard/v3.1.0/install.sh | bash -s -- --api-url http://127.0.0.1:19876 --harness-hub-url http://127.0.0.1:4176 --dir evopilot-dashboard-run
+curl -fsSL https://raw.githubusercontent.com/yeliang-wang/evopilot-dashboard/v3.1.1/install.sh | bash -s -- --api-url http://127.0.0.1:19876 --harness-hub-url http://127.0.0.1:4176 --dir evopilot-dashboard-run
 ```
 
 ## Self-Hosted Stack
