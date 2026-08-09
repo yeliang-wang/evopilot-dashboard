@@ -47,7 +47,7 @@ Ordinary users do not choose, create, approve, publish, or evolve public `Harnes
 - [Cloud Deployment](deployment/cloud.md) explains operator-owned cloud deployment paths.
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v3.0.0 Release Notes](releases/3.0.0.md) is the EvoPilot v3 external Harness Catalog consumer and read-only Harness Hub compatibility body for the current public production baseline.
+- [EvoPilot Dashboard v3.1.0 Release Notes](releases/3.1.0.md) is the embedded independent `evopilot-harness` Hub compatibility body for the current public production baseline.
 - [EvoPilot Dashboard v2.4.0 Release Notes](releases/2.4.0.md) is the EvoPilot v2.4 one-command Harness evolution compatibility body superseded by v2.5.
 - [EvoPilot Dashboard v2.3.0 Release Notes](releases/2.3.0.md) is the EvoPilot v2.3 Harness auto-match compatibility body superseded by v2.4.
 - [EvoPilot Dashboard v2.2.0 Release Notes](releases/2.2.0.md) is the EvoPilot v2.2 Harness Knowledge Factory compatibility body superseded by v2.3.

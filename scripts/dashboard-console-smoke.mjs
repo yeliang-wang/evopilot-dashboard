@@ -23,7 +23,7 @@ const smokeId = `dashboard-console-smoke-${Date.now()}`;
 await check("api.health", apiBaseUrl, "/health", { expectStatus: 200 });
 await check("api.ready", apiBaseUrl, "/ready", { expectStatus: 200 });
 await check("dashboard.root", dashboardBaseUrl, "/", { expectStatus: 200, expectText: "EvoPilot" });
-await check("dashboard.config", dashboardBaseUrl, "/config.js", { expectStatus: 200, expectText: "EVOPILOT_DASHBOARD_CONFIG" });
+await check("dashboard.config", dashboardBaseUrl, "/config.js", { expectStatus: 200, expectText: "harnessHubUrl" });
 await check("dashboard.proxy.health", dashboardBaseUrl, "/health", { expectStatus: 200 });
 await check("dashboard.proxy.ready", dashboardBaseUrl, "/ready", { expectStatus: 200 });
 await check("auth.bootstrap", dashboardBaseUrl, "/api/v1/auth/bootstrap", { expectStatus: 200 });
@@ -39,7 +39,6 @@ if (!token) {
 }
 
 await check("summary.authenticated", dashboardBaseUrl, "/api/v1/summary", { token, expectStatus: 200 });
-await check("harness.catalogs", dashboardBaseUrl, "/api/v1/harness/catalogs", { token, expectStatus: 200 });
 await check("projects.list", dashboardBaseUrl, "/api/v1/projects", { token, expectStatus: 200 });
 await check("goals.list", dashboardBaseUrl, "/api/v1/goals", { token, expectStatus: 200 });
 await check("release.targets", dashboardBaseUrl, "/api/v1/release/targets", { token, expectStatus: 200 });

@@ -9,6 +9,12 @@ server {
     return 200 "ok\n";
   }
 
+  location = /config.js {
+    add_header Content-Type application/javascript;
+    add_header Cache-Control no-store;
+    return 200 "window.EVOPILOT_DASHBOARD_CONFIG = {\n  apiBaseUrl: \"\",\n  harnessHubUrl: \"${EVOPILOT_HARNESS_HUB_URL}\"\n};\n";
+  }
+
   location /api/ {
     proxy_pass ${EVOPILOT_API_BASE_URL};
     proxy_http_version 1.1;

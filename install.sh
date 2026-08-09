@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="${EVOPILOT_DASHBOARD_INSTALL_VERSION:-3.0.0}"
+VERSION="${EVOPILOT_DASHBOARD_INSTALL_VERSION:-3.1.0}"
 DIR="${EVOPILOT_DASHBOARD_INSTALL_DIR:-evopilot-dashboard-run}"
 IMAGE="${EVOPILOT_DASHBOARD_IMAGE:-ghcr.io/yeliang-wang/evopilot-dashboard:${VERSION}}"
 API_URL="${EVOPILOT_API_BASE_URL:-http://host.docker.internal:19876}"
+HARNESS_HUB_URL="${EVOPILOT_HARNESS_HUB_URL:-http://127.0.0.1:4176}"
 NETWORK="${EVOPILOT_DOCKER_NETWORK:-}"
 PORT="${EVOPILOT_DASHBOARD_PORT:-8080}"
 START=0
@@ -16,12 +17,13 @@ usage() {
 EvoPilot Dashboard container installer
 
 Usage:
-  install.sh [--dir evopilot-dashboard-run] [--api-url http://127.0.0.1:19876] [--network evopilot_default] [--port 8080] [--start]
+  install.sh [--dir evopilot-dashboard-run] [--api-url http://127.0.0.1:19876] [--harness-hub-url http://127.0.0.1:4176] [--network evopilot_default] [--port 8080] [--start]
 
 Environment:
   EVOPILOT_DASHBOARD_INSTALL_VERSION   image tag default. Default: ${VERSION}
   EVOPILOT_DASHBOARD_IMAGE             full image reference. Default: ${IMAGE}
   EVOPILOT_API_BASE_URL                EvoPilot API URL from the Dashboard container. Default: ${API_URL}
+  EVOPILOT_HARNESS_HUB_URL             evopilot-harness Hub URL from the user's browser. Default: ${HARNESS_HUB_URL}
   EVOPILOT_DOCKER_NETWORK              existing Docker network for API service discovery. Default: empty
   EVOPILOT_DASHBOARD_PORT              host port. Default: ${PORT}
 USAGE
@@ -35,6 +37,10 @@ while [ "$#" -gt 0 ]; do
       ;;
     --api-url)
       API_URL="${2:?--api-url requires a value}"
+      shift 2
+      ;;
+    --harness-hub-url)
+      HARNESS_HUB_URL="${2:?--harness-hub-url requires a value}"
       shift 2
       ;;
     --image)
@@ -94,6 +100,7 @@ services:
       - "\${EVOPILOT_DASHBOARD_PORT:-${PORT}}:8080"
     environment:
       EVOPILOT_API_BASE_URL: "\${EVOPILOT_API_BASE_URL:-${API_URL}}"
+      EVOPILOT_HARNESS_HUB_URL: "\${EVOPILOT_HARNESS_HUB_URL:-${HARNESS_HUB_URL}}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 COMPOSE
@@ -134,6 +141,7 @@ docker compose up -d
 
 - Dashboard: http://127.0.0.1:${PORT}
 - EvoPilot API: ${API_URL}
+- evopilot-harness Hub: ${HARNESS_HUB_URL}
 - Docker network: ${NETWORK:-default}
 - Image: ${IMAGE}
 README

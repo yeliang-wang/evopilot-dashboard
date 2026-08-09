@@ -19,7 +19,7 @@ Dashboard users, WorkBuddy setup agents, and developers validating the split das
 | --- | --- | --- |
 | Run Dashboard | You have an EvoPilot API server and want a containerized browser surface | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
 | Self-host with EvoPilot | You want Dashboard generated with the full EvoPilot stack | `npx create-evopilot@3.0.0 self-host --dir evopilot-stack --init-env` |
-| Connect to API | You deploy static assets behind a same-origin proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
+| Connect to API | You deploy static assets behind a same-origin proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "", harnessHubUrl: "http://127.0.0.1:4176" }` |
 
 Desktop app and hosted Cloud trial are not published Dashboard surfaces yet. Use [Distribution](operations/distribution.md) for the supported entry points.
 
@@ -44,7 +44,8 @@ For cross-origin development, set `public/config.js`:
 
 ```js
 window.EVOPILOT_DASHBOARD_CONFIG = {
-  apiBaseUrl: "http://127.0.0.1:19876"
+  apiBaseUrl: "http://127.0.0.1:19876",
+  harnessHubUrl: "http://127.0.0.1:4176"
 };
 ```
 

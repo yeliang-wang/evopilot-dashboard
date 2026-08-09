@@ -8,6 +8,23 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 3.1.0 - 2026-08-09
+
+### Added
+
+- Added `harnessHubUrl` runtime configuration and `EVOPILOT_HARNESS_HUB_URL` container configuration for the independent evopilot-harness Hub iframe.
+- Added release notes for the Dashboard 3.1.0 embedded Hub boundary.
+
+### Changed
+
+- Replaced the Dashboard-owned Harness Hub Catalog projection page with an iframe host for the independently running `evopilot-harness` Hub.
+- Removed Dashboard smoke/static contract expectations that Harness Hub reads EvoPilot Harness Catalog list/inspect APIs.
+- Kept `selectedHarness.yaml` review in Agent Console as an EvoPilot goal-plan approval step.
+
+### Validation
+
+- Full release validation is required before publication: `npm run check`, `npm run test:browser`, `npm run release:artifact`, `npm run verify:release-artifact`, and `git diff --check`.
+
 ## 3.0.0 - 2026-08-09
 
 ### Added

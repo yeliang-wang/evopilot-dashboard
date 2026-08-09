@@ -149,7 +149,7 @@ export function Topbar({
     tenants: ["平台租户管理", "创建租户、工作区和租户管理员；只有 platform admin 能跨 tenant 切换 scope。"],
     workspaces: ["工作区管理", "按租户管理 workspace 边界、owner、项目配额和 loop 配额。"],
     users: ["用户权限管理", "创建 tenant/workspace scoped 用户，首次登录必须改密，所有操作进入 audit。"],
-    templates: ["Harness Hub / 专家市场", "管理员查看外部 Catalog、领域专家资产和 Harness 进化 run；执行仍由 EvoPilot 控制面治理。"],
+    templates: ["Harness Hub / 专家市场", "右侧主页面嵌入独立 evopilot-harness Hub；Dashboard 不拥有 Harness 管理和进化能力。"],
     "llm-profiles": ["LLM Profiles", "Register the provider and secret reference EvoPilot can use for project loops."],
     audit: ["审计与日志溯源", "按 requestId、actor、scope、action、nextAction 和 blocker 定位问题。"]
   };

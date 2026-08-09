@@ -47,7 +47,7 @@ Do not expect workspace/project cards, active sessions, recent decisions, user f
 | Tenants | Create tenant, workspace, and tenant admin. | Stop on `403`, missing platform admin role, or missing tenant/workspace id. |
 | Workspaces | Create tenant-scoped workspace with owner and quota. | Stop on tenant mismatch or quota policy failure. |
 | Users | Create scoped user with `mustChangePassword=true`. | Stop if the requested role exceeds the signed-in user's authority. |
-| Harness Hub | Read configured published Harness Catalogs and domain Harness experts. | Do not expect Dashboard to create, approve, publish, or mutate Harness definitions. |
+| Harness Hub | Embed the independently served `evopilot-harness` Hub through `harnessHubUrl`. | Do not treat Dashboard as the owner of Harness lifecycle state. |
 | LLM Profiles | Register workspace profiles for project defaults or user profiles for run overrides. | Do not paste raw keys into screenshots; stop on profile readiness or secret-ref blockers. |
 | Audit | Read request, action, scope, blockers, and failure trace. | Do not claim root cause without requestId or server trace evidence. |
 

@@ -104,22 +104,6 @@ export async function mockEvoPilotApi(
       }, "req-goal-advance"));
     }
 
-    if (method === "GET" && url.pathname === "/api/v1/harness/catalogs") {
-      return fulfill(route, ok(harnessCatalogProjection(), "req-harness-catalogs"));
-    }
-
-    if (method === "GET" && /^\/api\/v1\/harness\/catalogs\/[^/]+$/.test(url.pathname)) {
-      const scan = harnessCatalogScanProjection();
-      return fulfill(route, ok({
-        schema: "evopilot-harness-catalog-inspect-result/v1",
-        mount: scan.mount,
-        catalog: scan.catalog,
-        templates: scan.templates,
-        scan,
-        nextAction: "use-catalog-harness-for-project-auto-match"
-      }, "req-harness-catalog-inspect"));
-    }
-
     return fulfill(route, ok(defaultProjection(url.pathname), requestIdFrom(key)));
   });
 
@@ -138,94 +122,6 @@ function defaultProjection(pathname: string): unknown {
     status: "READY",
     nextAction: "none",
     blockers: []
-  };
-}
-
-function harnessCatalogProjection(): {
-  schema: string;
-  catalogs: Record<string, unknown>[];
-  mounts: Record<string, unknown>[];
-  scans: Record<string, unknown>[];
-  templates: Record<string, unknown>[];
-  nextAction: string;
-} {
-  const scan = harnessCatalogScanProjection();
-  return {
-    schema: "evopilot-harness-catalog-list/v1",
-    catalogs: [scan.catalog],
-    mounts: [scan.mount],
-    scans: [scan],
-    templates: scan.templates,
-    nextAction: "use-catalog-harness-for-project-auto-match"
-  };
-}
-
-function harnessCatalogScanProjection(): Record<string, unknown> & {
-  mount: Record<string, unknown>;
-  catalog: Record<string, unknown>;
-  templates: Record<string, unknown>[];
-} {
-  const templates = harnessTemplates();
-  return {
-    schema: "evopilot-harness-catalog-scan-result/v1",
-    status: "READY",
-    scannedAt: "2026-08-09T00:00:00.000Z",
-    mount: {
-      schema: "evopilot-harness-catalog-mount/v1",
-      catalogId: "evopilot-public-harness-catalog",
-      name: "EvoPilot Public Harness Catalog",
-      source: "/opt/evopilot-harness/published",
-      status: "ACTIVE",
-      lastReadStatus: "READY",
-      catalogDigest: "sha256:mock-catalog",
-      templateCount: templates.length
-    },
-    catalog: {
-      schema: "evopilot-published-harness-catalog/v1",
-      catalogId: "evopilot-public-harness-catalog",
-      catalogVersion: 1,
-      catalogDigest: "sha256:mock-catalog",
-      compatibleEvopilot: ">=3.0.0",
-      entries: templates.map((template) => ({
-        name: template.id,
-        version: template.version,
-        layer: template.harnessLayer,
-        domain: template.domain,
-        status: "published",
-        path: template.catalogRef.entryPath,
-        digest: template.catalogRef.entryDigest,
-        tags: [template.domain]
-      })),
-      warnings: []
-    },
-    templates,
-    entries: [],
-    warnings: []
-  };
-}
-
-function harnessTemplates(): Record<string, unknown>[] {
-  return [
-    template("database-product-harness", "Database Product Harness", "2.2.0", "database-product", "sha256:mock-db-entry"),
-    template("api-gateway-harness", "API Gateway Harness", "2.2.0", "api-gateway", "sha256:mock-gateway-entry"),
-    template("distributed-cache-harness", "Distributed Cache Harness", "0.1.0", "distributed-cache", "sha256:mock-cache-entry")
-  ];
-}
-
-function template(id: string, name: string, version: string, domain: string, entryDigest: string): Record<string, unknown> {
-  return {
-    id,
-    name,
-    version,
-    harnessLayer: "domain",
-    domain,
-    digest: entryDigest,
-    catalogRef: {
-      catalogId: "evopilot-public-harness-catalog",
-      catalogDigest: "sha256:mock-catalog",
-      entryPath: `./${id}/${version}/template.yaml`,
-      entryDigest
-    }
   };
 }
 

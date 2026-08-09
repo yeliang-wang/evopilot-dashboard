@@ -14,7 +14,7 @@ Platform administrators, tenant administrators, and operations staff.
 | User and scope setup | Tenants / Workspaces / Users | user role, tenant, workspace, status, audit row |
 | Project credentials | Agent Console | server-side secret or tokenRef saved, checklist/preflight result |
 | DevOps boundary | Agent Console | executionMode, devopsOwner, workflowRepository, credentialPrincipal, claimBoundary |
-| Harness governance | Agent Console Review Pack / Harness Hub | selectedHarness id/version/catalog/entry digests, Catalog compatibility, read-only Harness Hub evidence |
+| Harness governance | Agent Console Review Pack / embedded Harness Hub | selectedHarness id/version/catalog/entry digests, configured `harnessHubUrl`, evopilot-harness Hub evidence |
 | Phase governance | Agent Console | Alpha/Beta/RC/GA phase plan, owner confirmation, approval audit |
 | Release governance | Agent Console / Audit | TargetEvidencePackage, PhasePackage, releaseDecision |
 | Troubleshooting | Audit / Evidence Drawer | requestId, traceId, actor, operation, error, nextAction |
@@ -31,7 +31,7 @@ The Dashboard exposes mutating controls, but EvoPilot API remains the enforcemen
 | Harness plan approval | Require owner review of the selectedHarness binding before phase-plan approval. | Review Pack shows Harness id, version, Catalog id, entry path, Catalog digest, and entry digest. |
 | Goal plan approval | Require Alpha/Beta/RC/GA phase plan review before approval. | Review Pack requires `confirmedBy` and `confirmation`; Audit can verify approval. |
 | Incident repair | Use requestId, traceId, failed node, root cause, and nextAction. | Audit and Evidence Drawer show troubleshooting contract; server logs remain authoritative. |
-| Harness lifecycle | Use `evopilot-harness` for versioned evolution, review, approval, and publication. | Harness Hub only reads published Catalogs and cannot create, approve, publish, or mutate Harness definitions. |
+| Harness lifecycle | Use `evopilot-harness` for versioned evolution, review, approval, publication, CLI, and Hub UI. | Dashboard only embeds the independent Hub and cannot create, approve, publish, or mutate Harness definitions itself. |
 
 If EvoPilot returns `403`, `409`, `WAITING_APPROVAL`, missing selectedHarness, `NO-GO`, or a repair-oriented `nextAction`, do not bypass it from the browser. Repair the server-side condition and rerun the same action.
 

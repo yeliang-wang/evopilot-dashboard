@@ -39,7 +39,7 @@ Ordinary users do not choose or mutate the public `Harness` manually. Template s
 | `LLM Profiles` |
 | `Audit` |
 
-Project context, active sessions, recent decisions, and user details are not sidebar content. They appear in the main Agent Console, the relevant admin page, or the Evidence Drawer. `Tenants`, `Workspaces`, `Users`, `Harness Hub`, and `LLM Profiles` call EvoPilot APIs and still obey RBAC, audit, and `nextAction` stop rules.
+Project context, active sessions, recent decisions, and user details are not sidebar content. They appear in the main Agent Console, the relevant admin page, or the Evidence Drawer. `Tenants`, `Workspaces`, `Users`, and `LLM Profiles` call EvoPilot APIs and still obey RBAC, audit, and `nextAction` stop rules. `Harness Hub` embeds the independent `evopilot-harness` UI configured by `harnessHubUrl`.
 
 ## Delivery Chain
 
@@ -96,9 +96,9 @@ Use **View evidence** when you need audit or AI-agent details:
 | Create tenant | `POST /api/v1/tenants` |
 | Create workspace | `POST /api/v1/workspaces` |
 | Create user | `POST /api/v1/users` |
-| Read Harness Catalogs | `GET /api/v1/harness/catalogs`, `GET /api/v1/harness/catalogs/{catalogId}` |
+| Open Harness Hub | Browser iframe to configured `harnessHubUrl` |
 | Read audit | `GET /api/v1/audit` |
 
-Dashboard does not call CLI commands. It uses EvoPilot HTTP APIs through `src/api.ts`.
+Dashboard does not call CLI commands. It uses EvoPilot HTTP APIs through `src/api.ts` for EvoPilot-owned state, and embeds the independent `evopilot-harness` Hub for Harness lifecycle screens.
 
-The Harness Hub / 专家市场 page is read-only. It displays configured published Catalogs, domain Harness experts, source types, and available Harness entries returned by EvoPilot. Source extraction, production-log redaction, snapshots, draft validation, approval, publish, impact, and `CATALOG.md` maintenance are owned by `evopilot-harness`, not Dashboard.
+The Harness Hub / 专家市场 page is an iframe container. Source extraction, production-log redaction, snapshots, draft validation, approval, publish, impact, `CATALOG.md` maintenance, lifecycle UI, and atomic plus one-click CLI are owned by `evopilot-harness`, not Dashboard.

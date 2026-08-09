@@ -75,8 +75,9 @@ test.describe("Agent Console browser matrix", () => {
     expect(unexpectedErrors(errors, ["409 (Conflict)"])).toEqual([]);
   });
 
-  test("mock API renders Harness Hub Catalog projections", async ({ page }) => {
+  test("Harness Hub embeds the independent evopilot-harness UI", async ({ page }) => {
     await ignoreFavicon(page);
+    await mockHarnessHub(page);
     const api = await mockEvoPilotApi(page, "happy-path");
     const errors = collectBrowserErrors(page);
 
@@ -85,11 +86,11 @@ test.describe("Agent Console browser matrix", () => {
     await page.getByLabel("Password").press("Enter");
     await page.getByRole("button", { name: "Harness Hub" }).click();
 
-    await expect(page.getByRole("heading", { name: "Harness Hub / 专家市场" })).toBeVisible();
-    await expect(page.getByText("EvoPilot Public Harness Catalog")).toBeVisible();
-    await expect(page.getByText("Distributed Cache Harness Expert")).toBeVisible();
-    await expect(page.getByText("distributed-cache-harness@0.1.0")).toBeVisible();
-    expect(api.calls).toContain("GET /api/v1/harness/catalogs");
+    await expect(page.getByRole("heading", { name: "evopilot-harness Hub / 专家市场", exact: true })).toBeVisible();
+    await expect(page.getByTitle("evopilot-harness Hub")).toBeVisible();
+    await expect(page.frameLocator("iframe[title='evopilot-harness Hub']").getByText("Independent Harness Hub")).toBeVisible();
+    await expect(page.getByText("http://127.0.0.1:4176")).toBeVisible();
+    expect(api.calls).not.toContain("GET /api/v1/harness/catalogs");
     expect(api.calls).not.toContain("GET /api/v1/harness/templates");
     expect(errors).toEqual([]);
   });
@@ -98,6 +99,21 @@ test.describe("Agent Console browser matrix", () => {
 async function ignoreFavicon(page: Page): Promise<void> {
   await page.route("**/favicon.ico", async (route) => {
     await route.fulfill({ status: 204, body: "" });
+  });
+}
+
+async function mockHarnessHub(page: Page): Promise<void> {
+  await page.route("http://127.0.0.1:4176/**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: [
+        "<!doctype html>",
+        "<html><body>",
+        "<main><h1>Independent Harness Hub</h1><p>evopilot-harness owns lifecycle, evolution, approval, and publication.</p></main>",
+        "</body></html>"
+      ].join("")
+    });
   });
 }
 

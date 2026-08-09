@@ -50,10 +50,10 @@ Only operate these pages when the signed-in user is a platform administrator and
 | Tenants | Create tenant, workspace, tenant admin | `POST /api/v1/tenants` |
 | Workspaces | Create workspace boundary and quota | `POST /api/v1/workspaces` |
 | Users | Create scoped user with `mustChangePassword=true` | `POST /api/v1/users` |
-| Harness Hub | Read configured Catalogs and inspect published Harness definitions | `GET /api/v1/harness/catalogs`, `GET /api/v1/harness/catalogs/{catalogId}` |
+| Harness Hub | Open the embedded independent `evopilot-harness` Hub | browser iframe to configured `harnessHubUrl` |
 | Audit | Read request/action/failure trace | `GET /api/v1/audit` |
 
-Harness lifecycle and evolution are not Dashboard browser operations. Use `evopilot-harness` to scan source projects, attachments, notes, EvoPilot history exports, and production logs; approve drafts; publish a usable Harness Catalog; then let EvoPilot read the configured Catalog directory.
+Harness lifecycle and evolution are not Dashboard-owned browser operations. The embedded page is served by `evopilot-harness`, which owns source-project scans, attachments, notes, EvoPilot history exports, production logs, draft approval, publication, the usable Harness Catalog, and the atomic plus one-click CLI.
 
 If RBAC hides a page or the server returns `403`, stop and report a scope or role problem. Do not try to switch tenant/workspace as an ordinary user.
 

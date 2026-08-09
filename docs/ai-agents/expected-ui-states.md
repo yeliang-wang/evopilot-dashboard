@@ -68,7 +68,7 @@ Expected fields:
 | Tenants | tenant table, `初始化新租户`, create action, audit evidence |
 | Workspaces | workspace table, owner and quota fields, project LLM/token usage projection, create action |
 | Users | user table, role/status fields, `mustChangePassword=true` behavior in docs |
-| Harness Hub | Published Harness Catalog table, domain expert rows, source types, inspect action |
+| Harness Hub | iframe container for the independently served `evopilot-harness` Hub and an external-open action |
 | Audit | audit rows, requestId, last action, nextAction, blockers, failure trace |
 
 ## Blocker State

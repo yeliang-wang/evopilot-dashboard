@@ -27,6 +27,7 @@ const installDir = path.join(tempRoot, "install-script");
 
 assert.ok(cloudRunbook.includes(`evopilot-dashboard:${version}`), "cloud deployment runbook should pin the Dashboard image version");
 assert.ok(cloudRunbook.includes("EVOPILOT_API_BASE_URL"), "cloud deployment runbook should document API base URL configuration");
+assert.ok(cloudRunbook.includes("EVOPILOT_HARNESS_HUB_URL"), "cloud deployment runbook should document external Harness Hub URL configuration");
 assert.ok(cloudRunbook.includes("Cloud Run"), "cloud deployment runbook should include Cloud Run guidance");
 assert.ok(cloudRunbook.includes("Static hosting"), "cloud deployment runbook should include static hosting guidance");
 
@@ -40,12 +41,14 @@ run("node", [
   runDir,
   "--api-url",
   "http://127.0.0.1:19876",
+  "--harness-hub-url",
+  "http://127.0.0.1:4176",
   "--network",
   "evopilot_default",
   "--port",
   "18080"
 ]);
-verifyGeneratedRun(runDir, "http://127.0.0.1:19876", "18080", "evopilot_default");
+verifyGeneratedRun(runDir, "http://127.0.0.1:19876", "http://127.0.0.1:4176", "18080", "evopilot_default");
 
 run("bash", [
   "install.sh",
@@ -53,16 +56,18 @@ run("bash", [
   installDir,
   "--api-url",
   "http://127.0.0.1:19876",
+  "--harness-hub-url",
+  "http://127.0.0.1:4176",
   "--network",
   "evopilot_default",
   "--port",
   "18081"
 ]);
-verifyGeneratedRun(installDir, "http://127.0.0.1:19876", "18081", "evopilot_default");
+verifyGeneratedRun(installDir, "http://127.0.0.1:19876", "http://127.0.0.1:4176", "18081", "evopilot_default");
 
 console.log("Dashboard distribution verification passed.");
 
-function verifyGeneratedRun(dir, apiUrl, port, network) {
+function verifyGeneratedRun(dir, apiUrl, harnessHubUrl, port, network) {
   for (const relativePath of ["compose.yaml", "README.md", "verify.sh"]) {
     const filePath = path.join(dir, relativePath);
     assert.ok(fs.existsSync(filePath), `${relativePath} should be generated`);
@@ -71,6 +76,7 @@ function verifyGeneratedRun(dir, apiUrl, port, network) {
   const compose = fs.readFileSync(path.join(dir, "compose.yaml"), "utf8");
   assert.match(compose, new RegExp(`ghcr\\.io/yeliang-wang/evopilot-dashboard:${escapeRegExp(version)}`));
   assert.ok(compose.includes(apiUrl), "compose.yaml should include the configured API URL");
+  assert.ok(compose.includes(harnessHubUrl), "compose.yaml should include the configured Harness Hub URL");
   assert.ok(compose.includes(network), "compose.yaml should include the configured Docker network");
   assert.ok(
     compose.includes(`:-${port}}:8080`) || compose.includes(`${port}:8080`),

@@ -135,27 +135,26 @@ audit list
 
 Do not create cross-tenant users from an ordinary operator session. Stop on `403`, missing role, missing tenant/workspace id, or server `nextAction`.
 
-## Scenario 7: Platform Admin Reviews Harness Hub
+## Scenario 7: Platform Admin Opens Embedded Harness Hub
 
-Use when an administrator wants to see which published Harness Catalogs and domain Harness experts EvoPilot can read.
+Use when an administrator wants to operate the independent `evopilot-harness` Hub from the Dashboard left menu without making Dashboard own Harness lifecycle state.
 
 ### Browser Flow
 
 1. Log in as a platform administrator.
 2. Open **Harness Hub**.
-3. Review published Catalog rows returned by EvoPilot.
-4. Inspect a Catalog when a row includes an inspect action.
-5. Review domain Harness experts, source types, versions, compatibility, entry paths, and digests.
-6. If the needed Harness is missing or stale, leave Dashboard and use `evopilot-harness` to evolve, approve, and publish a usable Harness.
+3. Confirm the right-side page renders an iframe whose source is the configured `harnessHubUrl`.
+4. Operate Harness lifecycle inside the embedded `evopilot-harness` UI, or open the Hub in a separate tab.
+5. If the needed Harness is missing or stale, use the Hub or `evopilot-harness` CLI to evolve, approve, and publish a usable Harness.
 
 ### CLI-equivalent
 
 ```text
-GET /api/v1/harness/catalogs
-GET /api/v1/harness/catalogs/{catalogId}
-# Harness lifecycle commands live in evopilot-harness, not Dashboard or EvoPilot CLI.
+evopilot-harness hub serve
+evopilot-harness hub snapshot --json
+evopilot-harness evolve --source-project /path/to/project --goal "..." --json
 ```
 
 ### WorkBuddy deviation guard
 
-Do not claim Dashboard created, approved, published, or evolved a Harness. Harness Hub is a read-only expert market over EvoPilot Catalog projections.
+Do not claim Dashboard created, approved, published, or evolved a Harness. The embedded Hub is an `evopilot-harness` surface; Dashboard is only the iframe host.

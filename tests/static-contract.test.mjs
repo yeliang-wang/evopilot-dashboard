@@ -55,14 +55,14 @@ const docs = [
   "docs/workflows/project-onboarding.md",
   "docs/workflows/source-to-ga-loop.md",
   "docs/workflows/release-decision-review.md",
-  "docs/releases/3.0.0.md"
+  "docs/releases/3.1.0.md"
 ].filter((file) => fs.existsSync(file)).map(read).join("\n");
 
 test("dashboard is a standalone React HTTP API client", () => {
   assert.match(index, /config\.js/);
   assert.match(index, /id="root"/);
   assert.match(index, /type="module" src="\/src\/main\.tsx"/);
-  assert.match(packageJson, /"version": "3\.0\.0"/);
+  assert.match(packageJson, /"version": "3\.1\.0"/);
   assert.match(packageJson, /"react"/);
   assert.match(packageJson, /"lucide-react"/);
   assert.match(api, /configuredApiBaseUrl/);
@@ -76,7 +76,7 @@ test("dashboard is a standalone React HTTP API client", () => {
   assert.doesNotMatch(dashboardSource, /evopilot\s+(target|goal|loop|harness)/);
 });
 
-test("dashboard uses EvoPilot v3 selectedHarness and read-only Harness Catalog APIs", () => {
+test("dashboard uses EvoPilot selectedHarness and embeds independent evopilot-harness Hub", () => {
   for (const text of [
     "selectedHarness",
     "selectedHarness.yaml",
@@ -84,23 +84,24 @@ test("dashboard uses EvoPilot v3 selectedHarness and read-only Harness Catalog A
     "catalogDigest",
     "entryDigest",
     "Harness Hub / 专家市场",
-    "Published Harness Catalog",
-    "Inspect Published Harness Catalog",
-    "EvoPilot goal plan",
-    "EVOPILOT_HARNESS_CATALOG_DIRS"
+    "evopilot-harness Hub",
+    "iframe",
+    "configuredHarnessHubUrl",
+    "harnessHubUrl",
+    "EvoPilot goal plan"
   ]) {
     assert.match(dashboardSource + docs, new RegExp(escapeRegExp(text)));
   }
 
-  assert.match(api, /harnessCatalogs: "\/api\/v1\/harness\/catalogs"/);
-  assert.match(api, /harnessCatalog: \(catalogId: string\) => `\/api\/v1\/harness\/catalogs\/\$\{encodeURIComponent\(catalogId\)\}`/);
+  assert.match(api, /configuredHarnessHubUrl/);
+  assert.match(components, /<iframe/);
   assert.match(controller, /apiSurface\.goalPlan/);
   assert.match(controller, /extractHarnessDraft\(plan\.data\)/);
   assert.match(mockApi, /selectedHarnessProjection/);
-  assert.match(mockApi, /compatibleEvopilot: ">=3\.0\.0"/);
 
   for (const forbidden of [
     "/api/v1/harness/templates",
+    "/api/v1/harness/catalogs",
     "/api/v1/harness/template-matches",
     "/api/v1/harness/template-evolutions",
     "/api/v1/harness/template-evolutions/evolve",
@@ -164,9 +165,10 @@ test("browser and smoke tests cover the v3 flow", () => {
   assert.match(browserE2E, /POST \/api\/v1\/goals\/goal-mock-ga\/plan/);
   assert.match(browserE2E, /not\.toContain\("GET \/api\/v1\/harness\/templates"\)/);
   assert.match(visualTest, /selectedHarness\.yaml/);
-  assert.match(consoleSmoke, /harness\.catalogs/);
+  assert.match(consoleSmoke, /harnessHubUrl/);
   assert.match(consoleSmoke, /mutating\.goal\.selectedHarness/);
   assert.doesNotMatch(consoleSmoke, /harness\.templates/);
+  assert.doesNotMatch(consoleSmoke, /harness\.catalogs/);
   assert.doesNotMatch(consoleSmoke, /harness\.generate/);
   assert.doesNotMatch(consoleSmoke, /harness\.activate/);
   assert.match(productionSmoke, /evopilot-version\/v1/);
@@ -184,7 +186,7 @@ test("release, governance, and deployment contracts remain present", () => {
   assert.match(dockerignore, /\.git/);
   assert.match(releaseBuilder, /evopilot-dashboard/);
   assert.match(releaseVerifier, /SHA256SUMS/);
-  assert.match(governanceVerifier, /docs\/releases\/3\.0\.0\.md/);
+  assert.match(governanceVerifier, /docs\/releases\/3\.1\.0\.md/);
 });
 
 test("production build includes runtime dashboard scripts", () => {

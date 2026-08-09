@@ -22,12 +22,11 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Tenants | `GET /api/v1/tenants`, `POST /api/v1/tenants` |
 | Workspaces | `GET /api/v1/workspaces`, `POST /api/v1/workspaces`, `GET /api/v1/workspaces/{workspaceId}/usage` |
 | Users | `GET /api/v1/users`, `POST /api/v1/users` |
-| Harness Catalogs | `GET /api/v1/harness/catalogs`, `GET /api/v1/harness/catalogs/{catalogId}` |
 | LLM profiles | `GET /api/v1/llm-profiles`, `POST /api/v1/llm-profiles`, `POST /api/v1/llm-profiles/{profileId}/preflight` |
 | Project LLM default | `GET /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm/preflight` |
 | Audit | `GET /api/v1/audit` |
 
-The Harness Hub page is read-only. It renders configured Catalog directories from `GET /api/v1/harness/catalogs` and inspects one Catalog through `GET /api/v1/harness/catalogs/{catalogId}`. Catalog growth, Harness lifecycle, source-project evolution, attachment ingestion, production-log redaction, approval, and publication are handled by `evopilot-harness`, not Dashboard.
+The Harness Hub page is an iframe container for the independently served `evopilot-harness` Hub configured by `window.EVOPILOT_DASHBOARD_CONFIG.harnessHubUrl`. Dashboard does not call EvoPilot Harness Catalog APIs for that page and does not own Catalog growth, source-project evolution, attachment ingestion, production-log redaction, approval, publication, or Hub UI state.
 
 ## Projection Context
 
@@ -81,8 +80,8 @@ Workspace usage and project LLM usage are server projections. Dashboard displays
 |---|---|
 | `# Agent Console` | ordinary project owner/operator flow |
 | `Tenants`, `Workspaces`, `Users` | platform or tenant administration through EvoPilot RBAC |
-| `Harness Hub` | read-only view of published Harness Catalogs and domain experts |
+| `Harness Hub` | iframe container for the independently served `evopilot-harness` Hub |
 | `LLM Profiles` | workspace profile registration for project defaults and user profile registration for run overrides |
 | `Audit` | current authorized audit scope |
 
-Dashboard never mutates local EvoPilot files, never calls CLI commands, and never manages Harness lifecycle. CLI and Dashboard remain separate adapters over EvoPilot server state, while Harness lifecycle is owned by `evopilot-harness`.
+Dashboard never mutates local EvoPilot files, never calls CLI commands, and never manages Harness lifecycle. Harness lifecycle, CLI, and Hub UI are owned by `evopilot-harness`; Dashboard only embeds that UI when `harnessHubUrl` is reachable.

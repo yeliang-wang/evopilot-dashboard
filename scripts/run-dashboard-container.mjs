@@ -50,6 +50,7 @@ function parseArgs(argv) {
     dir: get("--dir", "evopilot-dashboard-run"),
     image: get("--image", `ghcr.io/yeliang-wang/evopilot-dashboard:${version}`),
     apiUrl: get("--api-url", "http://host.docker.internal:19876"),
+    harnessHubUrl: get("--harness-hub-url", "http://127.0.0.1:4176"),
     network: get("--network", ""),
     port: get("--port", "8080"),
     force: has(argv, "--force"),
@@ -93,6 +94,7 @@ services:
       - "\${EVOPILOT_DASHBOARD_PORT:-${args.port}}:8080"
     environment:
       EVOPILOT_API_BASE_URL: "\${EVOPILOT_API_BASE_URL:-${args.apiUrl}}"
+      EVOPILOT_HARNESS_HUB_URL: "\${EVOPILOT_HARNESS_HUB_URL:-${args.harnessHubUrl}}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 ${serviceNetwork}    healthcheck:
@@ -121,6 +123,7 @@ docker compose up -d
 
 - Dashboard: http://127.0.0.1:${args.port}
 - EvoPilot API: ${args.apiUrl}
+- evopilot-harness Hub: ${args.harnessHubUrl}
 - Docker network: ${args.network || "default"}
 - Image: ${args.image}
 
@@ -143,11 +146,13 @@ function printHelp() {
   console.log(`EvoPilot Dashboard runner
 
 Usage:
-  npm run dashboard:run -- [--dir evopilot-dashboard-run] [--api-url http://127.0.0.1:19876] [--network evopilot_default] [--port 8080] [--start]
+  npm run dashboard:run -- [--dir evopilot-dashboard-run] [--api-url http://127.0.0.1:19876] [--harness-hub-url http://127.0.0.1:4176] [--network evopilot_default] [--port 8080] [--start]
 
 Options:
   --dir <path>      Output directory. Default: evopilot-dashboard-run
   --api-url <url>   EvoPilot API URL from the Dashboard container. Default: http://host.docker.internal:19876
+  --harness-hub-url <url>
+                    evopilot-harness Hub URL from the user's browser. Default: http://127.0.0.1:4176
   --image <image>   Dashboard image. Default: ghcr.io/yeliang-wang/evopilot-dashboard:${version}
   --network <name>  Existing Docker network for API service discovery
   --port <port>     Host Dashboard port. Default: 8080

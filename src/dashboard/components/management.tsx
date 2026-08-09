@@ -69,7 +69,7 @@ export function ManagementPage({
   if (page === "tenants") return <TenantsPage form={tenantForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onTenantForm} onRunAction={onRunAction} />;
   if (page === "workspaces") return <WorkspacesPage form={workspaceForm} scope={scope} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onWorkspaceForm} onRunAction={onRunAction} />;
   if (page === "users") return <UsersPage form={userForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onUserForm} onRunAction={onRunAction} />;
-  if (page === "templates") return <TemplatesPage snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onRunAction={onRunAction} />;
+  if (page === "templates") return <TemplatesPage />;
   if (page === "llm-profiles") return <LlmProfilesPage form={llmProfileForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onLlmProfileForm} onRunAction={onRunAction} onRefresh={onRefresh} />;
   return <AuditPage snapshot={snapshot} session={session} lastAction={lastAction} onRefresh={onRefresh} />;
 }

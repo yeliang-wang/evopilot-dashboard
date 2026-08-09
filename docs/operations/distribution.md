@@ -8,9 +8,9 @@ EvoPilot Dashboard has three supported public entry points. These labels match t
 | --- | --- | --- |
 | Run Dashboard | Developers and operators with an EvoPilot API server | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
 | Self-host with EvoPilot | Operators bringing up the full EvoPilot stack | `npx create-evopilot@3.0.0 self-host --dir evopilot-stack --init-env` |
-| Connect to API | Platform teams deploying Dashboard static assets behind a proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
+| Connect to API | Platform teams deploying Dashboard static assets behind a proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "", harnessHubUrl: "http://127.0.0.1:4176" }` |
 
-The Dashboard is a standalone React HTTP client. It does not publish a separate npm CLI, does not call the EvoPilot CLI, and does not own server state. EvoPilot API remains the system of record for users, tenant/workspace scope, projects, harness bindings, loops, evidence, audit, release decisions, and credentials.
+The Dashboard is a standalone React HTTP client. It does not publish a separate npm CLI, does not call the EvoPilot CLI, and does not own server state. EvoPilot API remains the system of record for users, tenant/workspace scope, projects, selected Harness bindings, loops, evidence, audit, release decisions, and credentials. Harness lifecycle UI and CLI are independently owned by `evopilot-harness`; Dashboard only embeds that Hub through `harnessHubUrl`.
 
 Desktop app and hosted Cloud trial are not published Dashboard distribution surfaces in this version. Do not present them as available paths until the product ships a signed desktop package or a hosted tenant onboarding flow.
 
@@ -48,7 +48,7 @@ npm run dashboard:run -- \
 From a release tag, bootstrap without cloning:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yeliang-wang/evopilot-dashboard/v3.0.0/install.sh | bash -s -- --api-url http://127.0.0.1:19876 --dir evopilot-dashboard-run
+curl -fsSL https://raw.githubusercontent.com/yeliang-wang/evopilot-dashboard/v3.1.0/install.sh | bash -s -- --api-url http://127.0.0.1:19876 --harness-hub-url http://127.0.0.1:4176 --dir evopilot-dashboard-run
 ```
 
 ## Self-Hosted Stack
@@ -70,11 +70,12 @@ For same-origin production deployments, serve Dashboard static assets at `/` and
 
 ```js
 window.EVOPILOT_DASHBOARD_CONFIG = {
-  apiBaseUrl: ""
+  apiBaseUrl: "",
+  harnessHubUrl: "http://127.0.0.1:4176"
 };
 ```
 
-Use an absolute `apiBaseUrl` only when CORS is explicitly configured on EvoPilot API.
+Use an absolute `apiBaseUrl` only when CORS is explicitly configured on EvoPilot API. Set `harnessHubUrl` to the independent evopilot-harness Hub URL reachable from the user's browser.
 
 ## Cloud Deployment
 

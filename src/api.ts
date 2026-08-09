@@ -1,5 +1,6 @@
 export interface DashboardRuntimeConfig {
   apiBaseUrl?: string;
+  harnessHubUrl?: string;
 }
 
 declare global {
@@ -72,6 +73,7 @@ const DASHBOARD_USAGE_API_TIMEOUT_MS = 45_000;
 
 export const configuredApiBaseUrl = String(window.EVOPILOT_DASHBOARD_CONFIG?.apiBaseUrl ?? "").replace(/\/+$/, "");
 export const controlPlaneBaseUrl = configuredApiBaseUrl || window.location.origin;
+export const configuredHarnessHubUrl = String(window.EVOPILOT_DASHBOARD_CONFIG?.harnessHubUrl ?? "http://127.0.0.1:4176").replace(/\/+$/, "");
 
 export function apiUrl(path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -273,8 +275,6 @@ export const apiSurface = {
   llmProfilePreflight: (profileId: string) => `/api/v1/llm-profiles/${encodeURIComponent(profileId)}/preflight`,
   projectLlm: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm`,
   projectLlmPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight`,
-  harnessCatalogs: "/api/v1/harness/catalogs",
-  harnessCatalog: (catalogId: string) => `/api/v1/harness/catalogs/${encodeURIComponent(catalogId)}`,
   goals: "/api/v1/goals",
   goal: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}`,
   goalPlan: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/plan`,
@@ -333,7 +333,6 @@ export async function loadDashboardApiSnapshot(
   const calls: Array<[string, string]> = [
     ["summary", apiSurface.summary],
     ["projects", apiSurface.projects],
-    ["harnessCatalogs", apiSurface.harnessCatalogs],
     ["releaseTargets", apiSurface.releaseTargets],
     ["maturityStandards", apiSurface.maturityStandards],
     ["goals", apiSurface.goals],
