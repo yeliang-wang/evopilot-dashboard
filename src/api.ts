@@ -273,22 +273,8 @@ export const apiSurface = {
   llmProfilePreflight: (profileId: string) => `/api/v1/llm-profiles/${encodeURIComponent(profileId)}/preflight`,
   projectLlm: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm`,
   projectLlmPreflight: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/llm/preflight`,
-  harnessTemplates: "/api/v1/harness/templates",
   harnessCatalogs: "/api/v1/harness/catalogs",
   harnessCatalog: (catalogId: string) => `/api/v1/harness/catalogs/${encodeURIComponent(catalogId)}`,
-  harnessCatalogScan: (catalogId: string) => `/api/v1/harness/catalogs/${encodeURIComponent(catalogId)}/scan`,
-  harnessTemplateValidate: "/api/v1/harness/templates/validate",
-  harnessTemplateMatches: "/api/v1/harness/template-matches",
-  harnessTemplateEvolutions: "/api/v1/harness/template-evolutions",
-  harnessTemplateEvolve: "/api/v1/harness/template-evolutions/evolve",
-  harnessPolicies: "/api/v1/harness/policies",
-  projectHarnessProfiles: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles`,
-  projectHarnessProfileGenerate: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/generate`,
-  projectHarnessProfileValidate: (projectId: string) => `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/validate`,
-  projectHarnessProfile: (projectId: string, profileId: string) =>
-    `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/${encodeURIComponent(profileId)}`,
-  projectHarnessProfileActivate: (projectId: string, profileId: string) =>
-    `/api/v1/projects/${encodeURIComponent(projectId)}/harness-profiles/${encodeURIComponent(profileId)}/activate`,
   goals: "/api/v1/goals",
   goal: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}`,
   goalPlan: (goalId: string) => `/api/v1/goals/${encodeURIComponent(goalId)}/plan`,
@@ -321,9 +307,6 @@ export const apiSurface = {
   releaseEvidenceItem: (evidenceId: string) => `/api/v1/release/evidence/${encodeURIComponent(evidenceId)}`,
   sourceClosureExecute: (loopId: string) => `/api/v1/loops/${encodeURIComponent(loopId)}/source-closure/execute`,
   sourceClosureReviewDecision: (loopId: string) => `/api/v1/loops/${encodeURIComponent(loopId)}/source-closure/review-decision`,
-  harnessTemplateEvolutionAdvance: (evolutionId: string) => `/api/v1/harness/template-evolutions/${encodeURIComponent(evolutionId)}/advance`,
-  harnessTemplateEvolutionApprove: (evolutionId: string) => `/api/v1/harness/template-evolutions/${encodeURIComponent(evolutionId)}/approve`,
-  harnessTemplateEvolutionPublish: (evolutionId: string) => `/api/v1/harness/template-evolutions/${encodeURIComponent(evolutionId)}/publish`,
   releaseTargets: "/api/v1/release/targets",
   maturityStandards: "/api/v1/maturity/standards",
   audit: "/api/v1/audit",
@@ -351,9 +334,6 @@ export async function loadDashboardApiSnapshot(
     ["summary", apiSurface.summary],
     ["projects", apiSurface.projects],
     ["harnessCatalogs", apiSurface.harnessCatalogs],
-    ["templates", apiSurface.harnessTemplates],
-    ["templateEvolutions", apiSurface.harnessTemplateEvolutions],
-    ["policies", apiSurface.harnessPolicies],
     ["releaseTargets", apiSurface.releaseTargets],
     ["maturityStandards", apiSurface.maturityStandards],
     ["goals", apiSurface.goals],
@@ -366,7 +346,6 @@ export async function loadDashboardApiSnapshot(
     ["users", apiSurface.users]
   ];
   if (projectId) {
-    calls.push(["profiles", apiSurface.projectHarnessProfiles(projectId)]);
     calls.push(["projectUsage", apiSurface.projectUsage(projectId)]);
     calls.push(["projectLlm", apiSurface.projectLlm(projectId)]);
     calls.push(["projectLlmPreflight", apiSurface.projectLlmPreflight(projectId)]);

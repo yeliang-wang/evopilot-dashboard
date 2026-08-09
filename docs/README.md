@@ -1,10 +1,10 @@
 # EvoPilot Dashboard Docs
 
-Dashboard docs describe the browser operation path for EvoPilot **Agent Console v2**. The root README stays short; this directory carries the human, administrator, AI Agent, operator, and maintainer details.
+Dashboard docs describe the browser operation path for EvoPilot **Agent Console v3**. The root README stays short; this directory carries the human, administrator, AI Agent, operator, and maintainer details.
 
 ```text
 Admin provisions user -> User logs in -> Project intake -> Template auto-match
--> ProjectHarnessProfile.yaml DRAFT -> Owner review -> Loop execution -> Release decision
+-> selectedHarness.yaml plan binding -> Owner review -> Loop execution -> Release decision
 ```
 
 ## Start Here
@@ -21,11 +21,11 @@ Admin provisions user -> User logs in -> Project intake -> Template auto-match
 
 ## Core Principle
 
-The Dashboard is login-first and chat-first. Administrators create users and assign tenant/workspace scope. Users connect GitHub/GitLab projects and describe goal loop targets. EvoPilot automatically matches a `HarnessTemplate`, combines it with project context and the target, and returns a `ProjectHarnessProfile.yaml` DRAFT for review.
+The Dashboard is login-first and chat-first. Administrators create users and assign tenant/workspace scope. Users connect GitHub/GitLab projects and describe goal loop targets. EvoPilot automatically matches a published `Harness`, combines it with project context and the target, and returns a `selectedHarness.yaml` plan binding for review.
 
-Users can request changes or confirm the DRAFT. Only after confirmation can EvoPilot activate the project harness profile, bind a phase plan, run the loop, and produce release evidence.
+Users can request a regenerated goal plan or confirm the selectedHarness binding plus Alpha/Beta/RC/GA phase plan. Only after confirmation can EvoPilot approve the phase plan, run the loop, and produce release evidence.
 
-Ordinary users do not choose public `HarnessTemplate` files manually. Template matching belongs to EvoPilot.
+Ordinary users do not choose, create, approve, publish, or evolve public `Harness` files manually. Template matching belongs to EvoPilot. Harness lifecycle belongs to `evopilot-harness`.
 
 ## Operation Guides
 
@@ -47,9 +47,9 @@ Ordinary users do not choose public `HarnessTemplate` files manually. Template m
 - [Cloud Deployment](deployment/cloud.md) explains operator-owned cloud deployment paths.
 - [Self-Hosting](operations/self-hosting.md) explains how to run Dashboard next to EvoPilot API.
 - [Release Management](operations/release-management.md) defines versioning, tag, compatibility, and smoke rules.
-- [EvoPilot Dashboard v2.5.0 Release Notes](releases/2.5.0.md) is the EvoPilot v2.5 external Harness Catalog and Harness Hub compatibility body for the current public production baseline.
+- [EvoPilot Dashboard v3.0.0 Release Notes](releases/3.0.0.md) is the EvoPilot v3 external Harness Catalog consumer and read-only Harness Hub compatibility body for the current public production baseline.
 - [EvoPilot Dashboard v2.4.0 Release Notes](releases/2.4.0.md) is the EvoPilot v2.4 one-command Harness evolution compatibility body superseded by v2.5.
-- [EvoPilot Dashboard v2.3.0 Release Notes](releases/2.3.0.md) is the EvoPilot v2.3 HarnessTemplate auto-match compatibility body superseded by v2.4.
+- [EvoPilot Dashboard v2.3.0 Release Notes](releases/2.3.0.md) is the EvoPilot v2.3 Harness auto-match compatibility body superseded by v2.4.
 - [EvoPilot Dashboard v2.2.0 Release Notes](releases/2.2.0.md) is the EvoPilot v2.2 Harness Knowledge Factory compatibility body superseded by v2.3.
 - [EvoPilot Dashboard v2.1.0 Release Notes](releases/2.1.0.md) is the EvoPilot v2.1 domain Harness execution compatibility body superseded by v2.2.
 - [EvoPilot Dashboard v1.0.13 Release Notes](releases/1.0.13.md) is the initial LLM Profiles and Agent Console project-binding body superseded by later Dashboard releases.

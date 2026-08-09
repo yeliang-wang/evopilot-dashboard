@@ -45,7 +45,7 @@ npm run test:e2e:mock
 npm run test:visual
 ```
 
-`npm run test:e2e:mock` verifies the Agent Console browser flow with an EvoPilot-shaped mocked API. It covers login, project intake, ProjectHarnessProfile generation, and a governed blocker carrying `requestId`, `nextAction`, and `blockers`.
+`npm run test:e2e:mock` verifies the Agent Console browser flow with an EvoPilot-shaped mocked API. It covers login, project intake, selectedHarness generation, and a governed blocker carrying `requestId`, `nextAction`, and `blockers`.
 
 `npm run test:visual` verifies review, blocker, and release decision baselines across desktop and mobile-sized viewports.
 
@@ -93,7 +93,7 @@ npm run smoke:console
 Mutating coverage:
 
 - Creates a temporary local project.
-- Generates a ProjectHarnessProfile through Dashboard proxy.
+- Generates a selectedHarness through Dashboard proxy.
 - Activates the actual returned profileId/version.
 - Creates a goal.
 - Generates a phase plan.

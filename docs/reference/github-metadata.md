@@ -31,7 +31,7 @@ typescript
 
 ## Social Preview
 
-Use `docs/assets/agent-console.png` or a cropped derivative that preserves the Agent Console, `ProjectHarnessProfile.yaml`, and Evidence Drawer.
+Use `docs/assets/agent-console.png` or a cropped derivative that preserves the Agent Console, `selectedHarness.yaml`, and Evidence Drawer.
 
 ## Update Rule
 

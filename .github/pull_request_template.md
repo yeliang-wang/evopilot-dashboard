@@ -6,7 +6,7 @@ Describe the user, operator, project owner, or AI Agent workflow affected by thi
 
 - [ ] Agent Console UI
 - [ ] API compatibility
-- [ ] ProjectHarnessProfile review
+- [ ] selectedHarness review
 - [ ] Evidence Drawer
 - [ ] Documentation or open-source productization
 - [ ] Tests or validation only
@@ -16,7 +16,7 @@ Describe the user, operator, project owner, or AI Agent workflow affected by thi
 - [ ] Keeps EvoPilot API as the system of record.
 - [ ] Does not call the EvoPilot CLI from browser code.
 - [ ] Does not read EvoPilot local data files or evidence folders.
-- [ ] Preserves ProjectHarnessProfile owner review before activation.
+- [ ] Preserves selectedHarness owner review before phase-plan approval.
 - [ ] Preserves stop behavior for blockers, nextAction, NO-GO, BLOCKED, FAILED, policy review, credential repair, LLM repair, and human approval.
 
 ## Validation

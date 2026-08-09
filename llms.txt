@@ -1,6 +1,6 @@
 # EvoPilot Dashboard
 
-EvoPilot Dashboard is the standalone browser Agent Console where administrator-provisioned users connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` DRAFTs, and run governed loops.
+EvoPilot Dashboard is the standalone browser Agent Console where administrator-provisioned users connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `selectedHarness.yaml` plan bindings, and run governed loops.
 
 Useful entry points for AI Agents:
 
@@ -17,6 +17,6 @@ Rules:
 
 - EvoPilot API is the system of record.
 - Dashboard is an HTTP client only.
-- Ordinary users do not manually choose public HarnessTemplates; EvoPilot auto-matches them.
-- Do not bypass human approval, ProjectHarnessProfile review, phase plan approval, release policy, RBAC, tenant/workspace scope, or audit.
+- Ordinary users do not manually choose or mutate public Harnesses; EvoPilot auto-matches published Catalog entries.
+- Do not bypass human approval, selectedHarness review, phase plan approval, release policy, RBAC, tenant/workspace scope, or audit.
 - Stop on `nextAction`, blockers, `NO-GO`, `BLOCKED`, `FAILED`, or repair actions.

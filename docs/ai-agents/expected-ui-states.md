@@ -24,37 +24,35 @@ The sidebar must not show workspace/project cards, active sessions, recent decis
 |---|---|
 | Project Intake | `editing goal`, `done` |
 | Template Auto-Match | `matching template`, `done` |
-| ProjectHarnessProfile DRAFT | `drafting profile`, `done` |
+| selectedHarness binding | `planning harness`, `done` |
 | Owner Review | `needs owner review`, `changes applied`, `done` |
 | Loop Execution | `planning`, `running`, `blocked repair`, `done` |
 | Release Decision | `not started`, `GO review`, `NO-GO`, `BLOCKED` |
 
-## ProjectHarnessProfile YAML Review
+## selectedHarness YAML Review
 
 Expected visible elements:
 
-- card title `ProjectHarnessProfile.yaml`
+- card title `selectedHarness.yaml`
 - Markdown owner review summary
-- YAML block with `projectHarnessProfile`
-- `inherits`
-- `scope`
-- `controls`
-- `exceptionHandling`
-- `logging`
-- `observability`
-- `releaseGates`
+- YAML block with `selectedHarness`
+- Harness id and version
+- Catalog id and entry path
+- Catalog digest and entry digest
+- selection reasons or match score when returned
+- phase-plan relationship
 - `Confirm`
 - `Request changes`
 - `View evidence`
 
-Do not continue to activation until this DRAFT has been shown to the user or project owner.
+Do not continue to phase-plan approval until this binding has been shown to the user or project owner.
 
 ## Evidence Drawer States
 
 Expected fields:
 
 - `requestId`
-- `profileDraft`
+- `selectedHarness`
 - `compiledDigest`
 - `policyRefs`
 - `generatedBy`
@@ -70,7 +68,7 @@ Expected fields:
 | Tenants | tenant table, `初始化新租户`, create action, audit evidence |
 | Workspaces | workspace table, owner and quota fields, project LLM/token usage projection, create action |
 | Users | user table, role/status fields, `mustChangePassword=true` behavior in docs |
-| Harness Hub | template table, evolution intent, source type, create evolution draft |
+| Harness Hub | Published Harness Catalog table, domain expert rows, source types, inspect action |
 | Audit | audit rows, requestId, last action, nextAction, blockers, failure trace |
 
 ## Blocker State

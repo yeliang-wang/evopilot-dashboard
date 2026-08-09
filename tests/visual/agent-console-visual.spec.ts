@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 test.describe("Agent Console visual regression", () => {
   test("review stage desktop baseline", async ({ page }) => {
     await openStableDemo(page, "/?demo=1&step=4", { width: 1440, height: 960 });
-    await expect(page.getByText("ProjectHarnessProfile.yaml", { exact: false }).first()).toBeVisible();
+    await expect(page.getByText("selectedHarness.yaml", { exact: false }).first()).toBeVisible();
     await expect(page).toHaveScreenshot("agent-console-review-desktop.png", {
       fullPage: true,
       animations: "disabled",

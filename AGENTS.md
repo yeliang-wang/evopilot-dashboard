@@ -4,9 +4,9 @@ This file is for AI coding agents and browser-operating agents that read this re
 
 ## Product Boundary
 
-EvoPilot Dashboard is a standalone React HTTP client for EvoPilot. It is the browser surface where administrator-provisioned users sign in, connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` DRAFTs, and run governed loops.
+EvoPilot Dashboard is a standalone React HTTP client for EvoPilot. It is the browser surface where administrator-provisioned users sign in, connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `selectedHarness.yaml` plan bindings, and run governed loops.
 
-Dashboard is not the system of record. EvoPilot API owns tenants, workspaces, projects, harness profiles, goals, loops, evidence, audit, release decisions, users, and credentials.
+Dashboard is not the system of record. EvoPilot API owns tenants, workspaces, projects, selected Harness plan evidence, goals, loops, evidence, audit, release decisions, users, and credentials. Harness lifecycle and evolution are owned by `evopilot-harness`; Dashboard only reads EvoPilot's Catalog and plan projections.
 
 ## Operating Rules
 
@@ -14,8 +14,8 @@ Dashboard is not the system of record. EvoPilot API owns tenants, workspaces, pr
 - Use [docs/workflows/end-to-end-scenarios.md](docs/workflows/end-to-end-scenarios.md) to understand real user flows.
 - Use [docs/reference/api-usage.md](docs/reference/api-usage.md) to map UI operations to EvoPilot API calls.
 - Do not paste GitHub, GitLab, LLM, deploy, or password secrets into screenshots, public config, issue reports, or docs.
-- Do not bypass EvoPilot RBAC, tenant/workspace scope, human approval, profile review, source closure, release policy, or audit.
-- Do not ask ordinary users to choose a public `HarnessTemplate`; EvoPilot owns template matching from project context, policy, history when present, and the goal loop target.
+- Do not bypass EvoPilot RBAC, tenant/workspace scope, human approval, selectedHarness review, phase-plan approval, source closure, release policy, or audit.
+- Do not ask ordinary users to choose or mutate a public `Harness`; EvoPilot auto-matches published Catalog entries from project context, policy, history when present, and the goal loop target.
 - Stop on EvoPilot `nextAction`, blockers, `NO-GO`, `BLOCKED`, `FAILED`, policy review, credential repair, LLM repair, deploy repair, or human approval.
 - Treat the Evidence Drawer as the primary operator-readable side channel for request IDs, digests, policy refs, token usage, blockers, and logs.
 - When claiming CLI and Dashboard parity, verify both the Dashboard static contract and EvoPilot OpenAPI or smoke evidence.
@@ -25,7 +25,7 @@ Dashboard is not the system of record. EvoPilot API owns tenants, workspaces, pr
 - Keep Dashboard as a browser client over EvoPilot HTTP APIs.
 - Do not import or execute the EvoPilot CLI from the browser app.
 - Do not read EvoPilot local files, Postgres, Docker state, or host secrets from Dashboard code.
-- Keep page text and docs aligned with EvoPilot CLI semantics for project onboarding, `ProjectHarnessProfile` review, phase plan approval, loop execution, evidence review, and release decisions.
+- Keep page text and docs aligned with EvoPilot CLI semantics for project onboarding, `selectedHarness` review, phase plan approval, loop execution, evidence review, and release decisions.
 - Run validation after edits:
 
 ```bash

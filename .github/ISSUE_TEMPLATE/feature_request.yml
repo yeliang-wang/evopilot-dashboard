@@ -41,5 +41,5 @@ body:
       options:
         - label: This keeps EvoPilot API as the system of record.
           required: true
-        - label: This does not bypass ProjectHarnessProfile review, phase-plan approval, RBAC, or stop rules.
+        - label: This does not bypass selectedHarness review, phase-plan approval, RBAC, or stop rules.
           required: true

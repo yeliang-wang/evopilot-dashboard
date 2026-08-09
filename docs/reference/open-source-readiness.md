@@ -4,7 +4,7 @@ This checklist defines EvoPilot Dashboard's public-product readiness baseline. I
 
 ## Positioning
 
-EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned users to connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `ProjectHarnessProfile.yaml` DRAFTs, and run governed project evolution loops. It is an HTTP API adapter over EvoPilot and must not become a separate system of record.
+EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned users to connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-generated `selectedHarness.yaml` plan bindings, and run governed project evolution loops. It is an HTTP API adapter over EvoPilot and must not become a separate system of record.
 
 ## Public Trust Assets
 
@@ -29,7 +29,7 @@ EvoPilot Dashboard is a chat-first Agent Console for administrator-provisioned u
 | Installable Dashboard runner | Present | `install.sh`, `scripts/run-dashboard-container.mjs`, `npm run verify:distribution` |
 | Self-hosting guide | Present | `docs/operations/self-hosting.md` |
 | Release playbook | Present | `docs/operations/release-management.md` |
-| Release notes | Present | `docs/releases/2.5.0.md` |
+| Release notes | Present | `docs/releases/3.0.0.md` |
 | Immutable release artifacts | Present | `scripts/build-release-artifacts.mjs`, `scripts/verify-release-artifacts.mjs`, `deploy/ecs/compose.immutable.yaml` |
 | Open-source maturity report | Present | `docs/reference/open-source-maturity-report.md` |
 
@@ -45,9 +45,9 @@ The public documentation model is:
 
 | Capability | Evidence |
 | --- | --- |
-| Agent Console v2 | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `src/styles.css` |
+| Agent Console v3 | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `src/styles.css` |
 | Code structure boundaries | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `tests/static-contract.test.mjs` |
-| ProjectHarnessProfile review | `docs/user-guide.md`, `docs/ai-agents/expected-ui-states.md` |
+| selectedHarness review | `docs/user-guide.md`, `docs/ai-agents/expected-ui-states.md` |
 | Evidence Drawer | `docs/reference/api-usage.md`, `docs/operations/troubleshooting.md` |
 | WorkBuddy operation | `docs/ai-agents/README.md`, `docs/workflows/end-to-end-scenarios.md` |
 | Smoke validation | `scripts/dashboard-console-smoke.mjs`, `scripts/production-compat-smoke.mjs` |

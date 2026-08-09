@@ -28,11 +28,10 @@ import {
   type ChatMessage,
   type ConsoleStep,
   type DrawerKind,
-  type HarnessProfileDraft,
+  type HarnessBindingDraft,
   type PageId,
   type ProjectLoopContext,
   type ReviewStep,
-  type TemplateEvolutionForm,
   type TenantForm,
   type UserForm,
   type WorkspaceForm
@@ -42,7 +41,7 @@ export function stageState(step: ConsoleStep) {
   const state = [
     { label: "Project Intake", status: "not started", kind: "" },
     { label: "Template Auto-Match", status: "not started", kind: "" },
-    { label: "ProjectHarnessProfile DRAFT", status: "not started", kind: "" },
+    { label: "selectedHarness binding", status: "not started", kind: "" },
     { label: "Owner Review", status: "not started", kind: "" },
     { label: "Loop Execution", status: "not started", kind: "" },
     { label: "Release Decision", status: "not started", kind: "" }
@@ -62,7 +61,7 @@ export function stageState(step: ConsoleStep) {
   if (step === "drafting") {
     done(0);
     done(1);
-    current(2, "drafting profile");
+    current(2, "planning binding");
   }
   if (step === "review") {
     done(0);
@@ -107,4 +106,3 @@ export function stageState(step: ConsoleStep) {
   }
   return state;
 }
-

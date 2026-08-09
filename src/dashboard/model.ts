@@ -57,9 +57,9 @@ export interface ProjectLoopContext extends DashboardProjectionContext {
   confirmation: string;
 }
 
-export interface HarnessProfileDraft {
+export interface HarnessBindingDraft {
   profileId: string;
-  version?: number;
+  version?: number | string;
   status?: string;
   sourceContent?: string;
   compiledContent?: string;
@@ -124,14 +124,6 @@ export interface UserForm {
   role: string;
   password: string;
   status: string;
-}
-
-export interface TemplateEvolutionForm {
-  baseTemplateId: string;
-  targetVersion: string;
-  intent: string;
-  sourceType: string;
-  sourceUri: string;
 }
 
 export interface LlmProfileForm {
@@ -342,9 +334,12 @@ export function isPlatformAdmin(session?: DashboardSession): boolean {
   return Boolean(session?.user?.platformAdmin || session?.user?.role === "platform-admin" || session?.user?.role === "admin");
 }
 
-export function extractHarnessDraft(value: unknown): HarnessProfileDraft | undefined {
+export function extractHarnessDraft(value: unknown): HarnessBindingDraft | undefined {
   const data = asRecord(dataEnvelope(value));
   if (!data) return undefined;
+  const plan = asRecord(data.plan) ?? data;
+  const selectedHarness = asRecord(plan.selectedHarness ?? data.selectedHarness);
+  if (selectedHarness) return extractSelectedHarnessBinding(plan, selectedHarness, value);
   const profile = asRecord(data.profile) ?? data;
   const summary = asRecord(data.summary);
   const generatedBy = asRecord(profile.generatedBy) ?? asRecord(data.generatedBy);
@@ -391,6 +386,63 @@ export function extractHarnessDraft(value: unknown): HarnessProfileDraft | undef
     validationSummary: readableJson(validation || undefined),
     diffSummary: readableJson(diffFromActive || undefined),
     raw: value
+  };
+}
+
+function extractSelectedHarnessBinding(plan: Record<string, unknown>, selectedHarness: Record<string, unknown>, raw: unknown): HarnessBindingDraft {
+  const harnessId = stringField(selectedHarness.harnessId) ?? stringField(selectedHarness.id) ?? "selected-harness";
+  const version = stringField(selectedHarness.version) ?? "unknown";
+  const catalogId = stringField(selectedHarness.catalogId) ?? "catalog";
+  const entryPath = stringField(selectedHarness.entryPath) ?? "";
+  const domain = stringField(selectedHarness.domain);
+  const status = stringField(selectedHarness.status) ?? stringField(plan.status) ?? "PENDING_APPROVAL";
+  const evidence = [
+    ...stringList(selectedHarness.evidence),
+    ...stringList(asRecord(plan.planner)?.evidence),
+    ...stringList(asRecord(plan.planner)?.selectionReasons),
+    ...stringList(selectedHarness.selectionReasons)
+  ];
+  const bindingYaml = [
+    "selectedHarness:",
+    "  schema: evopilot-goal-plan-selected-harness-binding/v1",
+    `  harnessId: ${harnessId}`,
+    `  version: ${version}`,
+    `  status: ${status}`,
+    `  domain: ${domain ?? "runtime"}`,
+    `  catalogId: ${catalogId}`,
+    `  entryPath: ${entryPath || "not returned"}`,
+    `  catalogDigest: ${stringField(selectedHarness.catalogDigest) ?? "not returned"}`,
+    `  entryDigest: ${stringField(selectedHarness.entryDigest) ?? "not returned"}`,
+    "  binding:",
+    "    source: published Harness Catalog",
+    "    owner: EvoPilot goal plan",
+    "    execution: loop uses this binding after explicit plan approval"
+  ].join("\n");
+  return {
+    profileId: harnessId,
+    version,
+    status,
+    sourceContent: bindingYaml,
+    compiledContent: readableJson(plan.targets ?? plan.phases ?? plan),
+    sourceDigest: stringField(selectedHarness.entryDigest),
+    compiledDigest: stringField(selectedHarness.catalogDigest),
+    policyRefs: [],
+    templateRef: `${harnessId}@${version}`,
+    harnessLayer: stringField(selectedHarness.layer) ?? stringField(selectedHarness.harnessLayer) ?? "domain",
+    domain,
+    compatibilityProfiles: [],
+    architectureProfiles: [],
+    runtimeProfiles: [],
+    referenceBoundary: entryPath ? `Catalog ${catalogId} entry ${entryPath}` : undefined,
+    domainRequiredActions: stringList(selectedHarness.requiredActions),
+    evidenceAdapters: stringList(selectedHarness.evidenceAdapters),
+    releaseBlockers: stringList(selectedHarness.releaseBlockers),
+    missingModuleBoundaries: [],
+    repoProbeStatus: "catalog-read",
+    generatedByEvidence: evidence,
+    validationSummary: `selectedHarness=${harnessId}@${version}; status=${status}; catalog=${catalogId}`,
+    diffSummary: "Harness definition changes are managed in evopilot-harness. EvoPilot only records this plan binding.",
+    raw
   };
 }
 
@@ -481,46 +533,31 @@ export function buildOnboardingAction(context: ProjectLoopContext): DashboardAct
   };
 }
 
-export function defaultDraft(context: ProjectLoopContext): HarnessProfileDraft {
+export function defaultDraft(context: ProjectLoopContext): HarnessBindingDraft {
   const projectId = context.projectId || projectIdFromRepository(context.repositoryUrl) || "inventory-service";
   return {
-    profileId: "default",
-    version: 1,
-    status: "DRAFT",
+    profileId: "database-product-harness",
+    version: "2.2.0",
+    status: "PENDING_APPROVAL",
     sourceContent: [
-      "projectHarnessProfile:",
-      "  id: profile_draft_41c8",
-      "  status: DRAFT",
-      "  inherits:",
-      "    - database-product-harness@2.2.0",
-      "  scope:",
-      "    include: [self-developed database product, SQL engine, storage engine, recovery]",
-      "    exclude: [evolving PostgreSQL or MySQL upstreams as the product]",
-      "  harnessLayers:",
-      "    domain: database-product",
-      "    compatibilityProfiles: [postgres-compatible, mysql-compatible, ansi-sql]",
-      "    architectureProfiles: [distributed, htap, mpp]",
-      "    runtimeProfiles: [java, go, rust, generic]",
-      "  controls:",
-      "    domainRules: [SQL compatibility, transaction isolation, crash recovery]",
-      "    referenceBoundary: PostgreSQL/MySQL are compatibility oracles only",
-      "    requiredActions: [declare-database-product-boundary, map-engine-module-boundaries, bind-sql-compatibility-suite, bind-correctness-and-recovery-suite]",
-      "    evidenceAdapters: [sql-compatibility-report, differential-oracle-report, crash-recovery-log, benchmark-summary]",
-      "    releaseBlockers: [missing product boundary, missing module boundary map, missing SQL compatibility report, missing recovery proof]",
-      "    exceptionHandling:",
-      "      required: [sqlState, queryId, transactionId, traceId]",
-      "      validation: release-blocking SQL and protocol error contract tests",
-      "    logging:",
-      "      requiredFields: [requestId, traceId, queryId, transactionId, sqlState]",
-      "      triage: ERROR logs must link to evidence.requestId",
-      "    observability:",
-      "      required: [query latency, transaction aborts, replication lag, recovery status]",
-      "    releaseGates:",
-      "      required: [SQL compatibility report, recovery proof, benchmark summary, human approval]"
+      "selectedHarness:",
+      "  schema: evopilot-goal-plan-selected-harness-binding/v1",
+      "  harnessId: database-product-harness",
+      "  version: 2.2.0",
+      "  status: PENDING_APPROVAL",
+      "  domain: database-product",
+      "  catalogId: evopilot-public-harness-catalog",
+      "  entryPath: ./database-product-harness/2.2.0/template.yaml",
+      "  catalogDigest: sha256:catalog-demo",
+      "  entryDigest: sha256:entry-demo",
+      "  binding:",
+      "    source: published Harness Catalog",
+      "    owner: EvoPilot goal plan",
+      "    execution: loop uses this binding after explicit plan approval"
     ].join("\n"),
     compiledContent: "",
-    sourceDigest: "sha256:7aa1c8...e912",
-    compiledDigest: "sha256:41c8...compiled",
+    sourceDigest: "sha256:entry-demo",
+    compiledDigest: "sha256:catalog-demo",
     policyRefs: [],
     templateRef: "database-product-harness@2.2.0",
     harnessLayer: "domain",
@@ -534,9 +571,9 @@ export function defaultDraft(context: ProjectLoopContext): HarnessProfileDraft {
     releaseBlockers: ["missing product boundary", "missing module boundary map", "missing SQL compatibility report", "missing recovery proof"],
     missingModuleBoundaries: [],
     repoProbeStatus: "PROBED",
-    generatedByEvidence: ["templateSelection=auto-match", "domain=database-product", "domainSignal=database product", `project=${projectId}`],
-    validationSummary: "32 checks; SQL compatibility, recovery, benchmark, observability, and release gates are release-blocking.",
-    diffSummary: "No active profile in demo baseline.",
+    generatedByEvidence: ["selectedHarness=database-product-harness@2.2.0", "catalogDigest=sha256:catalog-demo", "entryDigest=sha256:entry-demo", `project=${projectId}`],
+    validationSummary: "selectedHarness binding is ready for explicit plan approval.",
+    diffSummary: "Harness definition changes are managed in evopilot-harness, outside this Dashboard.",
     raw: undefined
   };
 }
@@ -558,7 +595,7 @@ export function initialMessages(step: ConsoleStep): ChatMessage[] {
       id: "template",
       role: "agent",
       title: "EvoPilot",
-      text: "项目上下文已解析。EvoPilot 自动匹配更贴合的领域 HarnessTemplate，不要求普通用户手动选择模板。",
+      text: "项目上下文已解析。EvoPilot 自动匹配更贴合的领域 Harness，不要求普通用户手动选择模板。",
       time: "09:31",
       card: "template"
     });
@@ -580,7 +617,7 @@ export function initialMessages(step: ConsoleStep): ChatMessage[] {
       id: "review",
       role: "agent",
       title: "EvoPilot",
-      text: "Review Pack 已生成。请检查能力边界、规则、异常处理、日志与监控要求。确认后我会激活该 ProjectHarnessProfile 并进入 loop planning。",
+      text: "Review Pack 已生成。请检查 selectedHarness、Catalog digest、entry digest 与 phase plan。确认后进入显式计划批准。",
       time: "09:34",
       card: "review"
     });
@@ -610,7 +647,7 @@ export function initialMessages(step: ConsoleStep): ChatMessage[] {
       id: "activated",
       role: "agent",
       title: "EvoPilot",
-      text: "ProjectHarnessProfile 已激活。后续目标拆解、执行、证据采集和发布门禁都会绑定这个 active profile。",
+      text: "selectedHarness 已确认。后续目标拆解、执行、证据采集和发布门禁都会绑定这个 plan binding。",
       time: "09:38",
       card: "activated"
     });
@@ -643,7 +680,7 @@ export function initialMessages(step: ConsoleStep): ChatMessage[] {
       id: "release",
       role: "agent",
       title: "EvoPilot",
-      text: "GA Release Decision 已准备好。当前证据满足 active ProjectHarnessProfile 的能力边界、规则、日志、监控、异常处理和发布门禁要求。",
+      text: "GA Release Decision 已准备好。当前证据满足 selectedHarness 绑定后的目标计划与发布门禁要求。",
       time: "10:06",
       card: "release"
     });

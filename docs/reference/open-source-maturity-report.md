@@ -12,13 +12,13 @@ It should not claim community parity with the most established public AI-agent c
 
 | Area | Current State | Evidence |
 | --- | --- | --- |
-| Browser product | Chat-first Agent Console v2 for users to connect GitHub/GitLab projects, submit goal loop targets, review generated harness DRAFTs, and run the core project evolution loop. | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `docs/assets/agent-console.png` |
+| Browser product | Chat-first Agent Console v3 for users to connect GitHub/GitLab projects, submit goal loop targets, review generated selectedHarness plan bindings, and run the core project evolution loop. | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `docs/assets/agent-console.png` |
 | API boundary | Standalone HTTP client over EvoPilot API. | `src/api.ts`, `docs/reference/api-usage.md` |
 | Documentation shape | Concise product README plus role-based docs index, workflow guides, and AI Agent operation docs. | `README.md`, `docs/README.md`, `docs/ai-agents/README.md` |
-| User flows | Project intake, EvoPilot template auto-match, `ProjectHarnessProfile.yaml` DRAFT review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
+| User flows | Project intake, EvoPilot published-Catalog auto-match, `selectedHarness.yaml` plan review, loop execution, evidence, release decisions. | `docs/workflows/`, `docs/user-guide.md` |
 | AI Agent readiness | WorkBuddy-readable page map, expected UI states, stop rules, AGENTS entrypoint. | `AGENTS.md`, `docs/ai-agents/` |
 | Distribution | README CTA entries, local browser run, standalone container runner, tagged installer, self-hosted full-stack installer path, static deployment config, Dockerfile, production compose, Nginx template, immutable release archive, SBOM, provenance, checksum, and image digest metadata. | `README.md`, `install.sh`, `scripts/run-dashboard-container.mjs`, `docs/operations/distribution.md`, `Dockerfile`, `compose.production.yaml`, `deploy/`, `.github/workflows/release-artifacts.yml` |
-| Release readiness | Versioned release notes, changelog, release checklist, smoke validation, browser test matrix, visual regression, PR artifacts, cloud runbook artifact, and immutable artifact workflow. | `CHANGELOG.md`, `docs/releases/2.5.0.md`, `docs/operations/release-management.md`, `docs/operations/test-matrix.md` |
+| Release readiness | Versioned release notes, changelog, release checklist, smoke validation, browser test matrix, visual regression, PR artifacts, cloud runbook artifact, and immutable artifact workflow. | `CHANGELOG.md`, `docs/releases/3.0.0.md`, `docs/operations/release-management.md`, `docs/operations/test-matrix.md` |
 | Code structure | Thin app shell, controller hook, shared model, focused component modules, and static boundary tests. | `src/App.tsx`, `src/dashboard/hooks/useAgentConsoleController.ts`, `src/dashboard/model.ts`, `src/dashboard/components/`, `tests/static-contract.test.mjs` |
 | Community shell | License, notice, contribution guide, security policy, code of conduct, issue forms, PR template. | Root governance files and `.github/` |
 

@@ -199,7 +199,7 @@ export function Composer({
       <section className="composer" aria-label="Owner review composer">
         <textarea
           value={ownerChange}
-          placeholder="Request a harness change, or confirm the displayed ProjectHarnessProfile.yaml."
+          placeholder="Request a goal-plan change, or confirm the displayed selectedHarness.yaml."
           onChange={(event) => onOwnerChange(event.currentTarget.value)}
         />
         <div className="composer-footer">
@@ -230,7 +230,7 @@ export function Composer({
           </label>
           <label>
             <span>Confirmation</span>
-            <textarea value={context.confirmation} placeholder="Project owner reviewed the active harness binding and Alpha/Beta/RC/GA phase plan." onChange={(event) => onPatchContext({ confirmation: event.currentTarget.value })} />
+            <textarea value={context.confirmation} placeholder="Project owner reviewed the selectedHarness binding and Alpha/Beta/RC/GA phase plan." onChange={(event) => onPatchContext({ confirmation: event.currentTarget.value })} />
           </label>
         </div>
         <div className="composer-footer">

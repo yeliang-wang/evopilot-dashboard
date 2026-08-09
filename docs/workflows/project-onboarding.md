@@ -19,7 +19,7 @@
 6. Open **Advanced Control Details** only when real project, DevOps, credential, LLM, or profile IDs are known.
 7. Click **Start intake**.
 8. Read **Project Onboarding Checklist** status, blockers, requestId, and nextAction.
-9. Continue only when the checklist allows harness profile generation and phase planning.
+9. Continue only when the checklist allows harness binding generation and phase planning.
 
 ## Expected Result
 

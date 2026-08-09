@@ -5,7 +5,7 @@
 ## Shared Flow
 
 ```text
-Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Phase Plan -> Loop Execution -> Evidence Drawer -> Release Decision
+Project Intake -> Template Auto-Match -> selectedHarness binding -> Owner Review -> Phase Plan -> Loop Execution -> Evidence Drawer -> Release Decision
 ```
 
 Use these walkthroughs to train human users and browser-operating AI Agents. EvoPilot API remains the system of record.
@@ -26,7 +26,7 @@ Browser steps:
 4. Select the execution boundary shown by the owner: owned repository, fork CI PR, or read-only public.
 5. Paste the goal loop target.
 6. Click **Start intake**.
-7. Read the `ProjectHarnessProfile.yaml` draft.
+7. Read the `selectedHarness.yaml` draft.
 8. If the owner requests changes, edit through EvoPilot profile apply/diff flow and regenerate the review pack.
 9. Activate only after owner confirmation.
 10. Review the Alpha/Beta/RC/GA phase plan.
@@ -74,7 +74,7 @@ Expected evidence:
 
 Stop and return control to the user when EvoPilot returns:
 
-- Generated `ProjectHarnessProfile` draft.
+- Generated `selectedHarness` draft.
 - Phase plan waiting for approval.
 - `nextAction`.
 - `NO-GO`, `BLOCKED`, or `FAILED`.

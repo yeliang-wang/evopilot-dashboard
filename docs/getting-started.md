@@ -18,7 +18,7 @@ Dashboard users, WorkBuddy setup agents, and developers validating the split das
 | Entry | Use when | Command |
 | --- | --- | --- |
 | Run Dashboard | You have an EvoPilot API server and want a containerized browser surface | `npm run dashboard:run -- --api-url http://127.0.0.1:19876 --start` |
-| Self-host with EvoPilot | You want Dashboard generated with the full EvoPilot stack | `npx create-evopilot@2.5.0 self-host --dir evopilot-stack --init-env` |
+| Self-host with EvoPilot | You want Dashboard generated with the full EvoPilot stack | `npx create-evopilot@3.0.0 self-host --dir evopilot-stack --init-env` |
 | Connect to API | You deploy static assets behind a same-origin proxy | `window.EVOPILOT_DASHBOARD_CONFIG = { apiBaseUrl: "" }` |
 
 Desktop app and hosted Cloud trial are not published Dashboard surfaces yet. Use [Distribution](operations/distribution.md) for the supported entry points.
@@ -60,8 +60,8 @@ Do not put bearer tokens, GitHub PATs, GitLab tokens, LLM keys, or deploy creden
 6. Confirm the left navigation shows only **# Agent Console**, **Tenants**, **Workspaces**, **Users**, **Harness Hub**, **LLM Profiles**, and **Audit**.
 7. Confirm it does not show project cards, active sessions, recent decisions, a user footer, or a **Projects** menu.
 8. Open **# Agent Console**, enter a GitHub/GitLab repository URL and goal loop target, and click **Start intake** only when using a real or disposable EvoPilot server.
-9. Confirm EvoPilot auto-matches the `HarnessTemplate`; ordinary users do not pick the template manually.
-10. Stop at the visible `ProjectHarnessProfile.yaml` DRAFT until the project owner confirms or requests changes.
+9. Confirm EvoPilot auto-matches the `Harness`; ordinary users do not pick the template manually.
+10. Stop at the visible `selectedHarness.yaml` plan binding until the project owner confirms or requests changes.
 
 ## Non-Mutating Compatibility Check
 

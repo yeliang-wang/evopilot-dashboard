@@ -4,10 +4,10 @@ import { mockEvoPilotApi } from "../fixtures/mock-evopilot-api";
 const demoStages = [
   { step: 1, heading: "Project Intake", marker: "Intake summary", action: "Start intake" },
   { step: 2, heading: "Context resolved", marker: "Template auto-match", action: "matched" },
-  { step: 3, heading: "Harness draft streaming", marker: "Generating ProjectHarnessProfile", action: "streaming" },
-  { step: 4, heading: "Review Pack ready", marker: "ProjectHarnessProfile.yaml", action: "Confirm" },
+  { step: 3, heading: "selectedHarness planning", marker: "Generating selectedHarness", action: "streaming" },
+  { step: 4, heading: "Review Pack ready", marker: "selectedHarness.yaml", action: "Confirm" },
   { step: 5, heading: "Owner changes applied", marker: "Draft update diff", action: "diff ready" },
-  { step: 6, heading: "Profile activated", marker: "Active profile binding", action: "active" },
+  { step: 6, heading: "Plan ready", marker: "selectedHarness binding", action: "Ready" },
   { step: 7, heading: "Loop execution", marker: "Loop plan progress", action: "Project scan" },
   { step: 8, heading: "Blocker repair", marker: "Blocker located", action: "BLOCKED" },
   { step: 9, heading: "Release decision", marker: "GA Release Decision", action: "GO candidate" }
@@ -29,7 +29,7 @@ test.describe("Agent Console browser matrix", () => {
     expect(errors).toEqual([]);
   });
 
-  test("mock API login reaches ProjectHarnessProfile review through protected calls", async ({ page }) => {
+  test("mock API login reaches selectedHarness review through protected calls", async ({ page }) => {
     await ignoreFavicon(page);
     const api = await mockEvoPilotApi(page, "happy-path");
     const errors = collectBrowserErrors(page);
@@ -45,11 +45,13 @@ test.describe("Agent Console browser matrix", () => {
     await page.getByRole("button", { name: /Start intake/ }).click();
 
     await expect(page.getByRole("heading", { name: "Review Pack ready" })).toBeVisible();
-    await expect(page.getByText("ProjectHarnessProfile.yaml", { exact: false }).first()).toBeVisible();
-    await expect(page.getByText("req-harness-generate")).toBeVisible();
+    await expect(page.getByText("selectedHarness.yaml", { exact: false }).first()).toBeVisible();
+    await expect(page.getByText("database-product-harness@2.2.0", { exact: false }).first()).toBeVisible();
+    await expect(page.getByText("req-goal-plan")).toBeVisible();
     expect(api.calls).toContain("POST /api/v1/auth/login");
     expect(api.calls).toContain("POST /api/v1/onboarding/project/checklist");
-    expect(api.calls).toContain("POST /api/v1/projects/inventory-service/harness-profiles/generate");
+    expect(api.calls).toContain("POST /api/v1/goals");
+    expect(api.calls).toContain("POST /api/v1/goals/goal-mock-ga/plan");
     expect(errors).toEqual([]);
   });
 
@@ -88,7 +90,7 @@ test.describe("Agent Console browser matrix", () => {
     await expect(page.getByText("Distributed Cache Harness Expert")).toBeVisible();
     await expect(page.getByText("distributed-cache-harness@0.1.0")).toBeVisible();
     expect(api.calls).toContain("GET /api/v1/harness/catalogs");
-    expect(api.calls).toContain("GET /api/v1/harness/templates");
+    expect(api.calls).not.toContain("GET /api/v1/harness/templates");
     expect(errors).toEqual([]);
   });
 });

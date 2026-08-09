@@ -1,13 +1,13 @@
 # AI Agents
 
-> WorkBuddy and browser-operating agents use EvoPilot Dashboard as the browser path for administrator-provisioned users to connect GitHub/GitLab projects, submit goal loop targets, and review EvoPilot-generated project harness drafts.
+> WorkBuddy and browser-operating agents use EvoPilot Dashboard as the browser path for administrator-provisioned users to connect GitHub/GitLab projects, submit goal loop targets, review EvoPilot-selected Harness bindings, and run governed loops.
 
-## Agent Console v2
+## Agent Console v3
 
 The visible flow is:
 
 ```text
-Project Intake -> Template Auto-Match -> ProjectHarnessProfile DRAFT -> Owner Review -> Loop Execution -> Release Decision
+Project Intake -> Template Auto-Match -> selectedHarness binding -> Owner Review -> Loop Execution -> Release Decision
 ```
 
 The Dashboard is login-first and chat-first. The agent reads the login result, locked tenant/workspace scope, role-based left navigation, conversation, stage bar, inline cards, and **Evidence Drawer**. It must not infer server state from color alone.
@@ -25,14 +25,15 @@ Assume the user account has already been created by an EvoPilot administrator. D
 7. Enter the user's goal loop target.
 8. Select the delivery chain; when source and CI/Loop differ, use the explicit GitHub source + GitLab CI bridge chain.
 9. Click **Start intake**.
-10. Wait while EvoPilot automatically matches a `HarnessTemplate` and returns the inline `ProjectHarnessProfile.yaml` DRAFT.
-11. Stop and show the DRAFT to the user or project owner.
-12. If the user requests changes, enter the change request and click **Request changes**.
-13. Repeat review until the user confirms.
-14. Click **Confirm** to activate only the reviewed profile.
-15. Review phase plan binding, fill real `Confirmed By` and `Confirmation`, then approve.
-16. Start or advance the loop.
-17. Use the **Evidence Drawer** to report request IDs, source system, CI/Loop executor, workflow repository, LLM profile, profile digests, policy refs, blockers, next actions, and release decisions.
+10. Wait while EvoPilot creates or reads the goal and generates a phase plan.
+11. Read the inline `selectedHarness.yaml` card. It must show Harness id, version, Catalog id, entry path, Catalog digest, and entry digest.
+12. Stop and show the binding to the user or project owner.
+13. If the user requests changes, enter the change request and click **Request changes**. This regenerates the plan; it does not edit Harness definitions.
+14. Repeat review until the user confirms.
+15. Click **Confirm** to move to explicit phase-plan approval.
+16. Fill real `Confirmed By` and `Confirmation`, then approve.
+17. Start or advance the loop.
+18. Use the **Evidence Drawer** to report request IDs, source system, CI/Loop executor, workflow repository, LLM profile, selectedHarness digests, blockers, next actions, and release decisions.
 
 | Expected left navigation |
 |---|
@@ -49,10 +50,10 @@ Only operate these pages when the signed-in user is a platform administrator and
 | Tenants | Create tenant, workspace, tenant admin | `POST /api/v1/tenants` |
 | Workspaces | Create workspace boundary and quota | `POST /api/v1/workspaces` |
 | Users | Create scoped user with `mustChangePassword=true` | `POST /api/v1/users` |
-| Harness Hub | Create `HarnessTemplateEvolution` draft through Harness Knowledge Factory | `POST /api/v1/harness/template-evolutions` |
+| Harness Hub | Read configured Catalogs and inspect published Harness definitions | `GET /api/v1/harness/catalogs`, `GET /api/v1/harness/catalogs/{catalogId}` |
 | Audit | Read request/action/failure trace | `GET /api/v1/audit` |
 
-Harness Knowledge Factory inputs include `source-project`, `source-corpus`, `production-log`, `evopilot-history`, attachments, repositories, existing templates, runtime evidence, and administrator notes. Stop at `REVIEW_REQUIRED` and report source coverage, `domainSignals`, `gapClassifications`, redaction status, generated pack, validation, diff, changelog, impact, requestId, and nextAction.
+Harness lifecycle and evolution are not Dashboard browser operations. Use `evopilot-harness` to scan source projects, attachments, notes, EvoPilot history exports, and production logs; approve drafts; publish a usable Harness Catalog; then let EvoPilot read the configured Catalog directory.
 
 If RBAC hides a page or the server returns `403`, stop and report a scope or role problem. Do not try to switch tenant/workspace as an ordinary user.
 
@@ -61,6 +62,8 @@ If RBAC hides a page or the server returns `403`, stop and report a scope or rol
 Stop on:
 
 - missing login or RBAC
+- missing `selectedHarness`
+- missing Catalog digest or entry digest
 - `nextAction`
 - blocker
 - `NO-GO`

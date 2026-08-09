@@ -29,7 +29,7 @@ Login
   -> # Agent Console
   -> Repository + Goal Loop Target
   -> Start Intake
-  -> Review ProjectHarnessProfile DRAFT
+  -> Review selectedHarness binding
   -> Review Alpha/Beta/RC/GA Phase Plan
   -> Owner Confirmation
   -> Activate Harness
@@ -67,10 +67,10 @@ WorkBuddy must not deviate from the real UI in these ways:
 
 - Do not jump directly to loop execution before review pack generation unless a user supplied an existing goalId.
 - Do not approve a phase plan without visible `Confirmed By` and `Confirmation`.
-- Do not activate a harness before the DRAFT has been shown to the project owner.
+- Do not approve a phase plan before the selectedHarness binding has been shown to the project owner.
 - Do not treat Audit projection failures as release failures; read the actual release decision.
 - Do not use CLI commands while claiming to operate the browser UI.
 
 ## Successful Completion
 
-A workflow is complete only when the expected UI state appears and the relevant server-derived evidence is visible: project ID, profile ID/version, goal ID, loop ID, release decision ID, request ID, schema, nextAction, blockers, LLM usage, or audit row.
+A workflow is complete only when the expected UI state appears and the relevant server-derived evidence is visible: project ID, selectedHarness id/version/catalog/entry digest, goal ID, loop ID, release decision ID, request ID, schema, nextAction, blockers, LLM usage, or audit row.

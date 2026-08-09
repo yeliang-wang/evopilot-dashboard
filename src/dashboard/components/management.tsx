@@ -18,7 +18,6 @@ import {
   roleLabel,
   type LlmProfileForm,
   type PageId,
-  type TemplateEvolutionForm,
   type TenantForm,
   type UserForm,
   type WorkspaceForm
@@ -42,12 +41,10 @@ export function ManagementPage({
   tenantForm,
   workspaceForm,
   userForm,
-  templateForm,
   llmProfileForm,
   onTenantForm,
   onWorkspaceForm,
   onUserForm,
-  onTemplateForm,
   onLlmProfileForm,
   onRunAction,
   onRefresh
@@ -61,12 +58,10 @@ export function ManagementPage({
   tenantForm: TenantForm;
   workspaceForm: WorkspaceForm;
   userForm: UserForm;
-  templateForm: TemplateEvolutionForm;
   llmProfileForm: LlmProfileForm;
   onTenantForm: (form: TenantForm) => void;
   onWorkspaceForm: (form: WorkspaceForm) => void;
   onUserForm: (form: UserForm) => void;
-  onTemplateForm: (form: TemplateEvolutionForm) => void;
   onLlmProfileForm: (form: LlmProfileForm) => void;
   onRunAction: (action: DashboardActionRequest) => void;
   onRefresh: () => void;
@@ -74,7 +69,7 @@ export function ManagementPage({
   if (page === "tenants") return <TenantsPage form={tenantForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onTenantForm} onRunAction={onRunAction} />;
   if (page === "workspaces") return <WorkspacesPage form={workspaceForm} scope={scope} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onWorkspaceForm} onRunAction={onRunAction} />;
   if (page === "users") return <UsersPage form={userForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onUserForm} onRunAction={onRunAction} />;
-  if (page === "templates") return <TemplatesPage form={templateForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onTemplateForm} onRunAction={onRunAction} />;
+  if (page === "templates") return <TemplatesPage snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onRunAction={onRunAction} />;
   if (page === "llm-profiles") return <LlmProfilesPage form={llmProfileForm} snapshot={snapshot} busyAction={busyAction} lastAction={lastAction} onForm={onLlmProfileForm} onRunAction={onRunAction} onRefresh={onRefresh} />;
   return <AuditPage snapshot={snapshot} session={session} lastAction={lastAction} onRefresh={onRefresh} />;
 }

@@ -28,11 +28,10 @@ import {
   type ChatMessage,
   type ConsoleStep,
   type DrawerKind,
-  type HarnessProfileDraft,
+  type HarnessBindingDraft,
   type PageId,
   type ProjectLoopContext,
   type ReviewStep,
-  type TemplateEvolutionForm,
   type TenantForm,
   type UserForm,
   type WorkspaceForm

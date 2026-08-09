@@ -35,12 +35,11 @@ import {
   type ChatMessage,
   type ConsoleStep,
   type DrawerKind,
-  type HarnessProfileDraft,
+  type HarnessBindingDraft,
   type LlmProfileForm,
   type PageId,
   type ProjectLoopContext,
   type ReviewStep,
-  type TemplateEvolutionForm,
   type TenantForm,
   type UserForm,
   type WorkspaceForm
@@ -71,7 +70,7 @@ export function useAgentConsoleController() {
       : undefined
   );
   const [messages, setMessages] = useState<ChatMessage[]>(() => initialMessages(initialStep));
-  const [profileDraft, setProfileDraft] = useState<HarnessProfileDraft | undefined>(() => demoMode ? defaultDraft(defaultContext) : undefined);
+  const [profileDraft, setProfileDraft] = useState<HarnessBindingDraft | undefined>(() => demoMode ? defaultDraft(defaultContext) : undefined);
   const [reviewSteps, setReviewSteps] = useState<ReviewStep[]>([]);
   const [lastAction, setLastAction] = useState<DashboardActionResult | undefined>();
   const [busyAction, setBusyAction] = useState<string | undefined>();
@@ -98,13 +97,6 @@ export function useAgentConsoleController() {
     role: "operator",
     password: "",
     status: "ACTIVE"
-  });
-  const [templateForm, setTemplateForm] = useState<TemplateEvolutionForm>({
-    baseTemplateId: "python-enterprise-harness",
-    targetVersion: "",
-    intent: "Evolve domain HarnessTemplate coverage from historical projects, production logs, attachments, and EvoPilot loop history.",
-    sourceType: "source-project",
-    sourceUri: "registered-project-or-source-project-path"
   });
   const [llmProfileForm, setLlmProfileForm] = useState<LlmProfileForm>({
     profileId: "workspace-glm-52",
@@ -301,7 +293,7 @@ export function useAgentConsoleController() {
       role: "agent",
       title: "EvoPilot",
       text: checklist.ok
-        ? "项目上下文已解析。EvoPilot 将基于项目上下文和 goal loop target 自动匹配 HarnessTemplate。"
+        ? "项目上下文已解析。EvoPilot 会在 goal plan 阶段从已发布 Catalog 自动绑定 selectedHarness。"
         : `项目接入检查被阻塞：${checklist.nextAction ?? checklist.error ?? checklist.status}`,
       card: checklist.ok ? "template" : "api"
     });
@@ -311,80 +303,22 @@ export function useAgentConsoleController() {
       return;
     }
 
-    await generateHarnessDraft(nextContext);
+    await createGoalAndPlan(nextContext.projectId || projectIdFromRepository(nextContext.repositoryUrl));
   }
 
   async function generateHarnessDraft(baseContext = context, changeText?: string) {
-    if (!scope.token) {
-      setDrawer("session");
-      return;
-    }
-    const projectId = baseContext.projectId || projectIdFromRepository(baseContext.repositoryUrl);
-    if (!projectId) return;
     setConsoleStep("drafting");
     appendMessage({
       role: "agent",
       title: "EvoPilot",
-      text: "正在生成 ProjectHarnessProfile。当前草案会继承公共模板和租户策略，并补齐项目级实现映射。",
+      text: "正在重新生成 goal plan。EvoPilot 会重新读取已发布 Catalog 并绑定 selectedHarness。",
       card: "drafting"
     });
-
-    const generated = await runAction({
-      id: "generate-harness-profile",
-      label: "Generate ProjectHarnessProfile Draft",
-      method: "POST",
-      path: apiSurface.projectHarnessProfileGenerate(projectId),
-      body: {
-        profileId: baseContext.profileId || "default",
-        templateId: baseContext.templateId || undefined,
-        goalLoopTarget: changeText ? `${baseContext.goalLoopTarget}\n\nOwner requested change:\n${changeText}` : baseContext.goalLoopTarget,
-        llmProfileId: baseContext.llmProfileId || undefined
-      }
-    });
-
-    const draft = extractHarnessDraft(generated.data);
-    setReviewSteps((current) => [
-      ...current,
-      {
-        id: "generate-harness-profile",
-        label: "ProjectHarnessProfile Draft",
-        status: generated.ok ? "REVIEW" : "BLOCKED",
-        detail: generated.ok
-          ? "DRAFT generated. Show sourceContent, compiledContent, validation, diff, digests, policyRefs, and generatedBy before activation."
-          : generated.error ?? "Could not generate harness profile.",
-        requestId: generated.requestId,
-        result: generated
-      }
-    ]);
-
-    if (!generated.ok || !draft) {
-      setDrawer("api");
-      appendMessage({
-        role: "agent",
-        title: "EvoPilot",
-        text: `ProjectHarnessProfile 生成失败：${generated.nextAction ?? generated.error ?? generated.status}`,
-        card: "api"
-      });
-      return;
-    }
-
-    setProfileDraft(draft);
     updateContext({
       ...baseContext,
-      projectId,
-      profileId: draft.profileId,
-      profileVersion: draft.version ? String(draft.version) : baseContext.profileVersion
+      goalLoopTarget: changeText ? `${baseContext.goalLoopTarget}\n\nOwner requested change:\n${changeText}` : baseContext.goalLoopTarget
     });
-    setConsoleStep(changeText ? "changes" : "review");
-    setDrawer(changeText ? "diff" : "review");
-    appendMessage({
-      role: "agent",
-      title: "EvoPilot",
-      text: changeText
-        ? "已根据用户修改请求生成新的 ProjectHarnessProfile DRAFT。请检查差异后再确认。"
-        : "Review Pack 已生成。请检查 ProjectHarnessProfile.yaml，确认前不会激活。",
-      card: changeText ? "diff" : "review"
-    });
+    await createGoalAndPlan(baseContext.projectId || projectIdFromRepository(baseContext.repositoryUrl), Boolean(changeText));
   }
 
   async function requestProfileChanges() {
@@ -409,49 +343,17 @@ export function useAgentConsoleController() {
       setDrawer("session");
       return;
     }
-    const projectId = context.projectId || projectIdFromRepository(context.repositoryUrl);
-    const profileId = profileDraft?.profileId || context.profileId || "default";
-    const version = Number(profileDraft?.version ?? context.profileVersion);
-    if (!projectId || !profileId) return;
-
-    const activated = await runAction({
-      id: "activate-harness-profile",
-      label: "Activate Reviewed ProjectHarnessProfile",
-      method: "POST",
-      path: apiSurface.projectHarnessProfileActivate(projectId, profileId),
-      body: { version: Number.isFinite(version) && version > 0 ? version : undefined }
-    });
-
-    setReviewSteps((current) => [
-      ...current,
-      {
-        id: "activate-harness-profile",
-        label: "Harness Activation",
-        status: activated.ok ? "DONE" : "BLOCKED",
-        detail: activated.ok ? "Reviewed ProjectHarnessProfile activated." : activated.error ?? "Activation failed.",
-        requestId: activated.requestId,
-        result: activated
-      }
-    ]);
-
-    if (!activated.ok) {
-      setDrawer("api");
-      return;
-    }
-
     setConsoleStep("activated");
     setDrawer(undefined);
     appendMessage({
       role: "agent",
       title: "EvoPilot",
-      text: "ProjectHarnessProfile 已激活。下一步会创建或读取 goal，并生成绑定 active harness 的 phase plan。",
+      text: "selectedHarness 和 phase plan 已完成人工确认。下一步需要填写真实 confirmedBy 与 confirmation 后批准计划。",
       card: "activated"
     });
-
-    await createGoalAndPlan(projectId);
   }
 
-  async function createGoalAndPlan(projectId: string) {
+  async function createGoalAndPlan(projectId: string, changeText = false) {
     let goalId = context.goalId;
     if (!goalId) {
       const created = await runAction({
@@ -492,19 +394,41 @@ export function useAgentConsoleController() {
       path: apiSurface.goalPlan(goalId),
       body: {}
     });
+    const binding = extractHarnessDraft(plan.data);
+    if (binding) setProfileDraft(binding);
     setReviewSteps((current) => [
       ...current,
       {
         id: "plan-goal",
-        label: "Phase Plan",
+        label: "Phase Plan selectedHarness",
         status: plan.ok ? "REVIEW" : "BLOCKED",
         detail: plan.ok
-          ? "Alpha/Beta/RC/GA phase plan generated. Show projectHarness binding before approval."
+          ? "Alpha/Beta/RC/GA phase plan generated. Show selectedHarness binding before approval."
           : plan.error ?? "Goal plan failed.",
         requestId: plan.requestId,
         result: plan
       }
     ]);
+    if (!plan.ok || !binding) {
+      setDrawer("api");
+      appendMessage({
+        role: "agent",
+        title: "EvoPilot",
+        text: `Goal plan 生成失败或缺少 selectedHarness：${plan.nextAction ?? plan.error ?? plan.status}`,
+        card: "api"
+      });
+      return;
+    }
+    setConsoleStep(changeText ? "changes" : "review");
+    setDrawer(changeText ? "diff" : "review");
+    appendMessage({
+      role: "agent",
+      title: "EvoPilot",
+      text: changeText
+        ? "已重新生成计划并更新 selectedHarness 绑定。请检查差异后再确认。"
+        : "Review Pack 已生成。请检查 selectedHarness、Catalog digest、entry digest 和 phase plan 后再确认。",
+      card: changeText ? "diff" : "review"
+    });
   }
 
   async function approvePlanAndAdvance() {
@@ -632,7 +556,6 @@ export function useAgentConsoleController() {
     session,
     signedIn,
     stages,
-    templateForm,
     tenantForm,
     userForm,
     workspaceForm,
@@ -650,7 +573,6 @@ export function useAgentConsoleController() {
     setLlmProfileForm,
     setOwnerChange,
     setPasswordForm,
-    setTemplateForm,
     setTenantForm,
     setUserForm,
     setWorkspaceForm,

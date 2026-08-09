@@ -22,7 +22,7 @@ body:
       options:
         - Agent Console UI
         - Project intake
-        - ProjectHarnessProfile review
+        - selectedHarness review
         - Loop execution
         - Evidence Drawer
         - API compatibility

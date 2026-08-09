@@ -2,7 +2,7 @@
 
 > WorkBuddy-readable browser flows that must produce the same EvoPilot server effects as CLI operation.
 
-## Scenario 1: First-Time GitHub/GitLab Project To Harness Review
+## Scenario 1: First-Time GitHub/GitLab Project To selectedHarness Review
 
 Use when an administrator-provisioned user gives a GitHub or GitLab repository and a business goal loop target.
 
@@ -14,23 +14,23 @@ Use when an administrator-provisioned user gives a GitHub or GitLab repository a
 4. Enter the GitHub/GitLab repository URL.
 5. Enter goal loop target.
 6. Click **Start intake**.
-7. Wait for EvoPilot to automatically match the `HarnessTemplate`.
-8. Wait for the `ProjectHarnessProfile.yaml` DRAFT.
-9. Stop and show the DRAFT profile source/compiled content, validation, diff, digests, policy refs, generatedBy evidence, and request ID to the project owner.
+7. Wait for EvoPilot to automatically match the `Harness`.
+8. Wait for the `selectedHarness.yaml` plan binding.
+9. Stop and show the selectedHarness id/version/catalog/entry digests, phase-plan summary, blockers, generatedBy evidence, and request ID to the project owner.
 
 ### CLI-equivalent
 
 ```text
 project onboard plan
-harness profile generate
+target plan or goal plan
 # STOP for owner review
 ```
 
 ### WorkBuddy deviation guard
 
-Do not click **Confirm**, approve a phase plan, or start a loop until the user accepts the visible DRAFT.
+Do not click **Confirm**, approve a phase plan, or start a loop until the user accepts the visible selectedHarness binding and phase plan.
 
-Do not ask the ordinary user to choose a public `HarnessTemplate`; EvoPilot owns template matching from project context, policy, history when present, and the goal loop target.
+Do not ask the ordinary user to choose a public `Harness`; EvoPilot owns template matching from project context, policy, history when present, and the goal loop target.
 
 ## Scenario 2: User Requests Harness Changes
 
@@ -38,36 +38,33 @@ Do not ask the ordinary user to choose a public `HarnessTemplate`; EvoPilot owns
 
 1. Type the requested change in the composer.
 2. Click **Request changes**.
-3. Wait for a revised DRAFT and diff evidence.
-4. Show the revised `ProjectHarnessProfile.yaml` again.
+3. Wait for a regenerated plan and selectedHarness evidence.
+4. Show the revised `selectedHarness.yaml` again.
 
 ### CLI-equivalent
 
 ```text
-harness profile validate
-harness profile diff
-harness profile apply
+target plan or goal plan
 # STOP for owner review
 ```
 
 ### WorkBuddy deviation guard
 
-Do not treat local browser text as active configuration. Only EvoPilot-returned DRAFTs can be reviewed and activated.
+Do not treat local browser text as active configuration. Only EvoPilot-returned goal plans can be reviewed and approved.
 
 ## Scenario 3: User Accepts The Harness And Plan
 
 ### Browser Flow
 
-1. Click **Confirm** only after the owner accepts the `ProjectHarnessProfile.yaml`.
-2. Verify activation succeeded or stop on blocker.
-3. Review the generated phase plan and project harness binding.
+1. Click **Confirm** only after the owner accepts the `selectedHarness.yaml`.
+2. Review the generated phase plan and selectedHarness binding.
+3. Stop on missing selectedHarness, blocker, or stale plan evidence.
 4. Fill real `Confirmed By` and `Confirmation`.
 5. Click **Approve plan & start loop**.
 
 ### CLI-equivalent
 
 ```text
-harness profile activate
 target plan or goal plan
 target plan approve or goal approve-plan
 goal advance
@@ -75,7 +72,7 @@ goal advance
 
 ### Stop conditions
 
-Stop on stale policy, missing active harness binding, missing confirmation, `nextAction`, `BLOCKED`, `FAILED`, `NO-GO`, or missing evidence.
+Stop on stale policy, missing selectedHarness binding, missing confirmation, `nextAction`, `BLOCKED`, `FAILED`, `NO-GO`, or missing evidence.
 
 ## Scenario 4: Blocker Repair
 
@@ -138,28 +135,27 @@ audit list
 
 Do not create cross-tenant users from an ordinary operator session. Stop on `403`, missing role, missing tenant/workspace id, or server `nextAction`.
 
-## Scenario 7: Platform Admin Starts Harness Template Evolution
+## Scenario 7: Platform Admin Reviews Harness Hub
 
-Use when an administrator wants to evolve a public HarnessTemplate knowledge pack from historical projects, project corpora, attachments, production logs, EvoPilot goal/loop history, and existing evidence without manually editing server state.
+Use when an administrator wants to see which published Harness Catalogs and domain Harness experts EvoPilot can read.
 
 ### Browser Flow
 
 1. Log in as a platform administrator.
 2. Open **Harness Hub**.
-3. Review existing template versions returned by EvoPilot.
-4. Fill base template, target version, intent, source type, and source value. Source type may be `source-project`, `source-corpus`, `production-log`, `evopilot-history`, `attachment`, `github-repo`, `gitlab-repo`, `web-url`, `local-pack`, `existing-template`, `runtime-evidence`, or `admin-note`.
-5. Click **创建 evolution draft**.
-6. Review the Harness Knowledge Factory table for `sourceTypes`, `domainSignals`, `gapClassifications`, status, and target version.
-7. Open evidence or audit and report `evolutionId`, requestId, status, and nextAction when returned.
+3. Review published Catalog rows returned by EvoPilot.
+4. Inspect a Catalog when a row includes an inspect action.
+5. Review domain Harness experts, source types, versions, compatibility, entry paths, and digests.
+6. If the needed Harness is missing or stale, leave Dashboard and use `evopilot-harness` to evolve, approve, and publish a usable Harness.
 
 ### CLI-equivalent
 
 ```text
-harness template evolution create
-harness template evolution advance
-# STOP before approve/publish until source coverage, generated pack, validation, diff, and project impact are shown
+GET /api/v1/harness/catalogs
+GET /api/v1/harness/catalogs/{catalogId}
+# Harness lifecycle commands live in evopilot-harness, not Dashboard or EvoPilot CLI.
 ```
 
 ### WorkBuddy deviation guard
 
-Do not approve or publish a template evolution from Dashboard unless EvoPilot exposes that gate and the administrator has reviewed source coverage, redaction status, generated pack, validation, diff, changelog, gap classifications, and project impact.
+Do not claim Dashboard created, approved, published, or evolved a Harness. Harness Hub is a read-only expert market over EvoPilot Catalog projections.

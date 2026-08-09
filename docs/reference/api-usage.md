@@ -1,6 +1,6 @@
 # API Usage
 
-Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into components. Components call typed adapter helpers and receive normalized `ApiResult` or `DashboardActionResult` values.
+Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into components. Components call adapter helpers and receive normalized `ApiResult` or `DashboardActionResult` values.
 
 ## Agent Console API Map
 
@@ -12,11 +12,8 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Locked scope projections | headers `X-EvoPilot-Tenant`, `X-EvoPilot-Workspace`, `X-EvoPilot-Actor` |
 | Project intake | `POST /api/v1/onboarding/project/checklist` |
 | Project LLM usage | `GET /api/v1/projects/{projectId}/usage` |
-| Harness draft | `POST /api/v1/projects/{projectId}/harness-profiles/generate` |
-| Harness profile list/read | `GET /api/v1/projects/{projectId}/harness-profiles`, `GET /api/v1/projects/{projectId}/harness-profiles/{profileId}` |
-| Harness activation | `POST /api/v1/projects/{projectId}/harness-profiles/{profileId}/activate` |
 | Goal create | `POST /api/v1/goals` |
-| Goal plan | `POST /api/v1/goals/{goalId}/plan` |
+| Goal plan with selectedHarness | `POST /api/v1/goals/{goalId}/plan` |
 | Phase-plan approval | `POST /api/v1/goals/{goalId}/approve-plan` |
 | Loop advance | `POST /api/v1/goals/{goalId}/advance` |
 | Goal projections | `GET /api/v1/goals/{goalId}/run-status`, `phase-plan`, `phase-packages`, `target-packages`, `snapshot`, `evidence-matrix`, `final-report` |
@@ -25,14 +22,12 @@ Dashboard uses `src/api.ts` as its HTTP adapter. Do not copy OpenAPI schema into
 | Tenants | `GET /api/v1/tenants`, `POST /api/v1/tenants` |
 | Workspaces | `GET /api/v1/workspaces`, `POST /api/v1/workspaces`, `GET /api/v1/workspaces/{workspaceId}/usage` |
 | Users | `GET /api/v1/users`, `POST /api/v1/users` |
-| Harness Catalogs | `GET /api/v1/harness/catalogs`, `POST /api/v1/harness/catalogs`, `POST /api/v1/harness/catalogs/{catalogId}/scan` |
-| Harness template evolution | `GET /api/v1/harness/template-evolutions`, `POST /api/v1/harness/template-evolutions` |
-| Harness templates and policies | `GET /api/v1/harness/templates`, `GET /api/v1/harness/policies` |
+| Harness Catalogs | `GET /api/v1/harness/catalogs`, `GET /api/v1/harness/catalogs/{catalogId}` |
 | LLM profiles | `GET /api/v1/llm-profiles`, `POST /api/v1/llm-profiles`, `POST /api/v1/llm-profiles/{profileId}/preflight` |
 | Project LLM default | `GET /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm`, `POST /api/v1/projects/{projectId}/llm/preflight` |
 | Audit | `GET /api/v1/audit` |
 
-The Harness Hub page renders Catalog mounts from `GET /api/v1/harness/catalogs`, available Harness definitions from `GET /api/v1/harness/templates`, and EvoPilot's Harness Knowledge Factory projection from `GET /api/v1/harness/template-evolutions`. It displays Catalog status/digests, domain Harness experts, connector source types, `sourceTypes`, `domainSignals`, `gapClassifications`, target template/version, status, and next action when returned. Catalog mounting and scanning go through EvoPilot API; file extraction, log redaction, snapshots, draft generation, approval, publish, impact, and `CATALOG.md` parsing remain EvoPilot server responsibilities.
+The Harness Hub page is read-only. It renders configured Catalog directories from `GET /api/v1/harness/catalogs` and inspects one Catalog through `GET /api/v1/harness/catalogs/{catalogId}`. Catalog growth, Harness lifecycle, source-project evolution, attachment ingestion, production-log redaction, approval, and publication are handled by `evopilot-harness`, not Dashboard.
 
 ## Projection Context
 
@@ -68,7 +63,13 @@ Every mutating action should surface:
 - schema
 - `nextAction`
 - blockers
-- profile digests or release evidence digests when returned
+- `selectedHarness.harnessId`
+- `selectedHarness.version`
+- `selectedHarness.catalogId`
+- `selectedHarness.catalogDigest`
+- `selectedHarness.entryPath`
+- `selectedHarness.entryDigest`
+- release evidence digests when returned
 
 The **Evidence Drawer** is the UI place for these fields.
 
@@ -80,8 +81,8 @@ Workspace usage and project LLM usage are server projections. Dashboard displays
 |---|---|
 | `# Agent Console` | ordinary project owner/operator flow |
 | `Tenants`, `Workspaces`, `Users` | platform or tenant administration through EvoPilot RBAC |
-| `Harness Hub` | administrator template evolution lifecycle, not direct project harness activation |
+| `Harness Hub` | read-only view of published Harness Catalogs and domain experts |
 | `LLM Profiles` | workspace profile registration for project defaults and user profile registration for run overrides |
 | `Audit` | current authorized audit scope |
 
-Dashboard never mutates local EvoPilot files and never calls CLI commands. CLI and Dashboard remain separate adapters over the same EvoPilot server state.
+Dashboard never mutates local EvoPilot files, never calls CLI commands, and never manages Harness lifecycle. CLI and Dashboard remain separate adapters over EvoPilot server state, while Harness lifecycle is owned by `evopilot-harness`.

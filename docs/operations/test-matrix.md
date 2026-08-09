@@ -27,7 +27,7 @@ Use `npx playwright install --with-deps chromium` in Linux CI.
 - All nine demo stages through `?demo=1&step=1` to `?demo=1&step=9`.
 - Login through `/api/v1/auth/login` with a mocked EvoPilot response.
 - Protected project intake through `/api/v1/onboarding/project/checklist`.
-- `ProjectHarnessProfile` draft generation through `/api/v1/projects/{projectId}/harness-profiles/generate`.
+- goal creation and `selectedHarness` plan binding through `/api/v1/goals` and `/api/v1/goals/{goalId}/plan`.
 - Governed preflight blockers where the API returns `409`, `requestId`, `nextAction`, and `blockers`.
 
 The mock API fixture is intentionally server-shaped, not product logic. It exists to prove the Dashboard preserves EvoPilot stop rules and evidence fields in the browser.

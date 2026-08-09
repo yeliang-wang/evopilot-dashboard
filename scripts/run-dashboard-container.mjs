@@ -124,7 +124,7 @@ docker compose up -d
 - Docker network: ${args.network || "default"}
 - Image: ${args.image}
 
-Dashboard remains a browser HTTP client. EvoPilot API is the system of record for auth, tenant/workspace scope, projects, harness profiles, loops, evidence, audit, release decisions, and credentials.
+Dashboard remains a browser HTTP client. EvoPilot API is the system of record for auth, tenant/workspace scope, projects, harness bindings, loops, evidence, audit, release decisions, and credentials.
 `;
 }
 

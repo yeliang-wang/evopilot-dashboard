@@ -6,7 +6,7 @@
 
 | Role | Can Do | Must Not Do |
 |---|---|---|
-| Platform administrator | Create tenants, workspaces, users, HarnessTemplateEvolution drafts, and cross-tenant audit views. | Bypass release gates or publish template evolution without administrator review. |
+| Platform administrator | Create tenants, workspaces, users, Harness evolution drafts, and cross-tenant audit views. | Bypass release gates or publish template evolution without administrator review. |
 | Tenant administrator | Manage users and project setup inside tenant/workspace when EvoPilot grants the action. | Grant platform admin privileges. |
 | Workspace developer | Onboard projects and start or advance reviewed goal loops from `# Agent Console`. | Approve high-risk release gates without authority. |
 | Release owner | Review release decisions, approve release actions, repair failed release runs. | Change unrelated credentials or user roles. |

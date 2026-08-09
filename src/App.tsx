@@ -40,7 +40,6 @@ export default function App() {
     session,
     signedIn,
     stages,
-    templateForm,
     tenantForm,
     userForm,
     workspaceForm,
@@ -58,7 +57,6 @@ export default function App() {
     setLlmProfileForm,
     setOwnerChange,
     setPasswordForm,
-    setTemplateForm,
     setTenantForm,
     setUserForm,
     setWorkspaceForm,
@@ -197,12 +195,10 @@ export default function App() {
             tenantForm={tenantForm}
             workspaceForm={workspaceForm}
             userForm={userForm}
-            templateForm={templateForm}
             llmProfileForm={llmProfileForm}
             onTenantForm={setTenantForm}
             onWorkspaceForm={setWorkspaceForm}
             onUserForm={setUserForm}
-            onTemplateForm={setTemplateForm}
             onLlmProfileForm={setLlmProfileForm}
             onRunAction={(action) => void runManagementAction(action)}
             onRefresh={() => void refreshApiSnapshot()}

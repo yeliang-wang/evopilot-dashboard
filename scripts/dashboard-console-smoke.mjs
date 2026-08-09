@@ -40,7 +40,6 @@ if (!token) {
 
 await check("summary.authenticated", dashboardBaseUrl, "/api/v1/summary", { token, expectStatus: 200 });
 await check("harness.catalogs", dashboardBaseUrl, "/api/v1/harness/catalogs", { token, expectStatus: 200 });
-await check("harness.templates", dashboardBaseUrl, "/api/v1/harness/templates", { token, expectStatus: 200 });
 await check("projects.list", dashboardBaseUrl, "/api/v1/projects", { token, expectStatus: 200 });
 await check("goals.list", dashboardBaseUrl, "/api/v1/goals", { token, expectStatus: 200 });
 await check("release.targets", dashboardBaseUrl, "/api/v1/release/targets", { token, expectStatus: 200 });
@@ -53,7 +52,7 @@ if (mutating) {
   checks.push({
     id: "mutating-flow",
     status: "SKIP",
-    detail: "Set EVOPILOT_MUTATING_SMOKE=1 to create a temporary project, generate/activate a harness profile, and approve a goal plan."
+    detail: "Set EVOPILOT_MUTATING_SMOKE=1 to create a temporary project, plan a goal with selectedHarness, and approve the goal plan."
   });
 }
 
@@ -116,29 +115,6 @@ async function runMutatingSmoke() {
   });
   if (!project || ![201, 409].includes(project.httpStatus)) return;
 
-  const generated = await check("mutating.harness.generate", dashboardBaseUrl, `/api/v1/projects/${encodeURIComponent(smokeId)}/harness-profiles/generate`, {
-    method: "POST",
-    token,
-    timeoutMs: longTimeoutMs,
-    body: {
-      profileId: "default",
-      templateId: "python-enterprise-harness",
-      goalLoopTarget: "Define a production Python enterprise harness for dashboard smoke."
-    },
-    expectOneOfStatuses: [201, 409]
-  });
-  if (!generated || generated.status !== "PASS") return;
-  const profileId = generated.json?.data?.profile?.profileId ?? "default";
-  const profileVersion = generated.json?.data?.profile?.version ?? 1;
-
-  const activated = await check("mutating.harness.activate", dashboardBaseUrl, `/api/v1/projects/${encodeURIComponent(smokeId)}/harness-profiles/${encodeURIComponent(profileId)}/activate`, {
-    method: "POST",
-    token,
-    body: { version: profileVersion },
-    expectStatus: 200
-  });
-  if (!activated || activated.status !== "PASS") return;
-
   const goal = await check("mutating.goal.create", dashboardBaseUrl, "/api/v1/goals", {
     method: "POST",
     token,
@@ -162,13 +138,18 @@ async function runMutatingSmoke() {
     expectStatus: 201
   });
   if (!planned || planned.status !== "PASS") return;
+  const selectedHarness = planned.json?.data?.plan?.selectedHarness ?? planned.json?.data?.selectedHarness;
+  if (!selectedHarness?.harnessId) {
+    checks.push({ id: "mutating.goal.selectedHarness", status: "FAIL", detail: "Goal plan did not return data.plan.selectedHarness.harnessId." });
+    return;
+  }
 
   await check("mutating.goal.approve-plan", dashboardBaseUrl, `/api/v1/goals/${encodeURIComponent(goalId)}/approve-plan`, {
     method: "POST",
     token,
     body: {
       confirmedBy: "Dashboard Smoke Owner",
-      confirmation: "Dashboard smoke owner reviewed and approved the displayed Alpha/Beta/RC/GA phase plan."
+      confirmation: "Dashboard smoke owner reviewed selectedHarness and approved the displayed Alpha/Beta/RC/GA phase plan."
     },
     expectStatus: 200
   });

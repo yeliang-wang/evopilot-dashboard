@@ -8,6 +8,25 @@ Dashboard releases should focus on browser-operable EvoPilot workflows, API comp
 
 No unreleased changes yet.
 
+## 3.0.0 - 2026-08-09
+
+### Added
+
+- Added the v3 Harness Hub / 专家市场 read-only view for EvoPilot published Harness Catalogs, domain Harness experts, source types, available Harness entries, compatibility, entry paths, and digests.
+- Added Dashboard flow support for EvoPilot `goal plan` responses that carry `plan.selectedHarness` as the owner-review artifact before phase-plan approval.
+- Added mock API, browser E2E, visual, smoke, and static contract coverage for selectedHarness planning and read-only Catalog APIs.
+
+### Changed
+
+- Removed Dashboard calls to EvoPilot-owned Harness lifecycle and evolution endpoints. Dashboard no longer mounts, scans, imports, generates, activates, evolves, approves, or publishes Harness definitions.
+- Reframed `selectedHarness.yaml` as a goal-plan binding, not a mutable Dashboard-managed project harness profile.
+- Updated user, admin, AI Agent, operation, API, release, and governance docs for the EvoPilot v3 / `evopilot-harness` boundary.
+- Updated package version, installer default image tag, release notes, and governance checks to `3.0.0`.
+
+### Validation
+
+- Full release validation is required before publication: `npm run check`, `npm run test:browser`, `npm run release:artifact`, `npm run verify:release-artifact`, and `git diff --check`.
+
 ## 2.5.0 - 2026-08-09
 
 ### Added

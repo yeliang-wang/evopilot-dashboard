@@ -31,11 +31,10 @@ import {
   type ChatMessage,
   type ConsoleStep,
   type DrawerKind,
-  type HarnessProfileDraft,
+  type HarnessBindingDraft,
   type PageId,
   type ProjectLoopContext,
   type ReviewStep,
-  type TemplateEvolutionForm,
   type TenantForm,
   type UserForm,
   type WorkspaceForm
@@ -79,7 +78,7 @@ export function EvidenceDrawer({
   apiNotice: string;
   apiLoading: boolean;
   snapshot: Record<string, ApiResult>;
-  profileDraft: HarnessProfileDraft;
+  profileDraft: HarnessBindingDraft;
   lastAction?: DashboardActionResult;
   onLoginForm: (form: { username: string; password: string }) => void;
   onPasswordForm: (form: { currentPassword: string; newPassword: string }) => void;
@@ -161,7 +160,7 @@ export function EvidenceDrawer({
         <EvidenceRow label="source" value={`${sourceProvider} · ${context.repositoryUrl || "repository missing"} · branch=${context.defaultBranch || "main"}`} />
         <EvidenceRow label="CI/Loop" value={`${workflowProvider} · ${deliveryChainLabel(chain)} · ${workflowRepository}`} />
         <EvidenceRow label="LLM profile" value={context.llmProfileId || "not selected"} />
-        <EvidenceRow label="profileDraft" value={`${profileDraft.profileId}${profileDraft.version ? ` v${profileDraft.version}` : ""} · ${profileDraft.sourceDigest ?? "sourceDigest missing"}`} />
+        <EvidenceRow label="selectedHarness" value={`${profileDraft.profileId}${profileDraft.version ? ` v${profileDraft.version}` : ""} · ${profileDraft.sourceDigest ?? "entryDigest missing"}`} />
         <EvidenceRow label="compiledDigest" value={profileDraft.compiledDigest ?? "not returned"} />
         <EvidenceRow label="policyRefs" value={profileDraft.policyRefs.join(", ") || "none"} />
         <EvidenceRow label="generatedBy" value={profileDraft.generatedByEvidence.join("; ") || "not returned"} />
@@ -238,9 +237,9 @@ export function LogLine({ level, text }: { level: "INFO" | "WARN" | "ERROR"; tex
   );
 }
 
-export function fallbackProfileYaml(context: ProjectLoopContext, profileDraft: HarnessProfileDraft) {
+export function fallbackProfileYaml(context: ProjectLoopContext, profileDraft: HarnessBindingDraft) {
   return [
-    "projectHarnessProfile:",
+    "selectedHarness:",
     `  id: ${profileDraft.profileId}`,
     `  status: ${profileDraft.status ?? "DRAFT"}`,
     "  inherits:",

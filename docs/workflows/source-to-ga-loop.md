@@ -7,14 +7,14 @@
 - Project checklist is acceptable.
 - Source credential preflight has acceptable state.
 - DevOps boundary is explicit.
-- ProjectHarnessProfile DRAFT has been reviewed and activated.
+- selectedHarness binding has been reviewed in the goal plan.
 - Alpha/Beta/RC/GA phase plan has been reviewed and approved.
 
 ## Steps
 
 1. Open **# Agent Console**.
 2. Click **Start intake** to generate the review pack if needed.
-3. Activate the reviewed harness profile.
+3. Review the selectedHarness binding returned by the goal plan.
 4. Approve the reviewed phase plan.
 5. Click **Start Or Advance Loop**.
 6. Stay in **# Agent Console** and open **View evidence** when details are needed.
